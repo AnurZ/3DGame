@@ -4,206 +4,184 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
-    public float speed = 5f; // Player movement speed
-    public float maxSlope = 45f; // Maximum climbable slope angle in degrees
-    public float raycastDistance = 1.1f; // Distance to check for ground
-    public float snapDistance = 2f; // Distance to the tree to trigger snapping
-    public float chopDuration = 4f; // Duration for which chopping animation plays
+    public float speed = 5f;
+    public float maxSlope = 45f;
+    public float raycastDistance = 1.1f;
+    public float snapDistance = 2f;
+    public float chopDuration = 4f;
 
-    private Vector2 move; // Store movement input
-    private Animator animator; // Animator reference
-    private Rigidbody rb; // Rigidbody reference
+    private Vector2 move;
+    private Animator animator;
+    private Rigidbody rb;
 
-    private Vector3 moveDirection; // Final direction of movement
-    private TreeController nearbyTree; // Reference to the nearby tree for interaction
-    private bool isChopping = false; // Track whether the player is chopping
-    private float chopTimer = 0f; // Timer to control animation duration
+    private Vector3 moveDirection;
+    private TreeController nearbyTree;
+    private bool isChopping = false;
+    private float chopTimer = 0f;
 
-    // Start is called before the first frame update
     void Start()
     {
-        animator = GetComponent<Animator>(); // Get Animator component
-        rb = GetComponent<Rigidbody>(); // Get Rigidbody component
-
-        // Freeze all rotation to prevent spinning issues
+        animator = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody>();
         rb.constraints = RigidbodyConstraints.FreezeRotation;
-
-        // Optional: Smooth collision handling
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
     }
 
-    // Handle player movement input
     public void OnMove(InputAction.CallbackContext context)
     {
-        move = context.ReadValue<Vector2>(); // Get move input
+        move = context.ReadValue<Vector2>();
     }
 
-    // Handle chop action input (spacebar or mapped key)
     public void OnChop(InputAction.CallbackContext context)
     {
-        if (nearbyTree != null) // Ensure the nearby tree is not null
+        if (nearbyTree != null && context.performed && !isChopping)
         {
-            if (context.performed && !isChopping) // Button pressed and not already chopping
-            {
-                StartChopping();
-            }
-            else if (context.performed && isChopping) // Button pressed and already chopping
-            {
-                CancelChopping();
-            }
+            StartChopping();
         }
-        else
+        else if (context.performed && isChopping)
         {
-            Debug.LogWarning("No nearby tree to chop.");
+            CancelChopping();
         }
     }
 
-    // Start the chopping process
     private void StartChopping()
     {
-        isChopping = true; // Start chopping
-        chopTimer = chopDuration; // Set the chop duration
-        animator.SetBool("isChopping", true); // Start chopping animation
-        nearbyTree.StartChopping(); // Start tree shake effect
+        isChopping = true;
+        chopTimer = chopDuration;
+        animator.SetBool("isChopping", true);
+        nearbyTree.StartChopping();
     }
 
-    // Cancel the chopping process
     private void CancelChopping()
     {
-        isChopping = false; // Stop chopping
-        animator.SetBool("isChopping", false); // Stop chopping animation
-        nearbyTree.StopChopping(); // Stop tree shake effect
-        chopTimer = 0f; // Reset chop timer
+        isChopping = false;
+        animator.SetBool("isChopping", false);
+        nearbyTree.StopChopping();
+        chopTimer = 0f;
     }
 
-    // Update is called once per frame (for animations only)
     void Update()
     {
-        UpdateAnimations(); // Handle walking animations
+        UpdateAnimations();
 
         if (isChopping)
         {
-            chopTimer -= Time.deltaTime; // Decrease the timer
+            chopTimer -= Time.deltaTime;
             if (chopTimer <= 0f)
             {
-                CancelChopping(); // Stop chopping when time is up
+                CancelChopping();
             }
-
-            SnapToTree(); // Continuously check for snapping to tree during chopping
+            SnapToTree();
         }
     }
 
-    // FixedUpdate for physics-based movement
     void FixedUpdate()
     {
-        if (!isChopping) // Only handle movement if not chopping
+        if (!isChopping)
         {
-            MovePlayer(); // Handle player physics movement
+            MovePlayer();
         }
     }
 
-    // Player movement with slope limit and ground check
     private void MovePlayer()
     {
         Vector3 inputDirection = new Vector3(move.x, 0f, move.y).normalized;
 
         if (inputDirection != Vector3.zero)
         {
-            // Raycast to detect ground and get normal
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position + Vector3.up * 0.1f, Vector3.down, out hit, raycastDistance))
-            {
-                Vector3 groundNormal = hit.normal;
-                float slopeAngle = Vector3.Angle(groundNormal, Vector3.up);
+            // Calculate the next position
+            Vector3 nextPosition = transform.position + inputDirection * speed * Time.deltaTime;
 
-                // Check if slope is acceptable
-                if (slopeAngle <= maxSlope)
+            // Raycast to check if the next position is valid
+            RaycastHit hit;
+            if (Physics.Raycast(nextPosition + Vector3.up * 0.1f, Vector3.down, out hit, raycastDistance))
+            {
+                // Check if the slope is walkable
+                if (Vector3.Angle(hit.normal, Vector3.up) <= maxSlope)
                 {
-                    moveDirection = inputDirection * speed; // Apply movement
+                    // Check if the next position's Y is greater than or equal to 0
+                    if (hit.point.y >= 0f)  // Prevent movement into any ground with y < 0
+                    {
+                        // Allow movement to the next position
+                        moveDirection = inputDirection * speed;
+                    }
+                    else
+                    {
+                        // Prevent movement if the ground is below 0
+                        moveDirection = Vector3.zero;
+                    }
                 }
                 else
                 {
-                    moveDirection = Vector3.zero; // Too steep, prevent moving
+                    // Prevent movement if the slope is too steep
+                    moveDirection = Vector3.zero;
                 }
             }
             else
             {
-                moveDirection = Vector3.zero; // No ground detected (airborne)
+                // No ground detected below, prevent movement
+                moveDirection = Vector3.zero;
             }
 
-            // Smoothly rotate player toward movement direction
+            // Apply rotation towards the movement direction
             Quaternion targetRotation = Quaternion.LookRotation(inputDirection);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 0.15f);
         }
         else
         {
-            moveDirection = Vector3.zero; // No input = no movement
+            moveDirection = Vector3.zero;
         }
 
-        // Check if grounded before applying movement
+        // Grounded check
         bool isGrounded = Physics.Raycast(transform.position + Vector3.up * 0.1f, Vector3.down, raycastDistance);
 
         if (isGrounded)
         {
-            // Keep Y velocity from gravity but move on X and Z
+            // Apply movement if grounded
             Vector3 velocity = new Vector3(moveDirection.x, rb.linearVelocity.y, moveDirection.z);
             rb.linearVelocity = velocity;
         }
         else
         {
-            // Falling, keep Y velocity only
+            // Prevent downward movement if not grounded
             rb.linearVelocity = new Vector3(0, rb.linearVelocity.y, 0);
         }
     }
 
-    // Handle animation state updates
     private void UpdateAnimations()
     {
-        bool isWalking = move != Vector2.zero;
-        animator.SetBool("IsWalking", isWalking); // Update walking animation state
+        animator.SetBool("IsWalking", move != Vector2.zero);
     }
 
-    // Check for tree interaction and store nearby tree reference
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Tree")) // Tree tagged as "Tree"
+        if (other.CompareTag("Tree"))
         {
-            nearbyTree = other.GetComponent<TreeController>(); // Cache tree reference
-            Debug.Log("Tree detected");
-            nearbyTree.StartHighlighting(); // Start highlighting the tree
+            nearbyTree = other.GetComponent<TreeController>();
+            nearbyTree.StartHighlighting();
         }
     }
 
     void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Tree"))
+        if (other.CompareTag("Tree") && nearbyTree != null && other.gameObject == nearbyTree.gameObject)
         {
-            if (nearbyTree != null && other.gameObject == nearbyTree.gameObject)
-            {
-                nearbyTree.StopHighlighting(); // Stop highlighting when leaving the tree area
-                nearbyTree.StopChopping(); // Stop shaking when leaving the tree area
-                nearbyTree = null; // Remove reference when leaving tree trigger
-                Debug.Log("Left tree area");
-            }
+            nearbyTree.StopHighlighting();
+            nearbyTree.StopChopping();
+            nearbyTree = null;
         }
     }
 
-    // Snap the player to the tree's direction only when close and pressing space
     private void SnapToTree()
     {
         if (nearbyTree != null)
         {
-            // Check if the player is within snap distance of the tree
             float distanceToTree = Vector3.Distance(transform.position, nearbyTree.transform.position);
-            
             if (distanceToTree <= snapDistance)
             {
-                // If within range, always snap to the tree direction
-                Vector3 directionToTree = (nearbyTree.transform.position - transform.position).normalized; // Direction to tree
-                Quaternion targetRotation = Quaternion.LookRotation(directionToTree); // Target rotation to face the tree
-
-                // Smoothly rotate player to the tree's direction
+                Vector3 directionToTree = (nearbyTree.transform.position - transform.position).normalized;
+                Quaternion targetRotation = Quaternion.LookRotation(directionToTree);
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 0.1f);
             }
         }

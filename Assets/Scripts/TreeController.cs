@@ -9,15 +9,24 @@ public class TreeController : MonoBehaviour
     private bool isShaking = false;
     private Quaternion originalRotation;
     private Vector3 originalPosition;
-    public float shakeAmount = 0.1f; // Shake intensity
-    public float shakeSpeed = 10f; // Speed of shaking
+
+    [Header("Shake Settings")]
+    public float shakeAmount = 0.1f;
+    public float shakeSpeed = 10f;
+
+    [Header("Drop Settings")]
+    public GameObject dropPrefab;
+    public Transform dropSpawnPoint;
+
+    [Header("Chop Settings")]
+    public float baseChopTime = 4f;
 
     private float shakeTime = 0f;
 
     void Start()
     {
         rend = GetComponent<Renderer>();
-        defaultMaterial = rend.material;
+        defaultMaterial = rend.sharedMaterial;
         originalRotation = transform.rotation;
         originalPosition = transform.position;
     }
@@ -26,11 +35,10 @@ public class TreeController : MonoBehaviour
     {
         if (isShaking)
         {
-            ShakeTree(); // Shake when chopping
+            ShakeTree();
         }
         else
         {
-            // Smoothly reset rotation and position
             transform.rotation = Quaternion.Slerp(transform.rotation, originalRotation, Time.deltaTime * 5f);
             transform.position = Vector3.Lerp(transform.position, originalPosition, Time.deltaTime * 5f);
         }
@@ -40,35 +48,68 @@ public class TreeController : MonoBehaviour
     {
         if (highlightMaterial != null)
         {
-            rend.material = highlightMaterial; // Highlight tree when near
+            rend.sharedMaterial = highlightMaterial;
         }
     }
 
     public void StopHighlighting()
     {
-        if (highlightMaterial != null)
+        if (defaultMaterial != null)
         {
-            rend.material = defaultMaterial; // Revert highlight when leaving
+            rend.sharedMaterial = defaultMaterial;
         }
     }
 
     public void StartChopping()
     {
-        isShaking = true; // Start shaking when chopping
+        isShaking = true;
     }
 
     public void StopChopping()
     {
-        isShaking = false; // Stop shaking when chopping stops
+        isShaking = false;
+    }
+
+    public void FinishChopping()
+    {
+        isShaking = false;
+
+        if (dropPrefab != null)
+        {
+            Vector3 spawnPosition = dropSpawnPoint != null ? dropSpawnPoint.position : transform.position + Vector3.up * 1f;
+            Instantiate(dropPrefab, spawnPosition, Quaternion.identity);
+        }
+
+        Destroy(gameObject, 0.2f);
+    }
+
+    public float GetChopDuration()
+    {
+        return baseChopTime;
     }
 
     void ShakeTree()
     {
         shakeTime += Time.deltaTime * shakeSpeed;
-        float shakeOffset = Mathf.Sin(shakeTime) * shakeAmount; // Shake value based on sine wave for smooth oscillation
+        float shakeOffset = Mathf.Sin(shakeTime) * shakeAmount;
 
-        // Apply shake to tree's rotation and position
         transform.rotation = originalRotation * Quaternion.Euler(0, 0, shakeOffset);
-        transform.position = originalPosition + new Vector3(shakeOffset * 0.1f, 0, 0); // Small movement to simulate shaking
+        transform.position = originalPosition + new Vector3(shakeOffset * 0.1f, 0, 0);
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            StartHighlighting();
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            StopHighlighting();
+        }
     }
 }

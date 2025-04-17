@@ -40,7 +40,14 @@ Material:
     m_Floats:
     - _QueueControl: 0
     - _QueueOffset: 0
-    m_Colors: []
+    m_Colors:
+    - _basecolor: {r: 0.042452775, g: 0.5779036, b: 1, a: 0}
+    - _heightfrequency: {r: 0, g: 0, b: 0, a: 0}
+    - _ripplecolor: {r: 0, g: 3.245478, b: 4.584609, a: 0}
+    - _rippledencity: {r: 20, g: 20, b: 0, a: 0}
+    - _ripplespeed: {r: 10, g: 10, b: 0, a: 0}
+    - _slimmness: {r: 5, g: 5, b: 0, a: 0}
+    - _tilingandoffset: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &5667478831835792163

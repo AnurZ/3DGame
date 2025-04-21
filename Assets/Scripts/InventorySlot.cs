@@ -16,13 +16,28 @@ public class InventorySlot : MonoBehaviour, IDropHandler
     
     public void Select()
     {
-        image.color = selectedColor;
+        if (image != null)
+        {
+            image.color = selectedColor;
+        }
+        else
+        {
+            Debug.LogWarning($"Image reference is missing on {gameObject.name}");
+        }
     }
 
     public void Deselect()
     {
-        image.color = notSelectedColor;
+        if (image != null)
+        {
+            image.color = notSelectedColor;
+        }
+        else
+        {
+            Debug.LogWarning($"Image reference is missing on {gameObject.name}");
+        }
     }
+
     
     public void OnDrop(PointerEventData eventData)
     {

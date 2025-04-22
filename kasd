@@ -1,0 +1,136 @@
+[1mdiff --git a/Assets/Scripts/PlayerController.cs b/Assets/Scripts/PlayerController.cs[m
+[1mindex f7e060a..177bd7a 100644[m
+[1m--- a/Assets/Scripts/PlayerController.cs[m
+[1m+++ b/Assets/Scripts/PlayerController.cs[m
+[36m@@ -11,10 +11,17 @@[m [mpublic class PlayerController : MonoBehaviour[m
+     private Animator animator;[m
+     private Rigidbody rb;[m
+     private TreeController nearbyTree;[m
+[32m+[m[32m    private bool canSleep = false;[m
+[32m+[m[32m    private DayNightCycle dayNightCycle;[m
+[32m+[m[41m    [m
+[32m+[m[32m    public GameObject sleepPromptPrefab;[m[41m [m
+[32m+[m[32m    private GameObject activePrompt;[m[41m      [m
+[32m+[m
+[32m+[m[41m    [m
+     public bool isChopping = false;[m
+     private float chopTimer = 0f;[m
+     private InventoryManager inventoryManager;[m
+[31m-    [m
+[32m+[m
+     void Start()[m
+     {[m
+         animator = GetComponent<Animator>();[m
+[36m@@ -22,8 +29,9 @@[m [mpublic class PlayerController : MonoBehaviour[m
+         rb.constraints = RigidbodyConstraints.FreezeRotation;[m
+         rb.interpolation = RigidbodyInterpolation.Interpolate;[m
+         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;[m
+[31m-        [m
+[32m+[m
+         inventoryManager = FindObjectOfType<InventoryManager>();[m
+[32m+[m[32m        dayNightCycle = FindObjectOfType<DayNightCycle>();[m
+     }[m
+ [m
+     public void OnMove(InputAction.CallbackContext context)[m
+[36m@@ -52,23 +60,18 @@[m [mpublic class PlayerController : MonoBehaviour[m
+             }[m
+         }[m
+     }[m
+[31m-    [m
+[32m+[m
+     private bool IsHoldingAxe()[m
+     {[m
+         if (inventoryManager == null) return false;[m
+ [m
+[31m-        Item selectedItem = inventoryManager.GetSelectedItem(false); // false = don't consume[m
+[31m-        if (selectedItem != null && selectedItem.isAxe)[m
+[31m-        {[m
+[31m-            return true;[m
+[31m-        }[m
+[31m-[m
+[31m-        return false;[m
+[32m+[m[32m        Item selectedItem = inventoryManager.GetSelectedItem(false);[m
+[32m+[m[32m        return selectedItem != null && selectedItem.isAxe;[m
+     }[m
+ [m
+     private IEnumerator StartChopNextFrame()[m
+     {[m
+[31m-        yield return new WaitForFixedUpdate(); // Allow physics to complete first[m
+[32m+[m[32m        yield return new WaitForFixedUpdate();[m
+         FaceTreeInstantly();[m
+         StartChopping();[m
+     }[m
+[36m@@ -77,7 +80,7 @@[m [mpublic class PlayerController : MonoBehaviour[m
+     {[m
+         if (nearbyTree == null) return;[m
+ [m
+[31m-        chopTimer = nearbyTree.GetChopDuration(); // Get time from tree![m
+[32m+[m[32m        chopTimer = nearbyTree.GetChopDuration();[m
+         isChopping = true;[m
+ [m
+         animator.SetBool("isChopping", true);[m
+[36m@@ -120,9 +123,8 @@[m [mpublic class PlayerController : MonoBehaviour[m
+         if (isChopping)[m
+         {[m
+             chopTimer -= Time.deltaTime;[m
+[31m-            [m
+             transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);[m
+[31m-            [m
+[32m+[m
+             if (!IsPlayerFacingTree())[m
+             {[m
+                 CancelChopping();[m
+[36m@@ -133,6 +135,14 @@[m [mpublic class PlayerController : MonoBehaviour[m
+             }[m
+         }[m
+ [m
+[32m+[m[32m        if (canSleep && Input.GetKeyDown(KeyCode.Space))[m
+[32m+[m[32m        {[m
+[32m+[m[32m            if (dayNightCycle != null)[m
+[32m+[m[32m            {[m
+[32m+[m[32m                dayNightCycle.StartSleep();[m
+[32m+[m[32m            }[m
+[32m+[m[32m        }[m
+[32m+[m
+         UpdateAnimations();[m
+     }[m
+ [m
+[36m@@ -168,6 +178,17 @@[m [mpublic class PlayerController : MonoBehaviour[m
+             nearbyTree = other.GetComponent<TreeController>();[m
+             nearbyTree?.StartHighlighting();[m
+         }[m
+[32m+[m[32m        else if (other.CompareTag("Bed"))[m
+[32m+[m[32m        {[m
+[32m+[m[32m            canSleep = true;[m
+[32m+[m[32m            Debug.Log("Player može spavati!");[m
+[32m+[m[41m            [m
+[32m+[m[32m            if (activePrompt == null && sleepPromptPrefab != null)[m
+[32m+[m[32m            {[m
+[32m+[m[32m                activePrompt = Instantiate(sleepPromptPrefab, other.transform.position + Vector3.up * 1.5f, Quaternion.identity);[m
+[32m+[m[32m                activePrompt.transform.SetParent(other.transform);  // Da ide s krevetom ako se kreće[m
+[32m+[m[32m            }[m
+[32m+[m[32m        }[m
+     }[m
+ [m
+     void OnTriggerExit(Collider other)[m
+[36m@@ -175,9 +196,19 @@[m [mpublic class PlayerController : MonoBehaviour[m
+         if (other.CompareTag("Tree") && nearbyTree != null && other.gameObject == nearbyTree.gameObject)[m
+         {[m
+             nearbyTree.StopHighlighting();[m
+[31m-            nearbyTree.StopChopping(); // Don't destroy on exit[m
+[32m+[m[32m            nearbyTree.StopChopping();[m
+             nearbyTree = null;[m
+         }[m
+[32m+[m[32m        else if (other.CompareTag("Bed"))[m
+[32m+[m[32m        {[m
+[32m+[m[32m            canSleep = false;[m
+[32m+[m[41m            [m
+[32m+[m[32m            if (activePrompt != null)[m
+[32m+[m[32m            {[m
+[32m+[m[32m                Destroy(activePrompt);[m
+[32m+[m[32m                activePrompt = null;[m
+[32m+[m[32m            }[m
+[32m+[m[32m        }[m
+     }[m
+ [m
+     private void FaceTreeInstantly()[m

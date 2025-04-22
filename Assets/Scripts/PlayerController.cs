@@ -11,10 +11,17 @@ public class PlayerController : MonoBehaviour
     private Animator animator;
     private Rigidbody rb;
     private TreeController nearbyTree;
+    private bool canSleep = false;
+    private DayNightCycle dayNightCycle;
+    
+    public GameObject sleepPromptPrefab; 
+    private GameObject activePrompt;      
+
+    
     public bool isChopping = false;
     private float chopTimer = 0f;
     private InventoryManager inventoryManager;
-    
+
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -22,8 +29,9 @@ public class PlayerController : MonoBehaviour
         rb.constraints = RigidbodyConstraints.FreezeRotation;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
-        
+
         inventoryManager = FindObjectOfType<InventoryManager>();
+        dayNightCycle = FindObjectOfType<DayNightCycle>();
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -52,23 +60,18 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-    
+
     private bool IsHoldingAxe()
     {
         if (inventoryManager == null) return false;
 
-        Item selectedItem = inventoryManager.GetSelectedItem(false); // false = don't consume
-        if (selectedItem != null && selectedItem.isAxe)
-        {
-            return true;
-        }
-
-        return false;
+        Item selectedItem = inventoryManager.GetSelectedItem(false);
+        return selectedItem != null && selectedItem.isAxe;
     }
 
     private IEnumerator StartChopNextFrame()
     {
-        yield return new WaitForFixedUpdate(); // Allow physics to complete first
+        yield return new WaitForFixedUpdate();
         FaceTreeInstantly();
         StartChopping();
     }
@@ -77,7 +80,7 @@ public class PlayerController : MonoBehaviour
     {
         if (nearbyTree == null) return;
 
-        chopTimer = nearbyTree.GetChopDuration(); // Get time from tree!
+        chopTimer = nearbyTree.GetChopDuration();
         isChopping = true;
 
         animator.SetBool("isChopping", true);
@@ -120,9 +123,8 @@ public class PlayerController : MonoBehaviour
         if (isChopping)
         {
             chopTimer -= Time.deltaTime;
-            
             transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
-            
+
             if (!IsPlayerFacingTree())
             {
                 CancelChopping();
@@ -130,6 +132,14 @@ public class PlayerController : MonoBehaviour
             else if (chopTimer <= 0f)
             {
                 FinishChopping();
+            }
+        }
+
+        if (canSleep && Input.GetKeyDown(KeyCode.Space))
+        {
+            if (dayNightCycle != null)
+            {
+                dayNightCycle.StartSleep();
             }
         }
 
@@ -168,6 +178,17 @@ public class PlayerController : MonoBehaviour
             nearbyTree = other.GetComponent<TreeController>();
             nearbyTree?.StartHighlighting();
         }
+        else if (other.CompareTag("Bed"))
+        {
+            canSleep = true;
+            Debug.Log("Player može spavati!");
+            
+            if (activePrompt == null && sleepPromptPrefab != null)
+            {
+                activePrompt = Instantiate(sleepPromptPrefab, other.transform.position + Vector3.up * 1.5f, Quaternion.identity);
+                activePrompt.transform.SetParent(other.transform);  // Da ide s krevetom ako se kreće
+            }
+        }
     }
 
     void OnTriggerExit(Collider other)
@@ -175,8 +196,18 @@ public class PlayerController : MonoBehaviour
         if (other.CompareTag("Tree") && nearbyTree != null && other.gameObject == nearbyTree.gameObject)
         {
             nearbyTree.StopHighlighting();
-            nearbyTree.StopChopping(); // Don't destroy on exit
+            nearbyTree.StopChopping();
             nearbyTree = null;
+        }
+        else if (other.CompareTag("Bed"))
+        {
+            canSleep = false;
+            
+            if (activePrompt != null)
+            {
+                Destroy(activePrompt);
+                activePrompt = null;
+            }
         }
     }
 

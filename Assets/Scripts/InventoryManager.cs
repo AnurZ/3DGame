@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 
 public class InventoryManager : MonoBehaviour
 {
@@ -136,9 +137,10 @@ public class InventoryManager : MonoBehaviour
         InventoryItem itemInSlot = slot.GetComponentInChildren<InventoryItem>();
         if (itemInSlot != null)
         {
+                
             Item item = itemInSlot.item;
 
-            if (use == null)
+            if (use == true)
             {
                 itemInSlot.count--;
                 if (itemInSlot.count <= 0)

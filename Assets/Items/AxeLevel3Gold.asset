@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa9823dd45effeb42ab71ee39c1d3c7c, type: 3}
+  m_Name: AxeLevel3Gold
+  m_EditorClassIdentifier: 
+  type: 1
+  actionType: 0
+  stackable: 1
+  image: {fileID: 21300000, guid: 12f1876dc207196418a008b0977d2277, type: 3}
+  itemPrefab: {fileID: 4446704673127264477, guid: 129139d8b7d069d489bca9139d40dc3d, type: 3}
+  inHandPosition: {x: 0, y: 0, z: 0}
+  inHandRotation: {x: 0, y: 180, z: 0}
+  inHandScale: {x: 1, y: 1, z: 1}
+  isAxe: 1

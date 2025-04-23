@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
+using TMPro;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
@@ -12,12 +14,11 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     private TreeController nearbyTree;
     private bool canSleep = false;
-    private DayNightCycle dayNightCycle;
-    
-    public GameObject sleepPromptPrefab; 
-    private GameObject activePrompt;      
+    private SimpleDayNightCycle dayNightCycle;
 
-    
+    public GameObject uiPanel;
+    public TMP_Text interactionText;
+
     public bool isChopping = false;
     private float chopTimer = 0f;
     private InventoryManager inventoryManager;
@@ -31,7 +32,9 @@ public class PlayerController : MonoBehaviour
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
 
         inventoryManager = FindObjectOfType<InventoryManager>();
-        dayNightCycle = FindObjectOfType<DayNightCycle>();
+        dayNightCycle = FindObjectOfType<SimpleDayNightCycle>();
+
+        uiPanel.SetActive(false);
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -135,16 +138,23 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        // Ensure you can sleep only when near the bed
         if (canSleep && Input.GetKeyDown(KeyCode.Space))
         {
-            if (dayNightCycle != null)
+            if (dayNightCycle != null && dayNightCycle.IsSleepTime())
             {
-                dayNightCycle.StartSleep();
+                dayNightCycle.Sleep();
+                CancelChopping();  // Cancel chopping if player is sleeping
+            }
+            else
+            {
+                Debug.Log("Ne možeš spavati van termina (21:00 - 05:00)");
             }
         }
 
         UpdateAnimations();
     }
+
 
     void FixedUpdate()
     {
@@ -177,39 +187,49 @@ public class PlayerController : MonoBehaviour
         {
             nearbyTree = other.GetComponent<TreeController>();
             nearbyTree?.StartHighlighting();
+
+            if (interactionText != null)
+            {
+                interactionText.text = "Press Spacebar to Chop";
+                uiPanel.SetActive(true);
+            }
         }
         else if (other.CompareTag("Bed"))
         {
             canSleep = true;
             Debug.Log("Player može spavati!");
-            
-            if (activePrompt == null && sleepPromptPrefab != null)
+
+            if (interactionText != null)
             {
-                activePrompt = Instantiate(sleepPromptPrefab, other.transform.position + Vector3.up * 1.5f, Quaternion.identity);
-                activePrompt.transform.SetParent(other.transform);  // Da ide s krevetom ako se kreće
+                interactionText.text = "Press [Spacebar] to sleep.";
+                uiPanel.SetActive(true);
             }
         }
     }
 
     void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Tree") && nearbyTree != null && other.gameObject == nearbyTree.gameObject)
+        if (other.CompareTag("Tree") || other.CompareTag("Bed"))
         {
-            nearbyTree.StopHighlighting();
-            nearbyTree.StopChopping();
-            nearbyTree = null;
-        }
-        else if (other.CompareTag("Bed"))
-        {
-            canSleep = false;
-            
-            if (activePrompt != null)
+            if (uiPanel.activeSelf)
             {
-                Destroy(activePrompt);
-                activePrompt = null;
+                uiPanel.SetActive(false);
+            }
+
+            if (interactionText != null)
+            {
+                interactionText.text = "";
+            }
+
+            if (other.CompareTag("Bed"))
+            {
+                canSleep = false;
             }
         }
     }
+    
+    
+
 
     private void FaceTreeInstantly()
     {

@@ -28,7 +28,7 @@ public class DayNightCycle : MonoBehaviour
 
     private void Start()
     {
-        // Učitaj sačuvani broj dana iz PlayerPrefs, default je 0 ako nije sačuvano
+        // Učitaj sačuvani broj dana iz PlayerPrefs, default je 1 ako nije sačuvano
         dayCounter = PlayerPrefs.GetInt("CurrentDay", 1);
 
         // Postavljamo vrijeme tako da počne od 08:00 svakog dana
@@ -39,66 +39,90 @@ public class DayNightCycle : MonoBehaviour
         UpdateDayCounter();
     }
 
-    private void Update()
+  private void Update()
+{
+    if (!isSleeping)
     {
-        if (!isSleeping)
+        // Odredi koliko traje dan ili noć
+        float duration = isDay ? dayDuration : nightDuration;
+        cycleTime += Time.deltaTime / duration;
+
+        // Ako dođe do kraja ciklusa dana/noći, resetiraj cycleTime i prebacivanje na dan/noć
+        if (cycleTime >= 1f)
         {
-            float duration = isDay ? dayDuration : nightDuration;
-            cycleTime += Time.deltaTime / duration;
+            cycleTime = 0f;  // Resetiraj cycleTime
 
-            if (cycleTime >= 1f)
+            isDay = !isDay;  // Prebacivanje iz dana u noć i obrnuto
+
+            // Ako je novi dan, povećaj broj dana
+            if (isDay)
             {
-                cycleTime = 0f;  // Resetiranje vremena svakog dana
-                isDay = !isDay;
-
-                if (isDay)
-                {
-                    dayCounter++;
-                    UpdateDayCounter();
-                    PlayerPrefs.SetInt("CurrentDay", dayCounter);  // Spremi trenutni dan
-                    cycleTime = GetTimeFromHours(8); // Postavljanje vremena na 08:00 kada počinje novi dan
-                }
-
-                UpdateAudio();
-                UpdateStars();
+                dayCounter++;  // Povećaj broj dana
+                UpdateDayCounter();  // Ažuriraj prikaz broja dana
+                PlayerPrefs.SetInt("CurrentDay", dayCounter);  // Spremi broj dana u PlayerPrefs
             }
 
-            if (directionalLight != null)
-                directionalLight.color = lightColor.Evaluate(cycleTime);
-
-            if (sunPivot != null)
-            {
-                float totalDegrees = isDay ? 180f : 180f;
-                float baseAngle = isDay ? 0f : 180f;
-                sunPivot.localRotation = Quaternion.Euler(baseAngle + totalDegrees * cycleTime, 0f, 0f);
-            }
-
-            UpdateClock();
+            // Ažuriraj zvukove (dan/noć)
+            UpdateAudio();
+            // Ažuriraj zvijezde (ako je noć)
+            UpdateStars();
         }
-        else
+
+        // Ažuriraj boju svjetlosti (dnevno/noćno svjetlo)
+        if (directionalLight != null)
+            directionalLight.color = lightColor.Evaluate(cycleTime);
+
+        // Rotiraj sunce (sunPivot) u skladu s time
+        if (sunPivot != null)
         {
-            fadePanel.alpha = Mathf.MoveTowards(fadePanel.alpha, 1f, fadeSpeed * Time.deltaTime);
-            if (fadePanel.alpha >= 1f)
-            {
-                cycleTime = 0f;
-                isDay = true;
-                isSleeping = false;
-                dayCounter++;
-                UpdateDayCounter();
-                PlayerPrefs.SetInt("CurrentDay", dayCounter);  // Spremi trenutni dan nakon spavanja
-                UpdateAudio();
-                UpdateStars();
-            }
+            float totalDegrees = isDay ? 180f : 180f;
+            float baseAngle = isDay ? 0f : 180f;
+
+            // Izračunaj rotaciju sunca
+            float sunRotation = baseAngle + totalDegrees * cycleTime;
+
+            // Osiguraj da rotacija bude između 0° i 360°
+            sunRotation = Mathf.Repeat(sunRotation, 360f); // Nastavi rotaciju bez skakanja u negativne kutove
+
+            // Primijeni rotaciju sunca
+            sunPivot.localRotation = Quaternion.Euler(sunRotation, 0f, 0f);
         }
 
-        if (canSleep && Input.GetKeyDown(KeyCode.Space))
-        {
-            isSleeping = true;
-        }
-
-        if (!isSleeping && fadePanel.alpha > 0f)
-            fadePanel.alpha = Mathf.MoveTowards(fadePanel.alpha, 0f, fadeSpeed * Time.deltaTime);
+        // Ažuriraj sat (prikaz vremena)
+        UpdateClock();
     }
+    else
+    {
+        // Kad igrač spava, prikaži fade efekt
+        fadePanel.alpha = Mathf.MoveTowards(fadePanel.alpha, 1f, fadeSpeed * Time.deltaTime);
+        if (fadePanel.alpha >= 1f)
+        {
+            // Kad igrač spava, resetiraj vrijeme na 08:00
+            cycleTime = GetTimeFromHours(8);
+            isDay = true;
+            isSleeping = false;
+            dayCounter++;  // Povećaj broj dana kad igrač spava
+            UpdateDayCounter();
+            PlayerPrefs.SetInt("CurrentDay", dayCounter);  // Spremi broj dana
+            UpdateAudio();
+            UpdateStars();
+        }
+    }
+
+    // Ako igrač pritisne spacebar, započni spavanje
+    if (canSleep && Input.GetKeyDown(KeyCode.Space))
+    {
+        isSleeping = true;
+    }
+
+    // Fade out efekt kad igrač nije spavao
+    if (!isSleeping && fadePanel.alpha > 0f)
+        fadePanel.alpha = Mathf.MoveTowards(fadePanel.alpha, 0f, fadeSpeed * Time.deltaTime);
+}
+
+
+
+
 
     public void StartSleep()
     {
@@ -148,19 +172,16 @@ public class DayNightCycle : MonoBehaviour
             stars.SetActive(!isDay);
     }
 
-    private void UpdateClock()
-    {
-        if (timeText != null)
-        {
-            // Računanje trenutnog vremena na temelju cycleTime
-            float totalMinutes = (isDay ? cycleTime * dayDuration : cycleTime * nightDuration);
-            int minutes = Mathf.FloorToInt(totalMinutes) % 60;
-            int hours = Mathf.FloorToInt(totalMinutes) / 60;
+   void UpdateClock()
+{
+    float totalHours = cycleTime * 24f;
+    int hours = Mathf.FloorToInt(totalHours);
+    int minutes = Mathf.FloorToInt((totalHours - hours) * 60f);
 
-            // Prikazivanje vremena na ekranu
-            timeText.text = string.Format("{0:D2}:{1:D2}", hours, minutes);
-        }
-    }
+    string timeString = string.Format("{0:00}:{1:00}", hours, minutes);
+    timeText.text = timeString;
+}
+
 
     private void UpdateDayCounter()
     {
@@ -171,11 +192,9 @@ public class DayNightCycle : MonoBehaviour
     }
 
     // Funkcija za pretvaranje sati u normalizirani cycleTime
-    private float GetTimeFromHours(int hours)
+    float GetTimeFromHours(int hours)
     {
-        // 480 minuta = 8 sati
         float minutes = hours * 60f;
-        float totalMinutesInDayCycle = dayDuration + nightDuration;
-        return minutes / totalMinutesInDayCycle;
+        return minutes / 1440f; // 1440 minuta u pravom danu
     }
 }

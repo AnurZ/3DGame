@@ -3,6 +3,8 @@ using UnityEngine.InputSystem;
 using System.Collections;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.UI;  // Add this for UI Text
+using System.Collections;  // For IEnumerator
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
@@ -24,6 +26,15 @@ public class PlayerController : MonoBehaviour
 
     private float chopTimer = 0f;
     private InventoryManager inventoryManager;
+
+    // Injury system
+    public enum InjuryStatus { Healthy, Minor, Moderate, Severe }
+    public InjuryStatus currentInjury = InjuryStatus.Healthy;
+    private float injuryEffectMultiplier = 1f;  // A multiplier that affects player movement and actions based on injury severity
+
+    // UI reference
+    public Text injuryStateText;  // Reference to the injury state text UI
+
 
     public static PlayerController Local;
 
@@ -51,6 +62,15 @@ public class PlayerController : MonoBehaviour
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
 
         inventoryManager = FindObjectOfType<InventoryManager>();
+
+        // Ensure the injuryStateText is initialized correctly
+        if (injuryStateText != null)
+        {
+            injuryStateText.gameObject.SetActive(false);  // Start with the text invisible
+        }
+
+        // Start the injury cycling coroutine
+        StartCoroutine(CycleInjuryStates());
         dayNightCycle = FindObjectOfType<SimpleDayNightCycle>();
 
         uiPanel.SetActive(false);
@@ -82,7 +102,7 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
+    
     private bool IsHoldingAxe()
     {
         if (inventoryManager == null) return false;
@@ -151,6 +171,7 @@ public class PlayerController : MonoBehaviour
         if (isChopping)
         {
             chopTimer -= Time.deltaTime;
+
             transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
 
             if (!IsPlayerFacingTree())
@@ -187,6 +208,10 @@ public class PlayerController : MonoBehaviour
     private void MovePlayer()
     {
         Vector3 inputDirection = new Vector3(move.x, 0f, move.y).normalized;
+
+        // Adjust movement speed based on injury severity
+        inputDirection *= injuryEffectMultiplier;
+
         if (inputDirection != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(inputDirection);
@@ -279,5 +304,62 @@ public class PlayerController : MonoBehaviour
             return dotProduct > 0.7f;
         }
         return false;
+    }
+
+    // Function to apply injury and update effects
+    public void ApplyInjury(InjuryStatus injury)
+    {
+        currentInjury = injury;
+
+        // Set the injury effect multiplier based on injury severity
+        switch (currentInjury)
+        {
+            case InjuryStatus.Minor:
+                injuryEffectMultiplier = 0.9f; // Minor injury causes 10% reduction in movement speed
+                UpdateInjuryUI("Minor Injury", Color.green);
+                break;
+            case InjuryStatus.Moderate:
+                injuryEffectMultiplier = 0.7f; // Moderate injury causes 30% reduction
+                UpdateInjuryUI("Moderate Injury", Color.yellow);
+                break;
+            case InjuryStatus.Severe:
+                injuryEffectMultiplier = 0.5f; // Severe injury causes 50% reduction
+                UpdateInjuryUI("Severe Injury", Color.red);
+                break;
+            case InjuryStatus.Healthy:
+                injuryEffectMultiplier = 1f; // No effect
+                if (injuryStateText != null)
+                {
+                    injuryStateText.gameObject.SetActive(false);  // Hide text when healthy
+                }
+                break;
+        }
+    }
+
+    // Function to update the injury UI text
+    private void UpdateInjuryUI(string injuryMessage, Color injuryColor)
+    {
+        if (injuryStateText != null)
+        {
+            injuryStateText.gameObject.SetActive(true); // Make the text visible
+            injuryStateText.text = injuryMessage;
+            injuryStateText.color = injuryColor;
+        }
+    }
+
+    // Coroutine to cycle through injury states every 5 seconds
+    private IEnumerator CycleInjuryStates()
+    {
+        while (true)
+        {
+            ApplyInjury(InjuryStatus.Healthy);
+            yield return new WaitForSeconds(5f);  // Wait for 5 seconds
+            ApplyInjury(InjuryStatus.Minor);
+            yield return new WaitForSeconds(5f);
+            ApplyInjury(InjuryStatus.Moderate);
+            yield return new WaitForSeconds(5f);
+            ApplyInjury(InjuryStatus.Severe);
+            yield return new WaitForSeconds(5f);
+        }
     }
 }

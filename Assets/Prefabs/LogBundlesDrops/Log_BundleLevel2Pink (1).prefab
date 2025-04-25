@@ -12,8 +12,11 @@ GameObject:
   - component: {fileID: 3881680146058376183}
   - component: {fileID: 3930885340818905885}
   - component: {fileID: -4360722078306371115}
+  - component: {fileID: 7643232249510566213}
+  - component: {fileID: 160611667737554387}
+  - component: {fileID: 78758499573159462}
   m_Layer: 0
-  m_Name: DropLog_BundleLevel2Pink (1)
+  m_Name: Log_BundleLevel2Pink (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28,7 +31,7 @@ Transform:
   m_GameObject: {fileID: 7905600428221956616}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.2588191, z: 0, w: 0.9659258}
-  m_LocalPosition: {x: 161.6025, y: 0.007323742, z: 122.621765}
+  m_LocalPosition: {x: 161.6025, y: 0.4400038, z: 122.621765}
   m_LocalScale: {x: 1.75, y: 1.75, z: 1.75}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -103,3 +106,50 @@ MonoBehaviour:
   rotationSpeed: 50
   bounceHeight: 0.25
   bounceSpeed: 2
+--- !u!65 &7643232249510566213
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7905600428221956616}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.5, y: 0.8, z: 1.2}
+  m_Center: {x: 0.02313512, y: 0.42624938, z: 0.023586068}
+--- !u!114 &160611667737554387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7905600428221956616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates: []
+--- !u!114 &78758499573159462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7905600428221956616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf85707d37de47b46861c8c40d4ee536, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemIndexToGive: 1

@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class TreeController : MonoBehaviour
 {
@@ -7,6 +8,7 @@ public class TreeController : MonoBehaviour
     private Renderer rend;
 
     private bool isShaking = false;
+    private bool isChopping = false; // Ensure only one chop happens at a time
     private Quaternion originalRotation;
     private Vector3 originalPosition;
 
@@ -19,7 +21,7 @@ public class TreeController : MonoBehaviour
     public Transform dropSpawnPoint;
 
     [Header("Chop Settings")]
-    public float baseChopTime = 4f;
+    public float baseChopTime = 4f; // Time it takes to chop the tree
 
     private float shakeTime = 0f;
 
@@ -62,25 +64,59 @@ public class TreeController : MonoBehaviour
 
     public void StartChopping()
     {
+        if (!isChopping) // Prevent starting multiple chop actions
+        {
+            isChopping = true;
+            StartCoroutine(ChopCoroutine());
+        }
+    }
+
+    private IEnumerator ChopCoroutine()
+    {
         isShaking = true;
+
+        float chopDuration = baseChopTime;
+        float elapsed = 0f;
+        float staminaPerSecond = (StaminaController.Instance != null) ? 10f / chopDuration : 0f;
+
+        while (elapsed < chopDuration && StaminaController.Instance != null && StaminaController.Instance.playerStamina > 0)
+        {
+            StaminaController.Instance.ReduceStamina(staminaPerSecond * Time.deltaTime);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        FinishChopping(); // Finish chopping once the duration is over or stamina runs out
     }
 
     public void StopChopping()
     {
         isShaking = false;
+        StopAllCoroutines(); // Stop the chopping coroutine if interrupted
     }
 
     public void FinishChopping()
     {
-        isShaking = false;
+        if (!isChopping) return; // If chopping was already finished, do nothing
 
+        isShaking = false;
+        isChopping = false; // Reset chopping state
+
+        // Drop the prefab when chopping is finished
         if (dropPrefab != null)
         {
-            Vector3 spawnPosition = dropSpawnPoint != null ? dropSpawnPoint.position : transform.position + Vector3.up * 1f;
+            Vector3 spawnPosition = dropSpawnPoint != null
+                ? dropSpawnPoint.position
+                : transform.position + Vector3.up * 1f;
+
             Instantiate(dropPrefab, spawnPosition, Quaternion.identity);
         }
+        else
+        {
+            Debug.LogWarning($"{gameObject.name} has no dropPrefab assigned!");
+        }
 
-        Destroy(gameObject, 0.2f);
+        Destroy(gameObject, 0.2f); // Destroy the tree after a short delay
     }
 
     public float GetChopDuration()

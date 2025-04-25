@@ -20,9 +20,28 @@ public class PlayerController : MonoBehaviour
     public TMP_Text interactionText;
 
     public bool isChopping = false;
+    public bool isInShop = false;
+
     private float chopTimer = 0f;
     private InventoryManager inventoryManager;
 
+    public static PlayerController Local;
+
+    public GameObject modelToHide; // povuci glavni model ovdje u inspectoru
+
+    public void SetVisible(bool isVisible)
+    {
+        if (modelToHide != null)
+            modelToHide.SetActive(isVisible);
+    }
+
+    
+    void Awake()
+    {
+        Local = this;
+    }
+
+    
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -123,6 +142,12 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (isInShop)
+        {
+            return; // Igrač ne može da se pomera ako je u shopu
+        }
+
+        // Ako nije u shopu, nastavi sa drugim logikama
         if (isChopping)
         {
             chopTimer -= Time.deltaTime;
@@ -137,27 +162,22 @@ public class PlayerController : MonoBehaviour
                 FinishChopping();
             }
         }
-
-        // Ensure you can sleep only when near the bed
-        if (canSleep && Input.GetKeyDown(KeyCode.Space))
+        else
         {
-            if (dayNightCycle != null && dayNightCycle.IsSleepTime())
-            {
-                dayNightCycle.Sleep();
-                CancelChopping();  // Cancel chopping if player is sleeping
-            }
-            else
-            {
-                Debug.Log("Ne možeš spavati van termina (21:00 - 05:00)");
-            }
+            UpdateAnimations();
         }
-
-        UpdateAnimations();
     }
 
 
     void FixedUpdate()
     {
+        if (isInShop)
+        {
+            
+            return; // Igrač ne može da se pomera dok je u shopu
+        }
+
+        // Ako nije u shopu, nastavi sa kretanjem
         if (!isChopping)
         {
             MovePlayer();
@@ -205,11 +225,16 @@ public class PlayerController : MonoBehaviour
                 uiPanel.SetActive(true);
             }
         }
+        else if (other.CompareTag("Shop") && !isInShop)
+        {
+            interactionText.text = "Press [Space] to enter shop.";
+            uiPanel.SetActive(true);
+        }
     }
 
     void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Tree") || other.CompareTag("Bed"))
+        if (other.CompareTag("Tree") || other.CompareTag("Bed") || other.CompareTag("Shop") )
         {
             if (uiPanel.activeSelf)
             {

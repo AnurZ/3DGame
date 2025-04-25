@@ -5,6 +5,7 @@ using UnityEditor.Experimental.GraphView;
 
 public class InventoryManager : MonoBehaviour
 {
+    public static InventoryManager Instance;
     public InventorySlot[] inventorySlots;
     public GameObject inventoryItemPrefab;
     public Transform handTransform; // Assign handslot.r in Inspector
@@ -49,6 +50,12 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
+    void Awake()
+    {
+        Instance = this;
+    }
+
+    
     
     void ChangeSelectedSlot(int newValue)
     {
@@ -93,7 +100,34 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
+    public bool HasItem(Item itemToCheck)
+    {
+        for (int i = 0; i < inventorySlots.Length; i++)
+        {
+            var invItem = inventorySlots[i].GetComponentInChildren<InventoryItem>();
+            if (invItem != null && invItem.item == itemToCheck)
+                return true;
+        }
+        return false;
+    }
 
+    public int RemoveAllOfItem(Item itemToRemove)
+    {
+        int totalRemoved = 0;
+
+        for (int i = 0; i < inventorySlots.Length; i++)
+        {
+            var slot = inventorySlots[i];
+            var invItem = slot.GetComponentInChildren<InventoryItem>();
+            if (invItem != null && invItem.item == itemToRemove)
+            {
+                totalRemoved += invItem.count;
+                Destroy(invItem.gameObject);
+            }
+        }
+
+        return totalRemoved;
+    }   
     
     public bool AddItem(Item item)
     {

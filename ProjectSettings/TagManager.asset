@@ -8,6 +8,8 @@ TagManager:
   - Terrain
   - Axe
   - Bed
+  - InventorySlot
+  - Shop
   layers:
   - Default
   - TransparentFX

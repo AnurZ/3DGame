@@ -11,7 +11,7 @@ public class ShopUI : MonoBehaviour
 
     void Update()
     {
-        moneyText.text = "Money: $" + CurrencyManager.Instance.CurrentMoney;
+        moneyText.text = "" + CurrencyManager.Instance.CurrentMoney;
 
     }
 
@@ -41,6 +41,7 @@ public class ShopUI : MonoBehaviour
         if (CurrencyManager.Instance.TrySpendMoney(price))
         {
             inventoryManager.AddItem(axeItem);
+            MoneyPopupManager.Instance.ShowPopup(-price, Input.mousePosition); 
         }
     }
 }

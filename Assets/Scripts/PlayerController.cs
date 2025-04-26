@@ -17,7 +17,10 @@ public class PlayerController : MonoBehaviour
     private TreeController nearbyTree;
     private bool canSleep = false;
     private SimpleDayNightCycle dayNightCycle;
-
+    
+    public GameObject gameplayUI;  // UI koji želiš sakriti (npr. health, inventory itd.)
+    public GameObject moneyUI;  
+    
     public GameObject uiPanel;
     public TMP_Text interactionText;
 
@@ -42,9 +45,14 @@ public class PlayerController : MonoBehaviour
 
     public void SetVisible(bool isVisible)
     {
-        if (modelToHide != null)
-            modelToHide.SetActive(isVisible);
+        // 1) Disable/enable all renderers so the mesh disappears
+        var rends = GetComponentsInChildren<Renderer>();
+        foreach (var r in rends)
+            r.enabled = isVisible;
+
+        
     }
+
 
     
     void Awake()
@@ -159,7 +167,30 @@ public class PlayerController : MonoBehaviour
 
         nearbyTree?.FinishChopping();
     }
+    
+    public void EnterShop()
+    {
+        isInShop = true;
 
+        if (gameplayUI != null)
+            gameplayUI.SetActive(false);
+
+        if (moneyUI != null)
+            moneyUI.SetActive(true);
+    }
+
+    public void ExitShop()
+    {
+        isInShop = false;
+
+        if (gameplayUI != null)
+            gameplayUI.SetActive(true);
+
+        if (moneyUI != null)
+            moneyUI.SetActive(true);
+    }
+
+    
     void Update()
     {
         if (isInShop)

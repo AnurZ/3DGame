@@ -3,8 +3,6 @@ using UnityEngine.InputSystem;
 using System.Collections;
 using TMPro;
 using UnityEngine.UI;
-using UnityEngine.UI;  // Add this for UI Text
-using System.Collections;  // For IEnumerator
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
@@ -18,8 +16,8 @@ public class PlayerController : MonoBehaviour
     private bool canSleep = false;
     private SimpleDayNightCycle dayNightCycle;
     
-    public GameObject gameplayUI;  // UI koji želiš sakriti (npr. health, inventory itd.)
-    public GameObject moneyUI;  
+    public GameObject gameplayUI;
+    public GameObject moneyUI;
     
     public GameObject uiPanel;
     public TMP_Text interactionText;
@@ -33,34 +31,31 @@ public class PlayerController : MonoBehaviour
     // Injury system
     public enum InjuryStatus { Healthy, Minor, Moderate, Severe }
     public InjuryStatus currentInjury = InjuryStatus.Healthy;
-    private float injuryEffectMultiplier = 1f;  // A multiplier that affects player movement and actions based on injury severity
+    private float injuryEffectMultiplier = 1f;
 
-    // UI reference
-    public Text injuryStateText;  // Reference to the injury state text UI
-
+    public Text injuryStateText;
 
     public static PlayerController Local;
 
-    public GameObject modelToHide; // povuci glavni model ovdje u inspectoru
+    public GameObject modelToHide;
 
     public void SetVisible(bool isVisible)
     {
-        // 1) Disable/enable all renderers so the mesh disappears
+        // iz kraće skripte: sakrij model ako treba
+        if (modelToHide != null)
+            modelToHide.SetActive(isVisible);
+
+        // ostali rendereri
         var rends = GetComponentsInChildren<Renderer>();
         foreach (var r in rends)
             r.enabled = isVisible;
-
-        
     }
 
-
-    
     void Awake()
     {
         Local = this;
     }
 
-    
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -71,13 +66,9 @@ public class PlayerController : MonoBehaviour
 
         inventoryManager = FindObjectOfType<InventoryManager>();
 
-        // Ensure the injuryStateText is initialized correctly
         if (injuryStateText != null)
-        {
-            injuryStateText.gameObject.SetActive(false);  // Start with the text invisible
-        }
+            injuryStateText.gameObject.SetActive(false);
 
-        // Start the injury cycling coroutine
         StartCoroutine(CycleInjuryStates());
         dayNightCycle = FindObjectOfType<SimpleDayNightCycle>();
 
@@ -86,14 +77,7 @@ public class PlayerController : MonoBehaviour
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        if (!isChopping)
-        {
-            move = context.ReadValue<Vector2>();
-        }
-        else
-        {
-            move = Vector2.zero;
-        }
+        move = isChopping ? Vector2.zero : context.ReadValue<Vector2>();
     }
 
     public void OnChop(InputAction.CallbackContext context)
@@ -101,20 +85,15 @@ public class PlayerController : MonoBehaviour
         if (context.performed && nearbyTree != null && IsHoldingAxe())
         {
             if (isChopping)
-            {
                 CancelChopping();
-            }
             else
-            {
                 StartCoroutine(StartChopNextFrame());
-            }
         }
     }
-    
+
     private bool IsHoldingAxe()
     {
         if (inventoryManager == null) return false;
-
         Item selectedItem = inventoryManager.GetSelectedItem(false);
         return selectedItem != null && selectedItem.isAxe;
     }
@@ -153,7 +132,8 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("IsWalking", false);
         rb.constraints = RigidbodyConstraints.FreezeRotation;
 
-        nearbyTree?.StopChopping();
+        if (nearbyTree != null)
+            nearbyTree.StopChopping();
     }
 
     private void FinishChopping()
@@ -165,9 +145,10 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("IsWalking", false);
         rb.constraints = RigidbodyConstraints.FreezeRotation;
 
-        nearbyTree?.FinishChopping();
+        if (nearbyTree != null)
+            nearbyTree.FinishChopping();
     }
-    
+
     public void EnterShop()
     {
         isInShop = true;
@@ -190,15 +171,11 @@ public class PlayerController : MonoBehaviour
             moneyUI.SetActive(true);
     }
 
-    
     void Update()
     {
         if (isInShop)
-        {
-            return; // Igrač ne može da se pomera ako je u shopu
-        }
+            return;
 
-        // Ako nije u shopu, nastavi sa drugim logikama
         if (isChopping)
         {
             chopTimer -= Time.deltaTime;
@@ -211,37 +188,36 @@ public class PlayerController : MonoBehaviour
             }
             else if (chopTimer <= 0f)
             {
-                FinishChopping();
+                // Umjesto direktnog FinishChopping(), čekamo kraj animacije
+                StartCoroutine(FinishChoppingAfterAnimation());
             }
         }
-        else
+
+        // Sleep
+        if (!isChopping && !isInShop && canSleep && Input.GetKeyDown(KeyCode.Space))
+        {
+            dayNightCycle.Sleep();
+            uiPanel.SetActive(false);
+            interactionText.text = "";
+        }
+        else if (!isChopping)
         {
             UpdateAnimations();
         }
     }
 
-
     void FixedUpdate()
     {
         if (isInShop)
-        {
-            
-            return; // Igrač ne može da se pomera dok je u shopu
-        }
+            return;
 
-        // Ako nije u shopu, nastavi sa kretanjem
         if (!isChopping)
-        {
             MovePlayer();
-        }
     }
 
     private void MovePlayer()
     {
-        Vector3 inputDirection = new Vector3(move.x, 0f, move.y).normalized;
-
-        // Adjust movement speed based on injury severity
-        inputDirection *= injuryEffectMultiplier;
+        Vector3 inputDirection = new Vector3(move.x, 0f, move.y).normalized * injuryEffectMultiplier;
 
         if (inputDirection != Vector3.zero)
         {
@@ -273,7 +249,6 @@ public class PlayerController : MonoBehaviour
         else if (other.CompareTag("Bed"))
         {
             canSleep = true;
-            Debug.Log("Player može spavati!");
 
             if (interactionText != null)
             {
@@ -283,34 +258,28 @@ public class PlayerController : MonoBehaviour
         }
         else if (other.CompareTag("Shop") && !isInShop)
         {
-            interactionText.text = "Press [Space] to enter shop.";
-            uiPanel.SetActive(true);
+            if (interactionText != null)
+            {
+                interactionText.text = "Press [Space] to enter shop.";
+                uiPanel.SetActive(true);
+            }
         }
     }
 
     void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Tree") || other.CompareTag("Bed") || other.CompareTag("Shop") )
+        if (other.CompareTag("Tree") || other.CompareTag("Bed") || other.CompareTag("Shop"))
         {
             if (uiPanel.activeSelf)
-            {
                 uiPanel.SetActive(false);
-            }
 
             if (interactionText != null)
-            {
                 interactionText.text = "";
-            }
 
             if (other.CompareTag("Bed"))
-            {
                 canSleep = false;
-            }
         }
     }
-    
-    
-
 
     private void FaceTreeInstantly()
     {
@@ -320,9 +289,7 @@ public class PlayerController : MonoBehaviour
             direction.y = 0f;
 
             if (direction.sqrMagnitude > 0.01f)
-            {
                 transform.rotation = Quaternion.LookRotation(direction.normalized);
-            }
         }
     }
 
@@ -337,54 +304,70 @@ public class PlayerController : MonoBehaviour
         return false;
     }
 
-    // Function to apply injury and update effects
+    // Coroutine koja čeka kraj chop animacije prije uništenja drveta
+    private IEnumerator FinishChoppingAfterAnimation()
+    {
+        // 1) čekaj onoliko koliko tree kaže
+        float waitTime = nearbyTree != null 
+            ? nearbyTree.GetChopDuration() 
+            : 0f;
+        yield return new WaitForSeconds(waitTime);
+
+        // 2) uništi drvo
+        FinishChopping();
+
+        // 3) sakrij UI
+        uiPanel.SetActive(false);
+        interactionText.text = "";
+    }
+
+
+
+
     public void ApplyInjury(InjuryStatus injury)
     {
         currentInjury = injury;
 
-        // Set the injury effect multiplier based on injury severity
         switch (currentInjury)
         {
             case InjuryStatus.Minor:
-                injuryEffectMultiplier = 0.9f; // Minor injury causes 10% reduction in movement speed
+                injuryEffectMultiplier = 0.9f;
                 UpdateInjuryUI("Minor Injury", Color.green);
                 break;
             case InjuryStatus.Moderate:
-                injuryEffectMultiplier = 0.7f; // Moderate injury causes 30% reduction
+                injuryEffectMultiplier = 0.7f;
                 UpdateInjuryUI("Moderate Injury", Color.yellow);
                 break;
             case InjuryStatus.Severe:
-                injuryEffectMultiplier = 0.5f; // Severe injury causes 50% reduction
+                injuryEffectMultiplier = 0.5f;
                 UpdateInjuryUI("Severe Injury", Color.red);
                 break;
             case InjuryStatus.Healthy:
-                injuryEffectMultiplier = 1f; // No effect
+                injuryEffectMultiplier = 1f;
                 if (injuryStateText != null)
-                {
-                    injuryStateText.gameObject.SetActive(false);  // Hide text when healthy
-                }
+                    injuryStateText.gameObject.SetActive(false);
                 break;
         }
     }
 
-    // Function to update the injury UI text
     private void UpdateInjuryUI(string injuryMessage, Color injuryColor)
     {
         if (injuryStateText != null)
         {
-            injuryStateText.gameObject.SetActive(true); // Make the text visible
+            injuryStateText.gameObject.SetActive(true);
             injuryStateText.text = injuryMessage;
             injuryStateText.color = injuryColor;
         }
     }
+    
+    
 
-    // Coroutine to cycle through injury states every 5 seconds
     private IEnumerator CycleInjuryStates()
     {
         while (true)
         {
             ApplyInjury(InjuryStatus.Healthy);
-            yield return new WaitForSeconds(5f);  // Wait for 5 seconds
+            yield return new WaitForSeconds(5f);
             ApplyInjury(InjuryStatus.Minor);
             yield return new WaitForSeconds(5f);
             ApplyInjury(InjuryStatus.Moderate);

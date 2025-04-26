@@ -8,7 +8,7 @@ public class TreeController : MonoBehaviour
     private Renderer rend;
 
     private bool isShaking = false;
-    private bool isChopping = false; // Ensure only one chop happens at a time
+    private bool isChopping = false;
     private Quaternion originalRotation;
     private Vector3 originalPosition;
 
@@ -21,9 +21,9 @@ public class TreeController : MonoBehaviour
     public Transform dropSpawnPoint;
 
     [Header("Chop Settings")]
-    public float baseChopTime = 4f; // Time it takes to chop the tree
+    public float baseChopTime = 4f;
 
-    private float shakeTime = 0f;
+    private Coroutine chopCoroutine;
 
     void Start()
     {
@@ -64,10 +64,24 @@ public class TreeController : MonoBehaviour
 
     public void StartChopping()
     {
-        if (!isChopping) // Prevent starting multiple chop actions
+        if (!isChopping)
         {
             isChopping = true;
-            StartCoroutine(ChopCoroutine());
+            chopCoroutine = StartCoroutine(ChopCoroutine());
+        }
+    }
+
+    public void StopChopping()
+    {
+        if (isChopping)
+        {
+            isShaking = false;
+            isChopping = false;
+
+            if (chopCoroutine != null)
+            {
+                StopCoroutine(chopCoroutine);
+            }
         }
     }
 
@@ -75,34 +89,33 @@ public class TreeController : MonoBehaviour
     {
         isShaking = true;
 
-        float chopDuration = baseChopTime;
         float elapsed = 0f;
-        float staminaPerSecond = (StaminaController.Instance != null) ? 10f / chopDuration : 0f;
+        float staminaPerSecond = (StaminaController.Instance != null) ? 10f / baseChopTime : 0f;
 
-        while (elapsed < chopDuration && StaminaController.Instance != null && StaminaController.Instance.playerStamina > 0)
+        while (elapsed < baseChopTime)
         {
-            StaminaController.Instance.ReduceStamina(staminaPerSecond * Time.deltaTime);
+            if (StaminaController.Instance != null)
+            {
+                StaminaController.Instance.ReduceStamina(staminaPerSecond * Time.deltaTime);
+                if (StaminaController.Instance.playerStamina <= 0f)
+                {
+                    StopChopping(); // Stop if stamina runs out
+                    yield break;
+                }
+            }
+
             elapsed += Time.deltaTime;
             yield return null;
         }
 
-        FinishChopping(); // Finish chopping once the duration is over or stamina runs out
-    }
-
-    public void StopChopping()
-    {
-        isShaking = false;
-        StopAllCoroutines(); // Stop the chopping coroutine if interrupted
+        FinishChopping();
     }
 
     public void FinishChopping()
     {
-        if (!isChopping) return; // If chopping was already finished, do nothing
-
         isShaking = false;
-        isChopping = false; // Reset chopping state
+        isChopping = false;
 
-        // Drop the prefab when chopping is finished
         if (dropPrefab != null)
         {
             Vector3 spawnPosition = dropSpawnPoint != null
@@ -111,12 +124,8 @@ public class TreeController : MonoBehaviour
 
             Instantiate(dropPrefab, spawnPosition, Quaternion.identity);
         }
-        else
-        {
-            Debug.LogWarning($"{gameObject.name} has no dropPrefab assigned!");
-        }
 
-        Destroy(gameObject, 0.2f); // Destroy the tree after a short delay
+        Destroy(gameObject, 0.2f);
     }
 
     public float GetChopDuration()
@@ -126,8 +135,7 @@ public class TreeController : MonoBehaviour
 
     void ShakeTree()
     {
-        shakeTime += Time.deltaTime * shakeSpeed;
-        float shakeOffset = Mathf.Sin(shakeTime) * shakeAmount;
+        float shakeOffset = Mathf.Sin(Time.time * shakeSpeed) * shakeAmount;
 
         transform.rotation = originalRotation * Quaternion.Euler(0, 0, shakeOffset);
         transform.position = originalPosition + new Vector3(shakeOffset * 0.1f, 0, 0);

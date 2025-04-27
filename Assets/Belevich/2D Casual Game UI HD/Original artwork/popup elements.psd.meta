@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Belevich_dst/2D Casual Game UI HD/Original artwork/popup elements.psd.meta
+guid: 18edabd960c969a49b5a2ca2a8cee4ff
+========
 guid: ad3c6855e98b2c54eab2aee81c00d2ad
+>>>>>>>> 676f596edb7b9bd6b0e253a5b155efaa678202db:Assets/Belevich/2D Casual Game UI HD/Original artwork/popup elements.psd.meta
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}

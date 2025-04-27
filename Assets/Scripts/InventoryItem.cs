@@ -28,12 +28,8 @@ public class InventoryItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     }
     public void InitialiseItem(Item newItem)
     {
-        if (newItem != null)
-        {
-            item = newItem;
-            image.sprite = newItem.image;
-        }
-
+        item = newItem;
+        image.sprite = newItem.image;
         RefreshCount();
     }
     private void Awake()

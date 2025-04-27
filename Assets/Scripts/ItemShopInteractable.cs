@@ -12,15 +12,13 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
     public int   cost = 10;
 
     [Header("Highlight Colors")]
-    public Color hoverColor = Color.green;
+    public Color hoverColor = Color.yellow;
     public Color grayOutColor = Color.gray;
 
     private Renderer[] renderers;
     private Color[]    originalColors;
     private Outline    outline;
 
-
-    
     void Start()
     {
         // Cache all renderers & their original colors
@@ -59,8 +57,6 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
         if (outline != null) outline.enabled = false;
     }
 
-  
-    
     public void OnActivate()
     {
         // Try to buy
@@ -74,7 +70,6 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
         {
             InventoryManager.Instance.AddItem(itemToGive);
             Debug.Log($"Kupio si {itemToGive.name}!");
-            MoneyPopupManager.Instance.ShowPopup(-cost, Input.mousePosition);
         }
         else
         {

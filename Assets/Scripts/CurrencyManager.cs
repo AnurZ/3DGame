@@ -28,7 +28,7 @@ public class CurrencyManager : MonoBehaviour
     {
         if (moneyText != null)
         {
-            moneyText.text = $"{CurrentMoney}";
+            moneyText.text = "Money: $" + CurrentMoney;
         }
     }
 

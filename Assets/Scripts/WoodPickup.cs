@@ -16,8 +16,16 @@ public class WoodPickup : MonoBehaviour
                 demoScript.PickupItem(itemIndexToGive);
             }
 
-            // Destroy the item immediately after the player picks it up
-            Destroy(gameObject);
+            // Disable the collider and make the item inactive to prevent further pickups
+            Collider itemCollider = GetComponent<Collider>();
+            if (itemCollider != null)
+            {
+                itemCollider.enabled = false;  // Disable the collider to prevent further triggers
+            }
+
+            // Destroy the item after a short delay to allow the pickup action to complete
+            Destroy(gameObject, 0.1f);  // Destroy after a brief moment to avoid immediate re-triggering
         }
     }
+
 }

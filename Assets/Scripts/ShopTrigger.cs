@@ -26,7 +26,6 @@ public class ShopTrigger : MonoBehaviour
             pc.interactionText.text = "";
             
             PlayerController.Local.SetVisible(false);
-            PlayerController.Local.EnterShop();
         }
 
         if (playerInside && Input.GetKeyDown(KeyCode.Escape))
@@ -37,9 +36,6 @@ public class ShopTrigger : MonoBehaviour
                 PlayerController.Local.isInShop = false;
 
             PlayerController.Local.SetVisible(true);
-            PlayerController.Local.ExitShop();
-
-
         }
     }
 

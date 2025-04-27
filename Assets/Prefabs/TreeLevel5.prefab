@@ -136,12 +136,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2753346aa6c6f454e98d24070b97314a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  health: 100
   highlightMaterial: {fileID: 2100000, guid: 54589bcc3464d6e4eb3c1a95b45fa88b, type: 2}
-  shakeAmount: 0.1
-  shakeSpeed: 10
-  dropPrefab: {fileID: 0}
-  dropSpawnPoint: {fileID: 0}
-  baseChopTime: 12
+  timeBetweenChops: 1
 --- !u!114 &7120747071932489644
 MonoBehaviour:
   m_ObjectHideFlags: 0

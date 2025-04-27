@@ -1,9 +1,5 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Assets/Forest Pack/Scenes/DemoScene_dst/ReflectionProbe-0.exr.meta
-guid: 5f4317a0dd8fdf7489072c01cd9a6e9a
-========
 guid: 8565e61c686b4fa40a3ba69c481dc5a3
->>>>>>>> 676f596edb7b9bd6b0e253a5b155efaa678202db:Assets/Forest Pack/Scenes/DemoScene/ReflectionProbe-0.exr.meta
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}

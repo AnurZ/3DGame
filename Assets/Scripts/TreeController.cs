@@ -1,159 +1,122 @@
 using UnityEngine;
-using System.Collections;
 
 public class TreeController : MonoBehaviour
 {
-    private Material defaultMaterial;
+    public float health = 100f;
     public Material highlightMaterial;
-    private Renderer rend;
-
-    private bool isShaking = false;
+    private Material originalMaterial;
+    private Renderer treeRenderer;
     private bool isChopping = false;
-    private Quaternion originalRotation;
-    private Vector3 originalPosition;
+    public float timeBetweenChops = 1f;
 
-    [Header("Shake Settings")]
-    public float shakeAmount = 0.1f;
-    public float shakeSpeed = 10f;
+    private float injuryRisk = 0f;
 
-    [Header("Drop Settings")]
-    public GameObject dropPrefab;
-    public Transform dropSpawnPoint;
+    public GameObject dropPrefab;  // The prefab to drop when the tree is chopped down
 
-    [Header("Chop Settings")]
-    public float baseChopTime = 4f;
+    public float choppingDuration = 6f;  // Default duration for chopping
+    private float choppingTime = 0f;  // Track continuous chopping time
 
-    private Coroutine chopCoroutine;
+    private bool hasDroppedPrefab = false;  // To check if prefab has been already dropped
+    private TreeSway treeSway;
 
-    void Start()
+    private void Start()
     {
-        rend = GetComponent<Renderer>();
-        defaultMaterial = rend.sharedMaterial;
-        originalRotation = transform.rotation;
-        originalPosition = transform.position;
-    }
+        treeRenderer = GetComponent<Renderer>();
+        if (treeRenderer != null)
+            originalMaterial = treeRenderer.material;
 
-    void Update()
-    {
-        if (isShaking)
-        {
-            ShakeTree();
-        }
-        else
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, originalRotation, Time.deltaTime * 5f);
-            transform.position = Vector3.Lerp(transform.position, originalPosition, Time.deltaTime * 5f);
-        }
+        treeSway = GetComponent<TreeSway>(); // Get reference to TreeSway component
     }
 
     public void StartHighlighting()
     {
-        if (highlightMaterial != null)
-        {
-            rend.sharedMaterial = highlightMaterial;
-        }
+        if (treeRenderer != null && highlightMaterial != null)
+            treeRenderer.material = highlightMaterial;
     }
 
     public void StopHighlighting()
     {
-        if (defaultMaterial != null)
-        {
-            rend.sharedMaterial = defaultMaterial;
-        }
+        if (treeRenderer != null && originalMaterial != null)
+            treeRenderer.material = originalMaterial;
     }
 
-    public void StartChopping()
+    public void StartChopping(float risk, float adjustedChopDuration)
     {
-        if (!isChopping)
-        {
-            isChopping = true;
-            chopCoroutine = StartCoroutine(ChopCoroutine());
-        }
+        isChopping = true;
+        injuryRisk = risk;
+
+        // Adjust the chopping duration based on injury
+        choppingDuration = adjustedChopDuration;
+
+        // Start swaying when chopping starts
+        treeSway?.StartSwaying();
     }
 
     public void StopChopping()
     {
+        isChopping = false;
+        choppingTime = 0f;  // Reset chopping time if the player stops chopping
+
+        // Stop swaying when chopping stops
+        treeSway?.StopSwaying();
+    }
+
+    private void Update()
+    {
         if (isChopping)
         {
-            isShaking = false;
-            isChopping = false;
+            choppingTime += Time.deltaTime;  // Track the continuous chopping time
 
-            if (chopCoroutine != null)
-            {
-                StopCoroutine(chopCoroutine);
-            }
-        }
-    }
-
-    private IEnumerator ChopCoroutine()
-    {
-        isShaking = true;
-
-        float elapsed = 0f;
-        float staminaPerSecond = (StaminaController.Instance != null) ? 10f / baseChopTime : 0f;
-
-        while (elapsed < baseChopTime)
-        {
+            // Drain stamina while chopping
             if (StaminaController.Instance != null)
+                StaminaController.Instance.ReduceStamina(1f * Time.deltaTime);  // Reduces stamina per second
+
+            // Check if the tree has been chopped for the adjusted duration
+            if (choppingTime >= choppingDuration)
             {
-                StaminaController.Instance.ReduceStamina(staminaPerSecond * Time.deltaTime);
-                if (StaminaController.Instance.playerStamina <= 0f)
-                {
-                    StopChopping(); // Stop if stamina runs out
-                    yield break;
-                }
+                Debug.Log("Tree chopped down after " + choppingDuration + " seconds of continuous chopping!");
+                DropPrefab();
+                PlayerController.Local.OnTreeChoppedDown(); // <-- Injury roll here
+                Destroy(gameObject);
             }
 
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
+            // Apply health damage over time
+            health -= injuryRisk * Time.deltaTime;
 
-        FinishChopping();
-    }
-
-    public void FinishChopping()
-    {
-        isShaking = false;
-        isChopping = false;
-
-        if (dropPrefab != null)
-        {
-            Vector3 spawnPosition = dropSpawnPoint != null
-                ? dropSpawnPoint.position
-                : transform.position + Vector3.up * 1f;
-
-            Instantiate(dropPrefab, spawnPosition, Quaternion.identity);
-        }
-
-        Destroy(gameObject, 0.2f);
-    }
-
-    public float GetChopDuration()
-    {
-        return baseChopTime;
-    }
-
-    void ShakeTree()
-    {
-        float shakeOffset = Mathf.Sin(Time.time * shakeSpeed) * shakeAmount;
-
-        transform.rotation = originalRotation * Quaternion.Euler(0, 0, shakeOffset);
-        transform.position = originalPosition + new Vector3(shakeOffset * 0.1f, 0, 0);
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            StartHighlighting();
+            if (health <= 0f)
+            {
+                Debug.Log("Tree chopped down!");
+                DropPrefab();
+                PlayerController.Local.OnTreeChoppedDown(); // <-- Injury roll here
+                Destroy(gameObject);
+            }
         }
     }
 
-    void OnTriggerExit(Collider other)
+    private void Chop()
     {
-        if (other.CompareTag("Player"))
+        if (StaminaController.Instance != null)
+            StaminaController.Instance.ReduceStamina(5);
+
+        float injuryRoll = Random.Range(0f, 100f);
+
+        health -= 10f;
+        if (health <= 0f)
         {
-            StopHighlighting();
+            Debug.Log("Tree chopped down!");
+            DropPrefab();
+            PlayerController.Local.OnTreeChoppedDown(); // <-- Injury roll here too (just in case this path is ever used)
+            Destroy(gameObject);
+        }
+    }
+
+    private void DropPrefab()
+    {
+        if (dropPrefab != null && !hasDroppedPrefab)
+        {
+            Instantiate(dropPrefab, transform.position, Quaternion.identity);
+            Debug.Log("Prefab dropped!");
+            hasDroppedPrefab = true;  // Set flag to true to ensure item is dropped only once
         }
     }
 }

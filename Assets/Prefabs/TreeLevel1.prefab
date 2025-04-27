@@ -31,7 +31,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 86714133389632869}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 164.51788, y: 60.03137, z: 129.18779}
   m_LocalScale: {x: 3, y: 4, z: 3}
   m_ConstrainProportionsScale: 0
@@ -126,12 +126,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbb5bdc2fda2468439df7e9f725fa436, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  swaySpeed: 1
-  swayAmount: 0.1
+  swaySpeed: 5
+  swayAmount: 1
   swayRandomness: 0.2
-  treeTop: {fileID: 0}
-  treeBase: {fileID: 0}
-  swayInterval: 1.5
 --- !u!114 &5192601651284018991
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -144,11 +141,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2753346aa6c6f454e98d24070b97314a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  health: 100
   highlightMaterial: {fileID: 2100000, guid: 40b71f23c59449147bf79b3ce9c3ca71, type: 2}
-  shakeAmount: 0.66
-  shakeSpeed: 9
-  dropPrefab: {fileID: 2342077406854791919, guid: 82780829f8a0cf14d8da6631542a3ed5, type: 3}
-  dropSpawnPoint: {fileID: 0}
+  timeBetweenChops: 1
+  dropPrefab: {fileID: 8954913584420728692, guid: fab2d1b5174baf14d82aabbd3fbe5e2b, type: 3}
+  choppingDuration: 5
 --- !u!136 &1951700210506906963
 CapsuleCollider:
   m_ObjectHideFlags: 0

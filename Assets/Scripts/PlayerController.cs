@@ -58,6 +58,8 @@ public class PlayerController : MonoBehaviour
         isInShop = true;
         gameplayUI.SetActive(false);
         uiPanel.SetActive(false);
+        DialogueManager.Instance.StartDialogue();
+        
         Debug.Log("Entered shop.");
     }
 
@@ -66,6 +68,8 @@ public class PlayerController : MonoBehaviour
         isInShop = false;
         if (gameplayUI != null) gameplayUI.SetActive(true);
         if (moneyUI != null) moneyUI.SetActive(true);
+        DialogueManager.Instance.EndDialogue();
+
     }
     
     private void Start()

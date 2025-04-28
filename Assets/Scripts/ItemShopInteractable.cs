@@ -1,30 +1,32 @@
 using cakeslice;
+using TMPro;
 using UnityEngine;
-
-// Make sure you have this interface somewhere in your project:
-
+using UnityEngine.UI;
+using Outline = cakeslice.Outline; // For UI text
 
 [RequireComponent(typeof(Collider))]
 public class ItemShopInteractable : MonoBehaviour, IShopInteractable
 {
     [Header("Buy Settings")]
-    public Item  itemToGive;
-    public int   cost = 10;
+    public Item itemToGive;
+    public int cost = 10;
 
     [Header("Highlight Colors")]
     public Color hoverColor = Color.green;
     public Color grayOutColor = Color.gray;
 
     private Renderer[] renderers;
-    private Color[]    originalColors;
-    private Outline    outline;
+    private Color[] originalColors;
+    private Outline outline;
 
+    // For showing price
+    public GameObject pricePopupPrefab;  // Assign prefab with a Text component
+    private GameObject pricePopupInstance;
 
-    
     void Start()
     {
         // Cache all renderers & their original colors
-        renderers      = GetComponentsInChildren<Renderer>();
+        renderers = GetComponentsInChildren<Renderer>();
         originalColors = new Color[renderers.Length];
         for (int i = 0; i < renderers.Length; i++)
             originalColors[i] = renderers[i].material.color;
@@ -46,7 +48,38 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
         // Highlight: yellow + outline
         SetAllColors(hoverColor);
         if (outline != null) outline.enabled = true;
+
+        // Show the price popup
+        if (pricePopupPrefab != null)
+        {
+            // Instantiate the price popup at the item's position
+            pricePopupInstance = Instantiate(pricePopupPrefab, transform.position, Quaternion.identity);
+
+            // Find the Text (or TMP_Text) component inside the popup instance
+            var priceText = pricePopupInstance.GetComponentInChildren<TMP_Text>();  // or TMP_Text if you're using TextMesh Pro
+        
+            if (priceText != null)
+            {
+                priceText.text = "$" + cost.ToString();  // Set the price text
+            }
+            else
+            {
+                Debug.LogWarning("Text component not found in pricePopupPrefab.");
+            }
+
+            // Set the parent to the MoneyUI's transform (replace 'MoneyUI' with your actual GameObject name or reference)
+            pricePopupInstance.transform.SetParent(GameObject.Find("MoneyUI").transform);  // Set the parent to MoneyUI
+
+            // Optionally adjust the local position if needed
+            pricePopupInstance.transform.localPosition = Vector3.zero;  // Adjust this as needed
+        }
+        else
+        {
+            Debug.LogWarning("pricePopupPrefab is not assigned in the Inspector.");
+        }
     }
+
+
 
     public void OnHoverExit()
     {
@@ -57,10 +90,14 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
             RestoreOriginalColors();
 
         if (outline != null) outline.enabled = false;
+
+        // Hide the price popup
+        if (pricePopupInstance != null)
+        {
+            Destroy(pricePopupInstance);  // Destroy the price popup when hover ends
+        }
     }
 
-  
-    
     public void OnActivate()
     {
         // Try to buy

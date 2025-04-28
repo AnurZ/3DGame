@@ -30,8 +30,22 @@ public class MoneyPopupManager : MonoBehaviour
             return;
         }
 
+        // Instantiate the popup
         GameObject popupObj = Instantiate(moneyPopupPrefab, popupParent);
-        popupObj.transform.position = screenPosition;
+
+        // Convert the screen position to local position within the Canvas
+        RectTransform rectTransform = popupObj.GetComponent<RectTransform>();
+
+        if (rectTransform != null)
+        {
+            // Convert screen space position to local space relative to the canvas
+            Vector2 localPosition;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(popupParent.GetComponent<RectTransform>(), screenPosition, null, out localPosition);
+            rectTransform.localPosition = localPosition;
+
+            // Optional: If you don't want rotation, ensure it's reset
+            rectTransform.localRotation = Quaternion.identity;
+        }
 
         var popup = popupObj.GetComponent<MoneyPopup>();
         if (popup != null)
@@ -39,4 +53,5 @@ public class MoneyPopupManager : MonoBehaviour
             popup.Setup(amount);
         }
     }
+
 }

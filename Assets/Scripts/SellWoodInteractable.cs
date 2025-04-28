@@ -11,14 +11,17 @@ public class SellWoodInteractable : MonoBehaviour, IShopInteractable
         public int pricePerUnit;
     }
 
+    [Header("Sell Settings")]
     public WoodPrice[] woodPrices;
+
+    [Header("Colors")]
     public Color hoverColor = Color.yellow;
     public Color soldColor = Color.green;
 
-    Renderer[] rends;
-    Color[] originalColors;
+    private Renderer[] rends;
+    private Color[] originalColors;
 
-    void Start()
+    private void Start()
     {
         rends = GetComponentsInChildren<Renderer>();
         originalColors = rends.Select(r => r.material.color).ToArray();
@@ -27,46 +30,54 @@ public class SellWoodInteractable : MonoBehaviour, IShopInteractable
     // IShopInteractable implementation
     public void OnHoverEnter()
     {
-        Debug.Log("Sell Hover Enter");
         SetAllColors(hoverColor);
     }
 
-    public void OnHoverExit() 
+    public void OnHoverExit()
     {
-        Debug.Log("Sell Hover Exit");
         ResetColors();
     }
 
     public void OnActivate()
     {
-        Debug.Log("Sell Activate");
         TrySell();
     }
 
-    // actual sell logic
-    void TrySell()
+    // Actual sell logic
+    private void TrySell()
     {
         var inv = InventoryManager.Instance;
-        int total = 0;
+        int totalEarned = 0;
 
         foreach (var wp in woodPrices)
-            total += inv.RemoveAllOfItem(wp.woodItem) * wp.pricePerUnit;
-
-        if (total > 0)
         {
-            CurrencyManager.Instance.AddMoney(total);
-            Debug.Log($"Sold wood for {total}");
-            SetAllColors(soldColor);
+            int amountSold = inv.RemoveAllOfItem(wp.woodItem);
+            if (amountSold > 0)
+            {
+                totalEarned += amountSold * wp.pricePerUnit;
+            }
         }
-        else Debug.Log("No wood to sell.");
+
+        if (totalEarned > 0)
+        {
+            CurrencyManager.Instance.AddMoney(totalEarned);
+            SetAllColors(soldColor);
+            MoneyPopupManager.Instance.ShowPopup(totalEarned, Input.mousePosition);
+        }
+        else
+        {
+            Debug.Log("No wood to sell.");
+        }
     }
 
-    void SetAllColors(Color c)
+    // Helpers
+    private void SetAllColors(Color color)
     {
-        foreach (var r in rends) r.material.color = c;
+        foreach (var r in rends)
+            r.material.color = color;
     }
 
-    void ResetColors()
+    private void ResetColors()
     {
         for (int i = 0; i < rends.Length; i++)
             rends[i].material.color = originalColors[i];

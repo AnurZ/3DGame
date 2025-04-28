@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: c9776548db71bd447a547b6e1b31a3aa
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - moneyPopupPrefab: {fileID: 5395629394396069096, guid: 517d6d37921f46c458e582d614bf60e2, type: 3}
+  - popupParent: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

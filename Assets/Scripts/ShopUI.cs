@@ -11,7 +11,7 @@ public class ShopUI : MonoBehaviour
 
     void Update()
     {
-        moneyText.text = "Money: $" + CurrencyManager.Instance.CurrentMoney;
+        moneyText.text = "" + CurrencyManager.Instance.CurrentMoney;
 
     }
 

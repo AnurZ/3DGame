@@ -15,6 +15,9 @@ public class PlayerController : MonoBehaviour
     private bool canSleep = false;
     private SimpleDayNightCycle dayNightCycle;
 
+    public GameObject gameplayUI;
+    public GameObject moneyUI;
+
     public GameObject uiPanel;
     public TMP_Text interactionText;
 
@@ -27,35 +30,45 @@ public class PlayerController : MonoBehaviour
     public InjuryStatus currentInjury = InjuryStatus.Healthy;
     private float injuryEffectMultiplier = 1f;
 
-    public int daysToRecover = 0;
     public Text injuryStateText;
+    
+
+    
+    public int daysToRecover = 0;
     public static PlayerController Local;
     public GameObject modelToHide;
 
     public GameObject playerInjuryAlert;
     public Text injuryAlertText;
-    
+
     private float injuryRisk = 0f;
     private string injuryRiskLevel = "LOW";
 
-    // Duration multiplier for chop duration
     private float chopDurationMultiplier = 1f;
-
     private InjurySystem.InjuryChanceData chopInjuryChance;
     private bool injuryCalculatedAtStart = false;
 
-    public void SetVisible(bool isVisible)
-    {
-        if (modelToHide != null)
-            modelToHide.SetActive(isVisible);
-    }
-
-    void Awake()
+    private void Awake()
     {
         Local = this;
     }
 
-    void Start()
+    public void EnterShop()
+    {
+        isInShop = true;
+        gameplayUI.SetActive(false);
+        uiPanel.SetActive(false);
+        Debug.Log("Entered shop.");
+    }
+
+    public void ExitShop()
+    {
+        isInShop = false;
+        if (gameplayUI != null) gameplayUI.SetActive(true);
+        if (moneyUI != null) moneyUI.SetActive(true);
+    }
+    
+    private void Start()
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
@@ -67,14 +80,22 @@ public class PlayerController : MonoBehaviour
         dayNightCycle = FindObjectOfType<SimpleDayNightCycle>();
 
         if (injuryStateText != null)
-            injuryStateText.gameObject.SetActive(true); // Ensure it's visible
+            injuryStateText.gameObject.SetActive(true);
 
         uiPanel.SetActive(false);
 
-        // Set the player to be healthy at the start
         currentInjury = InjuryStatus.Healthy;
-        
         playerInjuryAlert.SetActive(false);
+    }
+
+    public void SetVisible(bool isVisible)
+    {
+        if (modelToHide != null)
+            modelToHide.SetActive(isVisible);
+
+        var rends = GetComponentsInChildren<Renderer>();
+        foreach (var r in rends)
+            r.enabled = isVisible;
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -89,22 +110,9 @@ public class PlayerController : MonoBehaviour
             if (isChopping)
                 CancelChopping();
             else
-            {
-                // Calculate and log injury chances at the start of chopping
-                InjurySystem.InjuryChanceData injuryChanceData = InjurySystem.CalculateChance(currentInjury, StaminaController.Instance.playerStamina);
-
-                // Calculate the total injury chance (minor + moderate + severe)
-                float totalInjuryChance = injuryChanceData.minorChance + injuryChanceData.moderateChance + injuryChanceData.severeChance;
-                Debug.Log($"Total injury chance at chop start: {totalInjuryChance * 100}%");
-
-                // Log individual injury chances for reference
-                Debug.Log($"Injury chance at chop start: Minor {injuryChanceData.minorChance * 100}% | Moderate {injuryChanceData.moderateChance * 100}% | Severe {injuryChanceData.severeChance * 100}%");
-            
                 StartCoroutine(StartChopNextFrame());
-            }
         }
     }
-
 
     private bool IsHoldingAxe()
     {
@@ -130,15 +138,13 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // Calculate injury chance ONCE at start
         if (!injuryCalculatedAtStart)
         {
             chopInjuryChance = InjurySystem.CalculateChance(currentInjury, StaminaController.Instance.playerStamina);
             injuryCalculatedAtStart = true;
-            Debug.Log($"Injury chance set at chop start: Minor {chopInjuryChance.minorChance * 100}% | Moderate {chopInjuryChance.moderateChance * 100}% | Severe {chopInjuryChance.severeChance * 100}%");
+            Debug.Log($"Injury chance at chop start: Minor {chopInjuryChance.minorChance * 100}% | Moderate {chopInjuryChance.moderateChance * 100}% | Severe {chopInjuryChance.severeChance * 100}%");
         }
 
-        // Adjust chop duration based on injury state
         float baseChopTime = 10f;
         float adjustedChopTime = baseChopTime * chopDurationMultiplier;
 
@@ -149,7 +155,7 @@ public class PlayerController : MonoBehaviour
         rb.linearVelocity = Vector3.zero;
         rb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationY;
 
-        nearbyTree.StartChopping(risk, adjustedChopTime); // Pass adjusted chop time
+        nearbyTree.StartChopping(risk, adjustedChopTime);
 
         if (interactionText != null)
         {
@@ -160,64 +166,53 @@ public class PlayerController : MonoBehaviour
 
     public void OnTreeChoppedDown()
     {
-        // Player finished chopping, now roll for injury
         if (injuryCalculatedAtStart)
         {
-            TryApplyInjury();  // Injury check after chopping
-            injuryCalculatedAtStart = false;  // Reset the flag
+            TryApplyInjury();
+            injuryCalculatedAtStart = false;
         }
     }
 
     private void TryApplyInjury()
     {
-        float roll = Random.value; // 0.0 to 1.0
+        float roll = Random.value;
         Debug.Log($"Injury Roll: {roll}");
 
-        // Generate random recovery time based on injury severity
         int recoveryDays = 0;
 
         if (roll <= chopInjuryChance.severeChance)
         {
             currentInjury = InjuryStatus.Severe;
-            recoveryDays = Random.Range(6, 11); // 6-10 days for severe injury
+            recoveryDays = Random.Range(6, 11);
             Debug.Log($"You suffered a SEVERE injury! Recovery time: {recoveryDays} days.");
         }
         else if (roll <= chopInjuryChance.severeChance + chopInjuryChance.moderateChance)
         {
             currentInjury = InjuryStatus.Moderate;
-            recoveryDays = Random.Range(3, 6); // 3-5 days for moderate injury
+            recoveryDays = Random.Range(3, 6);
             Debug.Log($"You suffered a MODERATE injury! Recovery time: {recoveryDays} days.");
         }
         else if (roll <= chopInjuryChance.severeChance + chopInjuryChance.moderateChance + chopInjuryChance.minorChance)
         {
             currentInjury = InjuryStatus.Minor;
-            recoveryDays = Random.Range(1, 3); // 1-2 days for minor injury
+            recoveryDays = Random.Range(1, 3);
             Debug.Log($"You suffered a MINOR injury! Recovery time: {recoveryDays} days.");
         }
         else
         {
             currentInjury = InjuryStatus.Healthy;
             Debug.Log("No injury occurred.");
-        
-            // Hide the injury alert if no injury occurred
             if (playerInjuryAlert != null)
-            {
                 playerInjuryAlert.SetActive(false);
-            }
-            return; // No injury to process
+            return;
         }
+
         daysToRecover = recoveryDays;
-        // Show the injury state and recovery text after the injury has been decided
         SetInjuryStateText(recoveryDays);
 
-        // Make sure the player injury alert is visible when an injury occurs
         if (playerInjuryAlert != null)
-        {
             playerInjuryAlert.SetActive(true);
-        }
     }
-
-
 
     private void SetInjuryStateText(int recoveryDays)
     {
@@ -225,40 +220,38 @@ public class PlayerController : MonoBehaviour
         {
             if (currentInjury == InjuryStatus.Healthy)
             {
-                playerInjuryAlert.SetActive(false); // Hide if healthy
-                injuryStateText.text = ""; // Optionally clear the text
+                playerInjuryAlert.SetActive(false);
+                injuryStateText.text = "";
                 return;
             }
-            playerInjuryAlert.SetActive(true); // Show the alert if injured
 
-            // Set the injury text based on current injury status
-            string injuryText = $"You are injured!\n";
+            playerInjuryAlert.SetActive(true);
+            string injuryText = "You are injured!\n";
 
             if (currentInjury == InjuryStatus.Minor)
             {
                 injuryText += $"Chopping is 25% slower.\n Recovery time: {recoveryDays} days.";
-                injuryAlertText.color = Color.yellow; // Minor - Yellow
+                injuryAlertText.color = Color.yellow;
             }
             else if (currentInjury == InjuryStatus.Moderate)
             {
                 injuryText += $"Chopping is 50% slower.\n Recovery time: {recoveryDays} days.";
-                injuryAlertText.color = new Color(1f, 0.647f, 0f); // Moderate - Orange
+                injuryAlertText.color = new Color(1f, 0.647f, 0f);
             }
             else if (currentInjury == InjuryStatus.Severe)
             {
                 injuryText += $"You cannot chop trees\n while severely injured.\n Recovery time: {recoveryDays} days.";
-                injuryAlertText.color = new Color(0.75f, 0f, 0f); // Severe - Dark Red
+                injuryAlertText.color = new Color(0.75f, 0f, 0f);
             }
             else
             {
-                injuryAlertText.text = ""; // Healthy
+                injuryAlertText.text = "";
                 return;
             }
 
             injuryAlertText.text = injuryText;
         }
     }
-
 
     private void CancelChopping()
     {
@@ -269,7 +262,8 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("IsWalking", false);
         rb.constraints = RigidbodyConstraints.FreezeRotation;
 
-        nearbyTree?.StopChopping();
+        if (nearbyTree != null)
+            nearbyTree.StopChopping();
 
         if (interactionText != null)
         {
@@ -278,7 +272,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void Update()
+    private void Update()
     {
         if (isInShop)
             return;
@@ -293,51 +287,20 @@ public class PlayerController : MonoBehaviour
         {
             UpdateAnimations();
         }
-
-        // Update injury state text every frame
-        UpdateInjuryRisk();
-
-        // Get recovery days based on current injury
-        int recoveryDays = daysToRecover;
-
-        // Update injury state text with recovery days
-        UpdateInjuryStateText();
-    }
-
-    private void UpdateInjuryStateText()
-    {
-        if (injuryStateText != null)
+        
+       
+        
+        if (!isChopping && !isInShop && canSleep && Input.GetKeyDown(KeyCode.Space))
         {
-            string injuryText = "Injury state: ";
-
-            int recoveryDays = daysToRecover;
-
-            // Set injury text and color based on injury state
-            switch (currentInjury)
-            {
-                case InjuryStatus.Minor:
-                    injuryText += $"Minor injury ({recoveryDays} days left)";
-                    injuryStateText.color = Color.yellow; // Minor - Yellow
-                    break;
-                case InjuryStatus.Moderate:
-                    injuryText += $"Moderate injury ({recoveryDays} days left)";
-                    injuryStateText.color = new Color(1f, 0.647f, 0f); // Moderate - Orange
-                    break;
-                case InjuryStatus.Severe:
-                    injuryText += $"Severe injury ({recoveryDays} days left)";
-                    injuryStateText.color = new Color(0.75f, 0f, 0f); // Severe - Dark Red
-                    break;
-                default:
-                    injuryText = "";
-                    break;
-            }
-
-            injuryStateText.text = injuryText;
+            dayNightCycle.Sleep();
+            uiPanel.SetActive(false);
+            interactionText.text = "";
         }
+        UpdateInjuryRisk();
+        //UpdateInjuryStateText();
     }
 
-    
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         if (isInShop || isChopping)
             return;
@@ -347,7 +310,7 @@ public class PlayerController : MonoBehaviour
 
     private void MovePlayer()
     {
-        Vector3 inputDirection = new Vector3(move.x, 0f, move.y).normalized;
+        Vector3 inputDirection = new Vector3(move.x, 0f, move.y).normalized * injuryEffectMultiplier;
 
         if (inputDirection != Vector3.zero)
         {
@@ -363,19 +326,17 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("IsWalking", !isChopping && move != Vector2.zero);
     }
 
-    void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Tree"))
         {
-            if (nearbyTree != other.GetComponent<TreeController>()) // Ensure we're not already highlighting this tree
+            if (nearbyTree != other.GetComponent<TreeController>())
             {
                 if (nearbyTree != null)
-                {
-                    nearbyTree.StopHighlighting(); // Stop highlighting previous tree
-                }
+                    nearbyTree.StopHighlighting();
 
                 nearbyTree = other.GetComponent<TreeController>();
-                nearbyTree?.StartHighlighting(); // Highlight the new tree
+                nearbyTree?.StartHighlighting();
 
                 if (interactionText != null)
                 {
@@ -404,26 +365,27 @@ public class PlayerController : MonoBehaviour
         }
         else if (other.CompareTag("Shop") && !isInShop)
         {
-            interactionText.text = "Press [Space] to enter shop.";
-            uiPanel.SetActive(true);
+            if (interactionText != null)
+            {
+                interactionText.text = "Press [Space] to enter shop.";
+                uiPanel.SetActive(true);
+            }
+            
         }
     }
 
-    void OnTriggerExit(Collider other)
+    private void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Tree"))
         {
-            if (nearbyTree != null && nearbyTree.CompareTag("Tree"))
+            if (nearbyTree != null)
             {
-                nearbyTree.StopHighlighting(); // Stop highlighting the tree when leaving its collider
+                nearbyTree.StopHighlighting();
                 nearbyTree = null;
             }
 
-            // Optional: Reset interaction text if the player exits a tree's trigger zone
             if (interactionText != null)
-            {
                 interactionText.text = "";
-            }
 
             if (uiPanel.activeSelf)
                 uiPanel.SetActive(false);
@@ -431,6 +393,18 @@ public class PlayerController : MonoBehaviour
         else if (other.CompareTag("Bed"))
         {
             canSleep = false;
+        }
+        else if (other.CompareTag("Shop"))
+        {
+            if (uiPanel.activeSelf)
+                uiPanel.SetActive(false);
+            if (isInShop)
+            {
+                isInShop = false;
+                gameplayUI.SetActive(true);
+                Debug.Log("Exited shop.");
+            }
+            
         }
     }
 
@@ -458,39 +432,10 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateInjuryRisk()
     {
-        float stamina = StaminaController.Instance.playerStamina;
+        // Logika za update injury rizika (pretpostavljam da dolazi iz InjurySystem-a)
+        InjurySystem.InjuryChanceData injuryChanceData = InjurySystem.CalculateChance(currentInjury, StaminaController.Instance.playerStamina);
 
-        // Update chop duration multiplier based on injury status
-        if (currentInjury == InjuryStatus.Healthy)
-        {
-            chopDurationMultiplier = 1f; // Normal chop speed
-        }
-        else if (currentInjury == InjuryStatus.Minor)
-        {
-            chopDurationMultiplier = 1.25f; // 25% slower
-        }
-        else if (currentInjury == InjuryStatus.Moderate)
-        {
-            chopDurationMultiplier = 1.5f; // 50% slower
-        }
-        else if (currentInjury == InjuryStatus.Severe)
-        {
-            chopDurationMultiplier = 0f; // Prevent chopping (already handled in StartChopping)
-        }
-
-        if (currentInjury == InjuryStatus.Healthy)
-        {
-            if (stamina <= 30) { injuryRisk = 35; injuryRiskLevel = "HIGH"; }
-            else if (stamina <= 40) { injuryRisk = 25; injuryRiskLevel = "MEDIUM"; }
-            else if (stamina <= 50) { injuryRisk = 15; injuryRiskLevel = "LOW"; }
-            else { injuryRisk = 0; injuryRiskLevel = "LOW"; }
-        }
-        else if (currentInjury == InjuryStatus.Minor)
-        {
-            if (stamina <= 30) { injuryRisk = 50; injuryRiskLevel = "VERY HIGH"; }
-            else if (stamina <= 40) { injuryRisk = 40; injuryRiskLevel = "HIGH"; }
-            else if (stamina <= 50) { injuryRisk = 30; injuryRiskLevel = "MEDIUM"; }
-            else { injuryRisk = 15; injuryRiskLevel = "LOW"; }
-        }
+        float totalInjuryChance = injuryChanceData.minorChance + injuryChanceData.moderateChance + injuryChanceData.severeChance;
+        injuryRisk = totalInjuryChance;
     }
 }

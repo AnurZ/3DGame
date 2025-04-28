@@ -297,6 +297,8 @@ public class PlayerController : MonoBehaviour
         if (!isChopping && !isInShop && canSleep && Input.GetKeyDown(KeyCode.Space))
         {
             dayNightCycle.Sleep();
+            FindAnyObjectByType<SaveManager>().SaveGame();
+            Debug.Log("SavedGame!");
             uiPanel.SetActive(false);
             interactionText.text = "";
         }

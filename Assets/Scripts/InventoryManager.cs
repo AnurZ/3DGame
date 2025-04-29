@@ -18,7 +18,32 @@ public class InventoryManager : MonoBehaviour
     private void Start()
     {
         ChangeSelectedSlot(0);
+        if (InventoryIsEmpty())
+        {
+            AddDefaultItemsToInventory();
+        }
     }
+    
+    private bool InventoryIsEmpty()
+    {
+        foreach (var slot in inventorySlots)
+        {
+            if (slot.transform.childCount > 0) // If the slot has items, return false
+                return false;
+        }
+        return true;
+    }
+    
+    public int GetSelectedSlotIndex()
+    {
+        return selectedSlot;
+    }
+
+    public void ChangeSelectedSlotExternally(int index)
+    {
+        ChangeSelectedSlot(index);
+    }
+
 
     private void Update()
     {
@@ -57,7 +82,7 @@ public class InventoryManager : MonoBehaviour
 
     
     
-    void ChangeSelectedSlot(int newValue)
+   public void ChangeSelectedSlot(int newValue)
     {
         if (playerController != null && !playerController.isChopping)
         {
@@ -79,6 +104,24 @@ public class InventoryManager : MonoBehaviour
             currentHeldItem = null;
         }
     }
+    
+    private void AddDefaultItemsToInventory()
+    {
+        // Define default items to be added to the inventory
+        Item woodItem = Resources.Load<Item>("Items/Wood");
+        Item axeItem = Resources.Load<Item>("Items/Axe");
+        Item saplingItem = Resources.Load<Item>("Items/Sapling");
+
+        // Add default items to the inventory
+        InventoryManager.Instance.AddItem(woodItem);
+        InventoryManager.Instance.AddItem(axeItem);
+        InventoryManager.Instance.AddItem(saplingItem);
+
+        // Optionally set a starting amount
+        InventoryManager.Instance.AddItem(woodItem);
+        InventoryManager.Instance.AddItem(axeItem);
+    }
+
 
     
     void UpdateHeldItem()

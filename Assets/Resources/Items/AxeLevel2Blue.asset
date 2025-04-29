@@ -10,14 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa9823dd45effeb42ab71ee39c1d3c7c, type: 3}
-  m_Name: AxeLevel4Purple
+  m_Name: AxeLevel2Blue
   m_EditorClassIdentifier: 
-  type: 1
+  itemName: AxeLevel2Blue
+  type: 0
   actionType: 0
   stackable: 1
-  image: {fileID: 21300000, guid: 5b02ab96f03b5aa45ab0545a1ef56672, type: 3}
-  itemPrefab: {fileID: 2600890851036843320, guid: 49117d4f6bde3cc4e9830ae17531d780, type: 3}
+  image: {fileID: 21300000, guid: a0ab75c5094208948bafe233e9388628, type: 3}
+  itemPrefab: {fileID: 6092789239759599132, guid: 43a160578a55565468ecf9bbefa67176, type: 3}
   inHandPosition: {x: 0, y: 0, z: 0}
-  inHandRotation: {x: 0, y: 0, z: 0}
+  inHandRotation: {x: 0, y: 180, z: 0}
   inHandScale: {x: 1, y: 1, z: 1}
   isAxe: 1

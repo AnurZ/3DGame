@@ -16,9 +16,10 @@ MonoBehaviour:
   type: 0
   actionType: 0
   stackable: 1
-  image: {fileID: 0}
+  image: {fileID: 21300000, guid: dad3035bf9b99954c9dffb2990a2b5e2, type: 3}
   itemPrefab: {fileID: 1305883699301654, guid: 093a44e6b1a384df88fabf2976ac0055, type: 3}
   inHandPosition: {x: 0, y: 0, z: 0}
   inHandRotation: {x: 0, y: 0, z: 0}
   inHandScale: {x: 0.3, y: 0.3, z: 0.3}
   isAxe: 0
+  isPotion: 1

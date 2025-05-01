@@ -47,6 +47,8 @@ public class PlayerController : MonoBehaviour
     private float chopDurationMultiplier = 1f;
     private InjurySystem.InjuryChanceData chopInjuryChance;
     private bool injuryCalculatedAtStart = false;
+    
+    public PotionManager potionManager;
 
     private void Awake()
     {
@@ -62,6 +64,7 @@ public class PlayerController : MonoBehaviour
             if (daysToRecover <= 0)
             {
                 currentInjury = InjuryStatus.Healthy;
+                injuryEffectMultiplier = 1;
             }
             
             UpdateInjuryStateText();
@@ -97,7 +100,8 @@ public class PlayerController : MonoBehaviour
 
         inventoryManager = FindObjectOfType<InventoryManager>();
         dayNightCycle = FindObjectOfType<SimpleDayNightCycle>();
-
+        potionManager = FindObjectOfType<PotionManager>();
+        
         if (injuryStateText != null)
             injuryStateText.gameObject.SetActive(true);
 
@@ -157,14 +161,29 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if (!injuryCalculatedAtStart)
+        
+        chopInjuryChance = InjurySystem.CalculateChance(currentInjury, StaminaController.Instance.playerStamina);
+        if (potionManager.ShieldPotionDays > 0)
         {
-            chopInjuryChance = InjurySystem.CalculateChance(currentInjury, StaminaController.Instance.playerStamina);
-            injuryCalculatedAtStart = true;
-            Debug.Log($"Injury chance at chop start: Minor {chopInjuryChance.minorChance * 100}% | Moderate {chopInjuryChance.moderateChance * 100}% | Severe {chopInjuryChance.severeChance * 100}%");
+            chopInjuryChance.minorChance *= 0.5f;
+            chopInjuryChance.moderateChance *= 0.5f;
+            chopInjuryChance.severeChance *= 0.5f;
         }
+        Debug.Log($"Injury chance at chop start: Minor {chopInjuryChance.minorChance * 100}% | Moderate {chopInjuryChance.moderateChance * 100}% | Severe {chopInjuryChance.severeChance * 100}%");
+        
 
         float baseChopTime = nearbyTree.choppingDuration;
+        
+        if (currentInjury == InjuryStatus.Minor)
+            chopDurationMultiplier = 1.25f;
+        else if(currentInjury == InjuryStatus.Moderate)
+            chopDurationMultiplier = 1.5f;
+        else if (currentInjury == InjuryStatus.Healthy)
+            chopDurationMultiplier = 1f;
+        
+        if(potionManager.FocusPotionDays > 0)
+            chopDurationMultiplier *= 0.5f;
+        
         float adjustedChopTime = baseChopTime * chopDurationMultiplier;
 
         isChopping = true;
@@ -185,18 +204,15 @@ public class PlayerController : MonoBehaviour
 
     public void OnTreeChoppedDown()
     {
-        if (injuryCalculatedAtStart)
-        {
+        Debug.Log($"Ukupni chance {injuryRisk} Injury chance at chop start: Minor {chopInjuryChance.minorChance * 100}% | Moderate {chopInjuryChance.moderateChance * 100}% | Severe {chopInjuryChance.severeChance * 100}%");
             TryApplyInjury();
-            injuryCalculatedAtStart = false;
-        }
     }
 
     private void TryApplyInjury()
     {
         float roll = Random.value;
         Debug.Log($"Injury Roll: {roll}");
-
+        
         int recoveryDays = 0;
 
         if (roll <= chopInjuryChance.severeChance)
@@ -233,7 +249,7 @@ public class PlayerController : MonoBehaviour
             playerInjuryAlert.SetActive(true);
     }
 
-    private void SetInjuryStateText(int recoveryDays)
+    public void SetInjuryStateText(int recoveryDays)
     {
         daysToRecover = recoveryDays;
         if (playerInjuryAlert != null)
@@ -323,7 +339,7 @@ public class PlayerController : MonoBehaviour
         UpdateInjuryStateText();
     }
     
-    private void UpdateInjuryStateText()
+    public void UpdateInjuryStateText()
     {
         if (injuryStateText == null)
             return;

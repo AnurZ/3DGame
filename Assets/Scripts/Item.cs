@@ -29,6 +29,7 @@ public class Item : ScriptableObject
 
     [Header("Item Type")]
     public bool isAxe = false;
+    public bool isPotion = false;
 }
 
 

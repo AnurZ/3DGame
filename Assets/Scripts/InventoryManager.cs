@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEditor.Experimental.GraphView;
 
 public class InventoryManager : MonoBehaviour
@@ -14,7 +15,9 @@ public class InventoryManager : MonoBehaviour
     public PlayerController playerController;
 
     private int selectedSlot = -1;
-
+    public TMP_Text textMeshPro;
+    public GameObject uipanel;
+    
     private void Start()
     {
         ChangeSelectedSlot(0);
@@ -61,6 +64,7 @@ public class InventoryManager : MonoBehaviour
     }
 
     
+    
     public void CheckForSelectedSlotChange()
     {
         InventorySlot slot = inventorySlots[selectedSlot];
@@ -71,8 +75,18 @@ public class InventoryManager : MonoBehaviour
         if (currentItem != lastSelectedItem)
         {
             lastSelectedItem = currentItem;
+            
             UpdateHeldItem(); // Call when item changes
         }
+    }
+
+    private IEnumerator ShowTextCoroutine()
+    {
+        uipanel.SetActive(true);
+        textMeshPro.text = "Press [SPACEBAR] to drink the potion";
+        yield return new WaitForSeconds(2f); 
+        textMeshPro.text = "";
+        uipanel.SetActive(false);
     }
 
     void Awake()
@@ -91,8 +105,18 @@ public class InventoryManager : MonoBehaviour
             
                     inventorySlots[newValue].Select();
                     selectedSlot = newValue;
-            
-                    UpdateHeldItem(); // <-- Add this
+
+                    Item currentItem = GetSelectedItem(false);
+                    if(currentItem != null){
+                        Debug.Log("JE LI POTION: " + currentItem.isPotion);
+                        if (currentItem.isPotion)
+                        {
+                            StartCoroutine(ShowTextCoroutine());
+                        }
+                    }
+                    
+                    UpdateHeldItem(); 
+                    
         }
     }
 
@@ -100,10 +124,21 @@ public class InventoryManager : MonoBehaviour
     {
         if (currentHeldItem != null)
         {
-            Destroy(currentHeldItem); // Destroy the held item in hand
+            Destroy(currentHeldItem); // Remove the held item visually
             currentHeldItem = null;
         }
+
+        // Also remove the item from the currently selected inventory slot
+        InventorySlot slot = inventorySlots[selectedSlot];
+        InventoryItem itemInSlot = slot.GetComponentInChildren<InventoryItem>();
+        if (itemInSlot != null)
+        {
+            Destroy(itemInSlot.gameObject);
+        }
+
+        lastSelectedItem = null; // Reset the last selected item so held item updates on next change
     }
+
     
     private void AddDefaultItemsToInventory()
     {

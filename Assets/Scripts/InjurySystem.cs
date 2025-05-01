@@ -194,7 +194,7 @@ public static class InjurySystem
                 data.risk = RiskLevel.LOW;
             }
         }
-        
+
         return data;
         
     }

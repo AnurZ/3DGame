@@ -34,6 +34,8 @@ public class DayNightCycle : MonoBehaviour
 
     private float cycleTime;
 
+    public PotionManager potionManager;
+    
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -44,6 +46,8 @@ public class DayNightCycle : MonoBehaviour
 
         // Start time at 8:00 AM
         cycleTime = GetTimeFromHours(startHour);
+        
+        
     }
 
     private void Update()
@@ -140,6 +144,7 @@ public class DayNightCycle : MonoBehaviour
     {
         dayCounter++;
         UpdateDayCounter();
+        Debug.Log("POTIONMANAGER: " + potionManager.ShieldPotionDays);
         PlayerPrefs.SetInt("CurrentDay", dayCounter);
         Debug.Log("Novi dan");
         if (playerInjurySystem != null)

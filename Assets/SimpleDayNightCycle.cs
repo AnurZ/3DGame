@@ -26,10 +26,13 @@ public class SimpleDayNightCycle : MonoBehaviour
     [Header("Reference to Injury System")]
     public PlayerController playerInjurySystem;
 
+    public PotionManager potionManager;
+
     void Start()
     {
         timeOfDay = GetTimeNormalizedFromHour(8);
         currentDay = PlayerPrefs.GetInt("Day", 1);
+        potionManager = FindObjectOfType<PotionManager>();
         UpdateDayText();
     }
     private bool yawningPlayed = false; // Flag to track if yawning has played
@@ -170,6 +173,10 @@ public class SimpleDayNightCycle : MonoBehaviour
         Debug.Log("Novi dan");
         if (playerInjurySystem != null)
             playerInjurySystem.OnDayPassed();
+        if(potionManager.ShieldPotionDays>0)
+            potionManager.ShieldPotionDays--;
+        if(potionManager.FocusPotionDays>0)
+            potionManager.FocusPotionDays--;
     }
 
     float GetTimeNormalizedFromHour(int hour)

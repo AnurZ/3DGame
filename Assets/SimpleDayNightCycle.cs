@@ -22,6 +22,9 @@ public class SimpleDayNightCycle : MonoBehaviour
     private float timeOfDay = 0f;
     private int currentDay = 1;
     private bool isSleeping = false;
+    
+    [Header("Reference to Injury System")]
+    public PlayerController playerInjurySystem;
 
     void Start()
     {
@@ -164,10 +167,15 @@ public class SimpleDayNightCycle : MonoBehaviour
     void UpdateDayText()
     {
         dayText.text = "Day: " + currentDay.ToString();
+        Debug.Log("Novi dan");
+        if (playerInjurySystem != null)
+            playerInjurySystem.OnDayPassed();
     }
 
     float GetTimeNormalizedFromHour(int hour)
     {
         return (hour % 24) / 24f;
     }
+    
+    
 }

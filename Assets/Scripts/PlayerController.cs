@@ -52,6 +52,21 @@ public class PlayerController : MonoBehaviour
     {
         Local = this;
     }
+    
+    public void OnDayPassed()
+    {
+        if (currentInjury != InjuryStatus.Healthy)
+        {
+            daysToRecover--;
+            Debug.Log("daysToRecover" + daysToRecover);
+            if (daysToRecover <= 0)
+            {
+                currentInjury = InjuryStatus.Healthy;
+            }
+            
+            UpdateInjuryStateText();
+        }
+    }
 
     public void EnterShop()
     {
@@ -149,7 +164,7 @@ public class PlayerController : MonoBehaviour
             Debug.Log($"Injury chance at chop start: Minor {chopInjuryChance.minorChance * 100}% | Moderate {chopInjuryChance.moderateChance * 100}% | Severe {chopInjuryChance.severeChance * 100}%");
         }
 
-        float baseChopTime = 10f;
+        float baseChopTime = nearbyTree.choppingDuration;
         float adjustedChopTime = baseChopTime * chopDurationMultiplier;
 
         isChopping = true;
@@ -188,19 +203,19 @@ public class PlayerController : MonoBehaviour
         {
             currentInjury = InjuryStatus.Severe;
             recoveryDays = Random.Range(6, 11);
-            Debug.Log($"You suffered a SEVERE injury! Recovery time: {recoveryDays} days.");
+            Debug.Log($"You suffered a <color=#C0392B>MINOR</color> injury! Recovery time: {recoveryDays} days.");
         }
         else if (roll <= chopInjuryChance.severeChance + chopInjuryChance.moderateChance)
         {
             currentInjury = InjuryStatus.Moderate;
             recoveryDays = Random.Range(3, 6);
-            Debug.Log($"You suffered a MODERATE injury! Recovery time: {recoveryDays} days.");
+            Debug.Log($"You suffered a <color=#FFA500>MODERATE</color> injury! Recovery time: {recoveryDays} days.");
         }
         else if (roll <= chopInjuryChance.severeChance + chopInjuryChance.moderateChance + chopInjuryChance.minorChance)
         {
             currentInjury = InjuryStatus.Minor;
             recoveryDays = Random.Range(1, 3);
-            Debug.Log($"You suffered a MINOR injury! Recovery time: {recoveryDays} days.");
+            Debug.Log($"You suffered a <color=#FFFF66>SEVERE</color> injury! Recovery time: {recoveryDays} days.");
         }
         else
         {
@@ -220,6 +235,7 @@ public class PlayerController : MonoBehaviour
 
     private void SetInjuryStateText(int recoveryDays)
     {
+        daysToRecover = recoveryDays;
         if (playerInjuryAlert != null)
         {
             if (currentInjury == InjuryStatus.Healthy)
@@ -230,32 +246,33 @@ public class PlayerController : MonoBehaviour
             }
 
             playerInjuryAlert.SetActive(true);
-            string injuryText = "You are injured!\n";
+            string injuryText = "";
 
             if (currentInjury == InjuryStatus.Minor)
             {
-                injuryText += $"Chopping is 25% slower.\n Recovery time: {recoveryDays} days.";
-                injuryAlertText.color = Color.yellow;
+                injuryText += $"You suffered a <color=#FFFF66>MINOR</color> injury!\n" +
+                              $"Your chopping is 25% slower\n " +
+                              $"Recovery time: {recoveryDays} days.\"";
             }
             else if (currentInjury == InjuryStatus.Moderate)
             {
-                injuryText += $"Chopping is 50% slower.\n Recovery time: {recoveryDays} days.";
-                injuryAlertText.color = new Color(1f, 0.647f, 0f);
+                injuryText += $"You suffered a <color=#FFA500>MODERATE</color> injury!\n" +
+                              $"Your chopping is 50% slower\n" +
+                              $" Recovery time: {recoveryDays} days.";
             }
             else if (currentInjury == InjuryStatus.Severe)
             {
-                injuryText += $"You cannot chop trees\n while severely injured.\n Recovery time: {recoveryDays} days.";
-                injuryAlertText.color = new Color(0.75f, 0f, 0f);
-            }
-            else
-            {
-                injuryAlertText.text = "";
-                return;
+                injuryText += $"You suffered a <color=#C0392B>SEVERE</color> injury!\n" +
+                              $"You are not able to chop\n" +
+                              $"while severly injured\n" +
+                              $" Recovery time: {recoveryDays} days.";
             }
 
             injuryAlertText.text = injuryText;
         }
     }
+
+
 
     private void CancelChopping()
     {
@@ -303,8 +320,34 @@ public class PlayerController : MonoBehaviour
             interactionText.text = "";
         }
         UpdateInjuryRisk();
-        //UpdateInjuryStateText();
+        UpdateInjuryStateText();
     }
+    
+    private void UpdateInjuryStateText()
+    {
+        if (injuryStateText == null)
+            return;
+
+        switch (currentInjury)
+        {
+            case InjuryStatus.Healthy:
+                injuryStateText.text = "";
+                break;
+
+            case InjuryStatus.Minor:
+                injuryStateText.text = $"Injury state: <color=#FFFF66>Light injury</color> ({daysToRecover} day{(daysToRecover > 1 ? "s" : "")})";
+                break;
+
+            case InjuryStatus.Moderate:
+                injuryStateText.text = $"Injury state: <color=#FFA500>Moderate injury</color> ({daysToRecover} day{(daysToRecover > 1 ? "s" : "")})";
+                break;
+
+            case InjuryStatus.Severe:
+                injuryStateText.text = $"Injury state: <color=#C0392B>Severe injury</color> ({daysToRecover} day{(daysToRecover > 1 ? "s" : "")})";
+                break;
+        }
+    }
+
 
     private void FixedUpdate()
     {

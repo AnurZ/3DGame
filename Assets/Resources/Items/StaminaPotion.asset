@@ -10,14 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa9823dd45effeb42ab71ee39c1d3c7c, type: 3}
-  m_Name: AxeLevel2Blue
+  m_Name: StaminaPotion
   m_EditorClassIdentifier: 
+  itemName: StaminaPotion
   type: 0
   actionType: 0
   stackable: 1
-  image: {fileID: 21300000, guid: a0ab75c5094208948bafe233e9388628, type: 3}
-  itemPrefab: {fileID: 6092789239759599132, guid: 43a160578a55565468ecf9bbefa67176, type: 3}
+  image: {fileID: 21300000, guid: 751e6daf5d161db458ce5e12ebf4d19b, type: 3}
+  itemPrefab: {fileID: 1891390126468666, guid: d4368066c6a114efe9bcb98e6cb1486d, type: 3}
   inHandPosition: {x: 0, y: 0, z: 0}
-  inHandRotation: {x: 0, y: 180, z: 0}
-  inHandScale: {x: 1, y: 1, z: 1}
-  isAxe: 1
+  inHandRotation: {x: 0, y: 0, z: 0}
+  inHandScale: {x: 0.3, y: 0.3, z: 0.3}
+  isAxe: 0
+  isPotion: 1

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa9823dd45effeb42ab71ee39c1d3c7c, type: 3}
   m_Name: SaplingWood1
   m_EditorClassIdentifier: 
+  itemName: SaplingWood1
   type: 0
   actionType: 0
   stackable: 1
@@ -21,3 +22,4 @@ MonoBehaviour:
   inHandRotation: {x: 0, y: 0, z: 0}
   inHandScale: {x: 0.15, y: 0.15, z: 0.15}
   isAxe: 0
+  isPotion: 0

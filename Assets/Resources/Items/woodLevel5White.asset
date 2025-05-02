@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa9823dd45effeb42ab71ee39c1d3c7c, type: 3}
-  m_Name: FocusPotion
+  m_Name: woodLevel5White
   m_EditorClassIdentifier: 
-  itemName: 
-  type: 0
+  itemName: WoodLevel5White
+  type: 2
   actionType: 0
   stackable: 1
-  image: {fileID: 21300000, guid: dad3035bf9b99954c9dffb2990a2b5e2, type: 3}
-  itemPrefab: {fileID: 1305883699301654, guid: 093a44e6b1a384df88fabf2976ac0055, type: 3}
+  image: {fileID: 21300000, guid: 85ed97225fcba814486d6d2c5f78d4d7, type: 3}
+  itemPrefab: {fileID: 7312680072077244823, guid: 4ababea1af0869a418acba1b958ea34a, type: 3}
   inHandPosition: {x: 0, y: 0, z: 0}
-  inHandRotation: {x: 0, y: 0, z: 0}
-  inHandScale: {x: 0.3, y: 0.3, z: 0.3}
+  inHandRotation: {x: 20, y: -30, z: 30}
+  inHandScale: {x: 0.5, y: 0.5, z: 0.5}
   isAxe: 0
-  isPotion: 1
+  isPotion: 0

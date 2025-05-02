@@ -17,10 +17,24 @@ public class InventoryManager : MonoBehaviour
     private int selectedSlot = -1;
     public TMP_Text textMeshPro;
     public GameObject uipanel;
-    
+
     private void Start()
     {
         ChangeSelectedSlot(0);
+        if (InventoryIsEmpty())
+        {
+            AddDefaultItemsToInventory();
+        }
+    }
+
+    private bool InventoryIsEmpty()
+    {
+        foreach (var slot in inventorySlots)
+        {
+            if (slot.transform.childCount > 0) // If the slot has items, return false
+                return false;
+        }
+        return true;
     }
 
     private void Update()
@@ -38,8 +52,16 @@ public class InventoryManager : MonoBehaviour
         CheckForSelectedSlotChange();
     }
 
-    
-    
+    public int GetSelectedSlotIndex()
+    {
+        return selectedSlot;
+    }
+
+    public void ChangeSelectedSlotExternally(int index)
+    {
+        ChangeSelectedSlot(index);
+    }
+
     public void CheckForSelectedSlotChange()
     {
         InventorySlot slot = inventorySlots[selectedSlot];
@@ -50,7 +72,6 @@ public class InventoryManager : MonoBehaviour
         if (currentItem != lastSelectedItem)
         {
             lastSelectedItem = currentItem;
-            
             UpdateHeldItem(); // Call when item changes
         }
     }
@@ -59,7 +80,7 @@ public class InventoryManager : MonoBehaviour
     {
         uipanel.SetActive(true);
         textMeshPro.text = "Press [SPACEBAR] to drink the potion";
-        yield return new WaitForSeconds(2f); 
+        yield return new WaitForSeconds(2f);
         textMeshPro.text = "";
         uipanel.SetActive(false);
     }
@@ -69,29 +90,27 @@ public class InventoryManager : MonoBehaviour
         Instance = this;
     }
 
-    
-    
     void ChangeSelectedSlot(int newValue)
     {
         if (playerController != null && !playerController.isChopping)
         {
             if (selectedSlot >= 0)
-                        inventorySlots[selectedSlot].Deselect();
-            
-                    inventorySlots[newValue].Select();
-                    selectedSlot = newValue;
+                inventorySlots[selectedSlot].Deselect();
 
-                    Item currentItem = GetSelectedItem(false);
-                    if(currentItem != null){
-                        Debug.Log("JE LI POTION: " + currentItem.isPotion);
-                        if (currentItem.isPotion)
-                        {
-                            StartCoroutine(ShowTextCoroutine());
-                        }
-                    }
-                    
-                    UpdateHeldItem(); 
-                    
+            inventorySlots[newValue].Select();
+            selectedSlot = newValue;
+
+            Item currentItem = GetSelectedItem(false);
+            if (currentItem != null)
+            {
+                Debug.Log("JE LI POTION: " + currentItem.isPotion);
+                if (currentItem.isPotion)
+                {
+                    StartCoroutine(ShowTextCoroutine());
+                }
+            }
+
+            UpdateHeldItem();
         }
     }
 
@@ -114,7 +133,6 @@ public class InventoryManager : MonoBehaviour
         lastSelectedItem = null; // Reset the last selected item so held item updates on next change
     }
 
-    
     private void AddDefaultItemsToInventory()
     {
         // Define default items to be added to the inventory
@@ -132,8 +150,6 @@ public class InventoryManager : MonoBehaviour
         InventoryManager.Instance.AddItem(axeItem);
     }
 
-
-    
     void UpdateHeldItem()
     {
         if (currentHeldItem != null)
@@ -180,8 +196,8 @@ public class InventoryManager : MonoBehaviour
         }
 
         return totalRemoved;
-    }   
-    
+    }
+
     public bool AddItem(Item item)
     {
         for (int i = 0; i < inventorySlots.Length; i++)
@@ -190,13 +206,12 @@ public class InventoryManager : MonoBehaviour
             InventoryItem itemInSlot = slot.GetComponentInChildren<InventoryItem>();
             if (itemInSlot != null && itemInSlot.item == item)
             {
-
                 itemInSlot.count++;
                 itemInSlot.RefreshCount();
                 return true;
             }
         }
-        
+
         for (int i = 0; i < inventorySlots.Length; i++)
         {
             InventorySlot slot = inventorySlots[i];
@@ -209,7 +224,6 @@ public class InventoryManager : MonoBehaviour
         }
         return false;
     }
-
 
     void SpawnNewItem(Item item, InventorySlot slot)
     {
@@ -224,7 +238,6 @@ public class InventoryManager : MonoBehaviour
         InventoryItem itemInSlot = slot.GetComponentInChildren<InventoryItem>();
         if (itemInSlot != null)
         {
-                
             Item item = itemInSlot.item;
 
             if (use == true)
@@ -239,11 +252,10 @@ public class InventoryManager : MonoBehaviour
                     itemInSlot.RefreshCount();
                 }
             }
-            
+
             return item;
         }
 
         return null;
     }
-    
 }

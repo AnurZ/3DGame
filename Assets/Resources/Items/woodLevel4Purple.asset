@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa9823dd45effeb42ab71ee39c1d3c7c, type: 3}
-  m_Name: HealingPotion
+  m_Name: woodLevel4Purple
   m_EditorClassIdentifier: 
-  itemName: 
-  type: 0
+  itemName: WoodLevel4Purple
+  type: 2
   actionType: 0
   stackable: 1
-  image: {fileID: 21300000, guid: 6b5edc77595ac46429e46bb04c881687, type: 3}
-  itemPrefab: {fileID: 1999239547283070, guid: d027d4bce170c4abf8619a7d7980440e, type: 3}
+  image: {fileID: 21300000, guid: 5e001172f6510914f8af7ca876afca36, type: 3}
+  itemPrefab: {fileID: 929084121970119903, guid: d384d3571ccc3384d9c2a17954a09f96, type: 3}
   inHandPosition: {x: 0, y: 0, z: 0}
-  inHandRotation: {x: 0, y: 0, z: 0}
-  inHandScale: {x: 0.3, y: 0.3, z: 0.3}
+  inHandRotation: {x: 20, y: -30, z: 30}
+  inHandScale: {x: 0.5, y: 0.5, z: 0.5}
   isAxe: 0
-  isPotion: 1
+  isPotion: 0

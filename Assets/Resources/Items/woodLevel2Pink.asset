@@ -10,14 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa9823dd45effeb42ab71ee39c1d3c7c, type: 3}
-  m_Name: AxeLevel4Purple
+  m_Name: woodLevel2Pink
   m_EditorClassIdentifier: 
-  type: 1
+  itemName: WoodLevel2Pink
+  type: 2
   actionType: 0
   stackable: 1
-  image: {fileID: 21300000, guid: 5b02ab96f03b5aa45ab0545a1ef56672, type: 3}
-  itemPrefab: {fileID: 2600890851036843320, guid: 49117d4f6bde3cc4e9830ae17531d780, type: 3}
+  image: {fileID: 21300000, guid: 9f24fe2306fa459479b4c483fd9ac9df, type: 3}
+  itemPrefab: {fileID: 7564377143969596861, guid: d3be8e0c6acd3aa4c81bda01e8581c05, type: 3}
   inHandPosition: {x: 0, y: 0, z: 0}
-  inHandRotation: {x: 0, y: 0, z: 0}
-  inHandScale: {x: 1, y: 1, z: 1}
-  isAxe: 1
+  inHandRotation: {x: 20, y: -30, z: 30}
+  inHandScale: {x: 0.5, y: 0.5, z: 0.5}
+  isAxe: 0
+  isPotion: 0

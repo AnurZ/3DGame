@@ -10,14 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa9823dd45effeb42ab71ee39c1d3c7c, type: 3}
-  m_Name: AxeLevel1
+  m_Name: FocusPotion
   m_EditorClassIdentifier: 
-  type: 1
+  itemName: FocusPotion
+  type: 3
   actionType: 0
-  stackable: 0
-  image: {fileID: 21300000, guid: 2c96722fe2329064fb4e320e043110ee, type: 3}
-  itemPrefab: {fileID: 4298361972728318113, guid: 0a987e8321ed83e458a8eb2236762b34, type: 3}
+  stackable: 1
+  image: {fileID: 21300000, guid: dad3035bf9b99954c9dffb2990a2b5e2, type: 3}
+  itemPrefab: {fileID: 1305883699301654, guid: 093a44e6b1a384df88fabf2976ac0055, type: 3}
   inHandPosition: {x: 0, y: 0, z: 0}
   inHandRotation: {x: 0, y: 0, z: 0}
-  inHandScale: {x: 1, y: 1, z: 1}
-  isAxe: 1
+  inHandScale: {x: 0.3, y: 0.3, z: 0.3}
+  isAxe: 0
+  isPotion: 1

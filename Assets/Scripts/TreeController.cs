@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TreeController : MonoBehaviour
 {
@@ -18,7 +19,9 @@ public class TreeController : MonoBehaviour
 
     private bool hasDroppedPrefab = false;  // To check if prefab has been already dropped
     private TreeSway treeSway;
-
+    
+    public PlayerController playerController;
+    
     private void Start()
     {
         treeRenderer = GetComponent<Renderer>();
@@ -26,6 +29,7 @@ public class TreeController : MonoBehaviour
             originalMaterial = treeRenderer.material;
 
         treeSway = GetComponent<TreeSway>(); // Get reference to TreeSway component
+        playerController = FindObjectOfType<PlayerController>();
     }
 
     public void StartHighlighting()
@@ -50,6 +54,8 @@ public class TreeController : MonoBehaviour
 
         // Start swaying when chopping starts
         treeSway?.StartSwaying();
+        
+        playerController.ChoppingGameObject.SetActive(true);
     }
 
     public void StopChopping()
@@ -59,39 +65,50 @@ public class TreeController : MonoBehaviour
 
         // Stop swaying when chopping stops
         treeSway?.StopSwaying();
+        
+        playerController.ChoppingGameObject.SetActive(false);
+        if (playerController.choppingImage != null)
+        {
+            playerController.choppingImage.fillAmount = 0f;
+        }
+
     }
 
     private void Update()
     {
         if (isChopping)
         {
-            choppingTime += Time.deltaTime;  // Track the continuous chopping time
+            choppingTime += Time.deltaTime;
 
-            // Drain stamina while chopping
+            // Update chopping UI fill
+            if (playerController.choppingImage != null)
+            {
+                playerController.choppingImage.fillAmount = choppingTime / choppingDuration;
+            }
+
             if (StaminaController.Instance != null)
-                StaminaController.Instance.ReduceStamina(1f * Time.deltaTime);  // Reduces stamina per second
+                StaminaController.Instance.ReduceStamina(1f * Time.deltaTime);
 
-            // Check if the tree has been chopped for the adjusted duration
             if (choppingTime >= choppingDuration)
             {
-                Debug.Log("Tree chopped down after " + choppingDuration + " seconds of continuous chopping!");
+                playerController.ChoppingGameObject.SetActive(false);
+                playerController.choppingImage.fillAmount = 0f;
                 DropPrefab();
-                PlayerController.Local.OnTreeChoppedDown(); // <-- Injury roll here
+                PlayerController.Local.OnTreeChoppedDown();
                 Destroy(gameObject);
             }
 
-            // Apply health damage over time
             health -= injuryRisk * Time.deltaTime;
 
             if (health <= 0f)
             {
-                Debug.Log("Tree chopped down!");
                 DropPrefab();
-                PlayerController.Local.OnTreeChoppedDown(); // <-- Injury roll here
+                PlayerController.Local.OnTreeChoppedDown();
                 Destroy(gameObject);
             }
         }
     }
+
 
     private void Chop()
     {

@@ -49,6 +49,10 @@ public class PlayerController : MonoBehaviour
     private bool injuryCalculatedAtStart = false;
     
     public PotionManager potionManager;
+    
+    
+    public GameObject ChoppingGameObject;
+    public Image choppingImage;
 
     private void Awake()
     {

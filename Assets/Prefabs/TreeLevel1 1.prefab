@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 1951700210506906963}
   - component: {fileID: 7950240235183517634}
   m_Layer: 0
-  m_Name: TreeLevel1
+  m_Name: TreeLevel1 1
   m_TagString: Tree
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -145,9 +145,7 @@ MonoBehaviour:
   highlightMaterial: {fileID: 2100000, guid: 40b71f23c59449147bf79b3ce9c3ca71, type: 2}
   timeBetweenChops: 1
   dropPrefab: {fileID: 8954913584420728692, guid: fab2d1b5174baf14d82aabbd3fbe5e2b, type: 3}
-  choppingDuration: 1
-  ChoppingGameObject: {fileID: 0}
-  choppingImage: {fileID: 0}
+  choppingDuration: 5
 --- !u!136 &1951700210506906963
 CapsuleCollider:
   m_ObjectHideFlags: 0

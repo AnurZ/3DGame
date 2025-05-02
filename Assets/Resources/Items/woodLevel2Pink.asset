@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa9823dd45effeb42ab71ee39c1d3c7c, type: 3}
   m_Name: woodLevel2Pink
   m_EditorClassIdentifier: 
-  itemName: WoodLevel2
+  itemName: WoodLevel2Pink
   type: 2
   actionType: 0
   stackable: 1
@@ -22,3 +22,4 @@ MonoBehaviour:
   inHandRotation: {x: 20, y: -30, z: 30}
   inHandScale: {x: 0.5, y: 0.5, z: 0.5}
   isAxe: 0
+  isPotion: 0

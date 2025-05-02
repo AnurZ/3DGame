@@ -5,87 +5,70 @@ using UnityEngine.UI;
 
 public class InventoryItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    
-    
     [Header("UI")]
     public Image image;
     public Text countText;
-    
+
     public Item item;
     [HideInInspector] public int count = 1;
     [HideInInspector] public Transform parentAfterDrag;
 
-    public void RefreshCount()
+    private void Awake()
     {
-        countText.text = count.ToString();
-        bool textActive = count > 1;
-        countText.gameObject.SetActive(textActive);
+        if (image == null)
+            image = GetComponent<Image>(); // Osiguraj da postoji Image
     }
-    
-    private void Start()
-    {
-        InitialiseItem(item);
-    }
-    public void InitialiseItem(Item newItem)
+
+    public void InitialiseItem(Item newItem, int newAmount = 1)
     {
         if (newItem != null)
         {
             item = newItem;
+            count = Mathf.Max(1, newAmount); // Osiguraj da count nije manji od 1
             if (newItem.image != null)
-            image.sprite = newItem.image;
+                image.sprite = newItem.image;
             RefreshCount();
         }
     }
-    private void Awake()
+
+    public void RefreshCount()
     {
-        if (image == null)
-            image = GetComponent<Image>(); // Ensure there's an image component
+        countText.text = count.ToString();
+        countText.gameObject.SetActive(count > 1);
     }
 
-    
-    
     public void OnBeginDrag(PointerEventData eventData)
     {
-        image.raycastTarget = false; // Prevents blocking raycasts while dragging
-        parentAfterDrag = transform.parent; // Store original parent
-        transform.SetParent(transform.root); // Move to top level in hierarchy
+        image.raycastTarget = false;
+        parentAfterDrag = transform.parent;
+        transform.SetParent(transform.root); // Move to top hierarchy level
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        transform.position = Input.mousePosition; // Follow mouse position
+        transform.position = Input.mousePosition;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        image.raycastTarget = true; // Re-enable raycasts
+        image.raycastTarget = true;
 
         Transform newParent = GetSlotUnderPointer(eventData);
-        if (newParent != null)
-        {
-            transform.SetParent(newParent); // Move item to the detected slot
-        }
-        else
-        {
-            transform.SetParent(parentAfterDrag); // Return to original slot
-        }
-
-        transform.localPosition = Vector3.zero; // Reset position inside slot
+        transform.SetParent(newParent != null ? newParent : parentAfterDrag);
+        transform.localPosition = Vector3.zero;
     }
 
     private Transform GetSlotUnderPointer(PointerEventData eventData)
     {
         List<RaycastResult> results = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(eventData, results); // Get all objects under cursor
+        EventSystem.current.RaycastAll(eventData, results);
 
         foreach (RaycastResult result in results)
         {
-            if (result.gameObject.CompareTag("InventorySlot")) // Check for slots
-            {
-                return result.gameObject.transform; // Return the first valid slot
-            }
+            if (result.gameObject.CompareTag("InventorySlot"))
+                return result.gameObject.transform;
         }
 
-        return null; // No valid slot found
+        return null;
     }
 }

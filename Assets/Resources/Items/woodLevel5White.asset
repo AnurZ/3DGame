@@ -22,3 +22,4 @@ MonoBehaviour:
   inHandRotation: {x: 20, y: -30, z: 30}
   inHandScale: {x: 0.5, y: 0.5, z: 0.5}
   isAxe: 0
+  isPotion: 0

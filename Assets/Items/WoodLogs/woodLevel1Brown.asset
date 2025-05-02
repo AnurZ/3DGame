@@ -10,15 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa9823dd45effeb42ab71ee39c1d3c7c, type: 3}
-  m_Name: woodLevel5White
+  m_Name: woodLevel1Brown
   m_EditorClassIdentifier: 
-  itemName: WoodLevel5White
   type: 2
   actionType: 0
   stackable: 1
-  image: {fileID: 21300000, guid: 85ed97225fcba814486d6d2c5f78d4d7, type: 3}
-  itemPrefab: {fileID: 7312680072077244823, guid: 4ababea1af0869a418acba1b958ea34a, type: 3}
+  image: {fileID: 21300000, guid: eab2a4ddf3f43384c82dd2daec7b1422, type: 3}
+  itemPrefab: {fileID: 2342077406854791919, guid: 82780829f8a0cf14d8da6631542a3ed5, type: 3}
   inHandPosition: {x: 0, y: 0, z: 0}
   inHandRotation: {x: 20, y: -30, z: 30}
   inHandScale: {x: 0.5, y: 0.5, z: 0.5}
-  isAxe: 0

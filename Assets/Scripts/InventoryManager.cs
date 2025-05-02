@@ -21,32 +21,7 @@ public class InventoryManager : MonoBehaviour
     private void Start()
     {
         ChangeSelectedSlot(0);
-        if (InventoryIsEmpty())
-        {
-            AddDefaultItemsToInventory();
-        }
     }
-    
-    private bool InventoryIsEmpty()
-    {
-        foreach (var slot in inventorySlots)
-        {
-            if (slot.transform.childCount > 0) // If the slot has items, return false
-                return false;
-        }
-        return true;
-    }
-    
-    public int GetSelectedSlotIndex()
-    {
-        return selectedSlot;
-    }
-
-    public void ChangeSelectedSlotExternally(int index)
-    {
-        ChangeSelectedSlot(index);
-    }
-
 
     private void Update()
     {
@@ -96,7 +71,7 @@ public class InventoryManager : MonoBehaviour
 
     
     
-   public void ChangeSelectedSlot(int newValue)
+    void ChangeSelectedSlot(int newValue)
     {
         if (playerController != null && !playerController.isChopping)
         {

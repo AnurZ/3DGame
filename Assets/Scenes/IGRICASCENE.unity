@@ -12103,7 +12103,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1043780904}
-  currencyManager: {fileID: 293751507}
 --- !u!4 &1428973989
 Transform:
   m_ObjectHideFlags: 0

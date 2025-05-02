@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa9823dd45effeb42ab71ee39c1d3c7c, type: 3}
   m_Name: SaplingWood1
   m_EditorClassIdentifier: 
-  itemName: SaplingWood1
   type: 0
   actionType: 0
   stackable: 1

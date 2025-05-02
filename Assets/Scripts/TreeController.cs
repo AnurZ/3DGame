@@ -87,7 +87,7 @@ public class TreeController : MonoBehaviour
             }
 
             if (StaminaController.Instance != null)
-                StaminaController.Instance.ReduceStamina(1f * Time.deltaTime);
+                StaminaController.Instance.ReduceStamina(StaminaController.Instance.staminaReductionRate * Time.deltaTime);
 
             if (choppingTime >= choppingDuration)
             {
@@ -113,7 +113,7 @@ public class TreeController : MonoBehaviour
     private void Chop()
     {
         if (StaminaController.Instance != null)
-            StaminaController.Instance.ReduceStamina(5);
+            StaminaController.Instance.ReduceStamina(StaminaController.Instance.staminaReductionRate);
 
         float injuryRoll = Random.Range(0f, 100f);
 

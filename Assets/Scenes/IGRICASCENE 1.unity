@@ -15005,7 +15005,8 @@ Transform:
   m_LocalPosition: {x: 164.4503, y: 12.315555, z: 115.573425}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 2110419066}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1691750926
@@ -16591,7 +16592,6 @@ RectTransform:
   - {fileID: 35400239}
   - {fileID: 1274871623}
   - {fileID: 627685727}
-  - {fileID: 2110419066}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -18941,18 +18941,18 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2110419065}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -115.573425}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1742667642}
   - {fileID: 1145573038}
-  m_Father: {fileID: 1853906865}
+  m_Father: {fileID: 1688599265}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 795.5497, y: 527.68445}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &2112355144
@@ -19626,6 +19626,10 @@ PrefabInstance:
       propertyPath: modelToHide
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 1042241144453089339, guid: dae6bb760b9533545b98721e59447663, type: 3}
+      propertyPath: choppingImage
+      value: 
+      objectReference: {fileID: 1145573039}
     - target: {fileID: 1042241144453089339, guid: dae6bb760b9533545b98721e59447663, type: 3}
       propertyPath: currentInjury
       value: 0

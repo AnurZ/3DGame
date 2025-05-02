@@ -54,6 +54,12 @@ public class PlayerController : MonoBehaviour
     public GameObject ChoppingGameObject;
     public Image choppingImage;
 
+    public StaminaController staminaController;
+
+    public bool choppingSpeedUpgrade = false;
+    public bool severeInjuryShieldUpgrade = false;
+    public bool injuryShieldUpgrade = false;
+    
     private void Awake()
     {
         Local = this;
@@ -105,6 +111,8 @@ public class PlayerController : MonoBehaviour
         inventoryManager = FindObjectOfType<InventoryManager>();
         dayNightCycle = FindObjectOfType<SimpleDayNightCycle>();
         potionManager = FindObjectOfType<PotionManager>();
+        staminaController = FindObjectOfType<StaminaController>();
+        
         
         if (injuryStateText != null)
             injuryStateText.gameObject.SetActive(true);
@@ -164,6 +172,7 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Cannot chop while severely injured!");
             return;
         }
+        
 
         
         chopInjuryChance = InjurySystem.CalculateChance(currentInjury, StaminaController.Instance.playerStamina);
@@ -172,6 +181,19 @@ public class PlayerController : MonoBehaviour
             chopInjuryChance.minorChance *= 0.5f;
             chopInjuryChance.moderateChance *= 0.5f;
             chopInjuryChance.severeChance *= 0.5f;
+        }
+        if (severeInjuryShieldUpgrade)
+        {
+            chopInjuryChance.minorChance += chopInjuryChance.severeChance * 0.5f;
+            chopInjuryChance.moderateChance += chopInjuryChance.severeChance * 0.5f;
+            chopInjuryChance.severeChance *= 0.0f;
+        }
+
+        if (injuryShieldUpgrade)
+        {
+            chopInjuryChance.minorChance *= 0.9f;
+            chopInjuryChance.moderateChance *= 0.9f;
+            chopInjuryChance.severeChance *= 0.9f;
         }
         Debug.Log($"Injury chance at chop start: Minor {chopInjuryChance.minorChance * 100}% | Moderate {chopInjuryChance.moderateChance * 100}% | Severe {chopInjuryChance.severeChance * 100}%");
         
@@ -188,8 +210,19 @@ public class PlayerController : MonoBehaviour
         if(potionManager.FocusPotionDays > 0)
             chopDurationMultiplier *= 0.5f;
         
+        if(choppingSpeedUpgrade)
+            chopDurationMultiplier *= 0.8f;
+        
         float adjustedChopTime = baseChopTime * chopDurationMultiplier;
 
+        if (staminaController.playerStamina < adjustedChopTime)
+        {
+            interactionText.text = "Cannot chop while low on stamina!";
+            interactionText.color = Color.red;
+            uiPanel.SetActive(true);
+            return;
+        }
+        
         isChopping = true;
         animator.SetBool("isChopping", true);
         animator.SetBool("IsWalking", false);

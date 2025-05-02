@@ -19,7 +19,7 @@ public class StaminaController : MonoBehaviour
     private float smoothTimer;
 
     // Stamina reduction rate per second (1 stamina per second)
-    private float staminaReductionRate = 2f;
+    public float staminaReductionRate = 1f;
 
     // Track whether the player is chopping or not
     private bool isChopping = false;

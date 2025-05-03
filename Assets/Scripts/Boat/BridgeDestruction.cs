@@ -2,13 +2,20 @@ using UnityEngine;
 
 public class BridgeDestruction : MonoBehaviour
 {
-    public GameObject bridge;        // Most koji se uništava
+    public GameObject bridge1;        // Most koji se uništava
+    
+
+    public float timeToDestroyBridge1;
+    
+    
+    // Most koji se uništava
     //public ParticleSystem destructionEffect;  // Efekt uništavanja
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Boat"))
         {
+            Debug.Log("Collsion with " + other.name);
             DestroyBridge();
         }
     }
@@ -19,6 +26,7 @@ public class BridgeDestruction : MonoBehaviour
         //destructionEffect.Play();
 
         // Deaktiviraj most nakon kratkog vremena
-        Destroy(bridge, 1.0f);  // Uništi most nakon 1 sekunde
+        Destroy(bridge1, timeToDestroyBridge1);  // Uništi most nakon 1 sekunde
+          // Uništi most nakon 1 sekunde
     }
 }

@@ -18391,8 +18391,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ae82029bd2af614db94bec2f2fb5013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerController: {fileID: 0}
+  playerController: {fileID: 3374960197013519249}
   staminaController: {fileID: 0}
+  saveManager: {fileID: 1428973988}
   staminaRegenBackground: {fileID: 921792595}
   staminaRegenIcon: {fileID: 543435166}
   staminaRegenInfoBackground: {fileID: 791153156}
@@ -18421,6 +18422,13 @@ MonoBehaviour:
   choppingStaminaIcon: {fileID: 807871589}
   choppingStaminaInfoBackground: {fileID: 1096346395}
   choppingStaminaBuyButton: {fileID: 657225573}
+  hasStaminaRegen: 0
+  hasSpeed: 0
+  hasInjuryShield: 0
+  hasSevereInjuryShield: 0
+  hasPotionEffect: 0
+  hasChoppingSpeed: 0
+  hasChoppingStamina: 0
 --- !u!1 &1301918396
 GameObject:
   m_ObjectHideFlags: 0
@@ -19905,7 +19913,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1428973988
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19918,6 +19926,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 809126cb5597c7942afa9e7d6e55e150, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  upgradesManager: {fileID: 1301348796}
   player: {fileID: 1043780904}
   currencyManager: {fileID: 293751507}
 --- !u!4 &1428973989

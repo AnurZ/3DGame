@@ -74,7 +74,7 @@ PrefabInstance:
       objectReference: {fileID: 8975480819012031255, guid: 0805565610f2027478c26a7a1e569b85, type: 3}
     - target: {fileID: 919132149155446097, guid: 7424d45a698023849bd966a8dc47d923, type: 3}
       propertyPath: m_Name
-      value: TreeLevel5
+      value: TreeLevel3Blue
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 7424d45a698023849bd966a8dc47d923, type: 3}
       propertyPath: m_TagString
@@ -139,6 +139,10 @@ MonoBehaviour:
   health: 100
   highlightMaterial: {fileID: 2100000, guid: 54589bcc3464d6e4eb3c1a95b45fa88b, type: 2}
   timeBetweenChops: 1
+  dropPrefab: {fileID: 0}
+  choppingDuration: 6
+  playerController: {fileID: 0}
+  treeType: 2
 --- !u!114 &7120747071932489644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -154,7 +158,6 @@ MonoBehaviour:
   swaySpeed: 1
   swayAmount: 0.1
   swayRandomness: 0.2
-  swayInterval: 1.5
 --- !u!136 &3940551591148380578
 CapsuleCollider:
   m_ObjectHideFlags: 0

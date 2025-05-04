@@ -60,6 +60,8 @@ public class PlayerController : MonoBehaviour
     public bool severeInjuryShieldUpgrade = false;
     public bool injuryShieldUpgrade = false;
     
+    
+    
     private void Awake()
     {
         Local = this;
@@ -113,7 +115,6 @@ public class PlayerController : MonoBehaviour
         potionManager = FindObjectOfType<PotionManager>();
         staminaController = FindObjectOfType<StaminaController>();
         
-        
         if (injuryStateText != null)
             injuryStateText.gameObject.SetActive(true);
 
@@ -164,6 +165,8 @@ public class PlayerController : MonoBehaviour
         StartChopping(injuryRisk);
     }
 
+    
+    
     private void StartChopping(float risk)
     {
         if (nearbyTree == null) return;
@@ -172,8 +175,13 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Cannot chop while severely injured!");
             return;
         }
-        
-
+        Item selectedItem = inventoryManager.GetSelectedItem(false);
+        if (!IsHoldingAxe() || (int)nearbyTree.treeType > (int)selectedItem.currentAxeType)
+        {
+            interactionText.text = "You need a higher level axe to chop this tree!";
+            interactionText.color = Color.red;
+            return;
+        }
         
         chopInjuryChance = InjurySystem.CalculateChance(currentInjury, StaminaController.Instance.playerStamina);
         if (potionManager.ShieldPotionDays > 0)

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 149770404434934746}
   - component: {fileID: 2834412012588945214}
   - component: {fileID: 7492696738735959026}
+  - component: {fileID: 1244109131324908712}
   m_Layer: 0
   m_Name: AxeLevel1
   m_TagString: Axe
@@ -26,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4298361972728318113}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.000000056966357, y: -0.000000002276496, z: -0.000000030214018, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.000000059604645, y: 0.03330931, z: -0.00000023864456}
   m_LocalScale: {x: 1.0000005, y: 1.0000005, z: 1.0000001}
   m_ConstrainProportionsScale: 0
@@ -86,3 +87,16 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &1244109131324908712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4298361972728318113}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49bf3cf7efed4e1449021baf22547735, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentAxeType: 0

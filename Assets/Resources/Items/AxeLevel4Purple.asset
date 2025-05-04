@@ -23,3 +23,4 @@ MonoBehaviour:
   inHandScale: {x: 1, y: 1, z: 1}
   isAxe: 1
   isPotion: 0
+  currentAxeType: 5

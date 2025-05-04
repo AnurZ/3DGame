@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine.Tilemaps;
 
 
@@ -31,8 +32,19 @@ public class Item : ScriptableObject
     [Header("Item Type")]
     public bool isAxe = false;
     public bool isPotion = false;
-}
 
+    
+    
+    public  AxeTypeState currentAxeType;
+    
+}
+public enum AxeTypeState
+{
+    Level1 = 1,
+    Level2 = 3,
+    Level3 = 4,
+    Level4 = 5
+}
 
 public enum ItemType
 {

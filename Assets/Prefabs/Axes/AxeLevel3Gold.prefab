@@ -470,6 +470,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 210876623073424119}
+  - component: {fileID: 7244881971834135134}
   m_Layer: 0
   m_Name: AxeLevel3Gold
   m_TagString: Axe
@@ -501,6 +502,19 @@ Transform:
   - {fileID: 6276065400401083246}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 180, y: 0, z: -180}
+--- !u!114 &7244881971834135134
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4446704673127264477}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49bf3cf7efed4e1449021baf22547735, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentAxeType: 2
 --- !u!1 &5086319546062764858
 GameObject:
   m_ObjectHideFlags: 0

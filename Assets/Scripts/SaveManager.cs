@@ -1,43 +1,58 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using System.Collections;
+
 
 public class SaveManager : MonoBehaviour
 {
     public static bool IsNewGame = false;
+    private bool isLoading = false; 
 
-    private int previousMoney;
-    private int[] previousItemCounts;
-    private Vector3 previousPlayerPosition;
-
+    [Header("References")]
+    public UpgradesManager upgradesManager;  // Postavi u Inspectoru
     public GameObject player;
     public CurrencyManager currencyManager;
 
+    // Praćene vrijednosti za detekciju promjena
+    private int previousMoney;
+    private int[] previousItemCounts;
+    private Vector3 previousPlayerPosition;
+    private bool[] previousUpgrades;
+
+    // Putanja do fajla
     private string _path => Path.Combine(Application.persistentDataPath, "savefile.json");
 
-    private void Start()
+    private IEnumerator Start()
     {
+        // Ako nije ručno postavljeno, pronađi automatski
+        if (upgradesManager == null)
+            upgradesManager = FindObjectOfType<UpgradesManager>();
+
         previousMoney = currencyManager.CurrentMoney;
         previousPlayerPosition = player.transform.position;
         previousItemCounts = new int[InventoryManager.Instance.inventorySlots.Length];
         UpdateItemCounts();
 
+        // Koristimo interne flagove iz UpgradesManagera
+        previousUpgrades = GetCurrentUpgradeStates();
+
+        yield return null;  
         if (!IsNewGame)
-            Invoke(nameof(LoadGame), 0.1f);
+            LoadGame();
         else
             Debug.Log("🟡 Novi game – preskačem LoadGame()");
     }
 
-    private void UpdateItemCounts()
+    private void Update()
     {
-        for (int i = 0; i < InventoryManager.Instance.inventorySlots.Length; i++)
-        {
-            var inv = InventoryManager.Instance
-                        .inventorySlots[i]
-                        .GetComponentInChildren<InventoryItem>();
-            previousItemCounts[i] = inv != null ? inv.count : 0;
-        }
+        if (Input.GetKeyDown(KeyCode.K)) SaveGame();
+        if (Input.GetKeyDown(KeyCode.L)) LoadGame();
+
+        // Automatski save ako se išta promijenilo
+        
     }
 
     private void OnApplicationQuit()
@@ -45,21 +60,46 @@ public class SaveManager : MonoBehaviour
         SaveGame();
     }
 
-    private void Update()
+    private void UpdateItemCounts()
     {
-        if (Input.GetKeyDown(KeyCode.K)) SaveGame();
-        if (Input.GetKeyDown(KeyCode.L)) LoadGame();
+        var slots = InventoryManager.Instance.inventorySlots;
+        for (int i = 0; i < slots.Length; i++)
+        {
+            var inv = slots[i].GetComponentInChildren<InventoryItem>();
+            previousItemCounts[i] = inv != null ? inv.count : 0;
+        }
+    }
+
+    private bool[] GetCurrentUpgradeStates()
+    {
+        if (upgradesManager == null)
+            return new bool[7];
+
+        return new bool[]
+        {
+            upgradesManager.hasStaminaRegen,
+            upgradesManager.hasSpeed,
+            upgradesManager.hasInjuryShield,
+            upgradesManager.hasSevereInjuryShield,
+            upgradesManager.hasPotionEffect,
+            upgradesManager.hasChoppingSpeed,
+            upgradesManager.hasChoppingStamina
+        };
     }
 
     public void SaveGame()
     {
+        
+        
         if (player == null || currencyManager == null || InventoryManager.Instance == null)
         {
             Debug.LogWarning("SaveManager: nedostaju reference!");
             return;
         }
+        
+        if (isLoading)
+            return;
 
-        // Pripremi podatke
         var slots = InventoryManager.Instance.inventorySlots;
         var data = new PlayerSaveData
         {
@@ -71,27 +111,26 @@ public class SaveManager : MonoBehaviour
             inventoryItems = new List<InventoryItemData>()
         };
 
-        // Napuni listu itema
+        // Spremi inventar
         foreach (var slot in slots)
         {
             var inv = slot.GetComponentInChildren<InventoryItem>();
-            if (inv != null && inv.item != null && !string.IsNullOrEmpty(inv.item.name))
-            {
-                data.inventoryItems.Add(new InventoryItemData
-                {
-                    itemName = inv.item.name,
-                    amount = inv.count
-                });
-            }
-            else
-            {
-                data.inventoryItems.Add(new InventoryItemData
-                {
-                    itemName = "",
-                    amount = 0
-                });
-            }
+            data.inventoryItems.Add(
+                inv != null && inv.item != null && !string.IsNullOrEmpty(inv.item.name)
+                    ? new InventoryItemData { itemName = inv.item.name, amount = inv.count }
+                    : new InventoryItemData { itemName = "", amount = 0 }
+            );
         }
+
+        // Spremi upgradeove iz internog stanja
+        bool[] ups = GetCurrentUpgradeStates();
+        data.staminaRegenUpgrade       = ups[0];
+        data.speedUpgrade              = ups[1];
+        data.injuryShieldUpgrade       = ups[2];
+        data.severeInjuryShieldUpgrade = ups[3];
+        data.potionEffectUpgrade       = ups[4];
+        data.choppingSpeedUpgrade      = ups[5];
+        data.choppingStaminaUpgrade    = ups[6];
 
         // Zapiši JSON
         string json = JsonUtility.ToJson(data, true);
@@ -99,36 +138,30 @@ public class SaveManager : MonoBehaviour
         Debug.Log($"SaveManager: sačuvano → {_path}\n{json}");
 
         // Ažuriraj praćene vrijednosti
-        previousMoney = currencyManager.CurrentMoney;
+        previousMoney          = currencyManager.CurrentMoney;
         previousPlayerPosition = player.transform.position;
         UpdateItemCounts();
+        previousUpgrades       = ups;
     }
 
     private bool HasGameStateChanged()
     {
-        if (currencyManager.CurrentMoney != previousMoney)
-        {
-            Debug.Log("Detektirana promjena novca.");
-            return true;
-        }
+        if (currencyManager.CurrentMoney != previousMoney) return true;
+        if (player.transform.position != previousPlayerPosition) return true;
 
-        if (player.transform.position != previousPlayerPosition)
-        {
-            Debug.Log("Detektirana promjena pozicije igrača.");
-            return true;
-        }
-
+        // Inventar
         var slots = InventoryManager.Instance.inventorySlots;
         for (int i = 0; i < slots.Length; i++)
         {
             var inv = slots[i].GetComponentInChildren<InventoryItem>();
             int count = inv != null ? inv.count : 0;
-            if (count != previousItemCounts[i])
-            {
-                Debug.Log($"Detektirana promjena inventara u slotu {i}: {previousItemCounts[i]} → {count}");
-                return true;
-            }
+            if (count != previousItemCounts[i]) return true;
         }
+
+        // Upgradeovi
+        bool[] ups = GetCurrentUpgradeStates();
+        for (int i = 0; i < ups.Length; i++)
+            if (ups[i] != previousUpgrades[i]) return true;
 
         return false;
     }
@@ -147,33 +180,25 @@ public class SaveManager : MonoBehaviour
             FindObjectOfType<NewGameInventoryManager>()?.CreateDefaultInventory();
             return;
         }
+        
+        isLoading = true; 
 
-        // Čitaj JSON
         string json = File.ReadAllText(_path);
         var data = JsonUtility.FromJson<PlayerSaveData>(json);
         Debug.Log($"SaveManager: učitano →\n{json}");
 
         // Postavi player i novac
-        player.transform.position = new Vector3(data.posX, data.posY, data.posZ);
+        player.transform.position    = new Vector3(data.posX, data.posY, data.posZ);
         player.transform.eulerAngles = new Vector3(0, data.rotY, 0);
         currencyManager.CurrentMoney = data.currentMoney;
         currencyManager.SetMoneyText();
 
-        // **Temeljito očisti sve child objekte svakog slota**
+        // Očisti i reinstanciraj inventar
         var slots = InventoryManager.Instance.inventorySlots;
         foreach (var slot in slots)
-        {
-            // Sakupi listu child objektata
-            var toDestroy = slot.transform
-                                  .Cast<Transform>()
-                                  .Select(t => t.gameObject)
-                                  .ToList();
-            // Uništi ih sve
-            foreach (var go in toDestroy)
-                Destroy(go);
-        }
+            foreach (Transform t in slot.transform.Cast<Transform>().ToList())
+                Destroy(t.gameObject);
 
-        // Ponovo instanciraj samo iteme iz save fajla
         for (int i = 0; i < slots.Length && i < data.inventoryItems.Count; i++)
         {
             var itemData = data.inventoryItems[i];
@@ -194,9 +219,30 @@ public class SaveManager : MonoBehaviour
                 Debug.LogWarning($"SaveManager: '{itemData.itemName}' nije pronađen u Resources/Items/");
             }
         }
+
+        // Učitaj upgradeove pomoću Buy… metoda
+        if (upgradesManager != null)
+        {
+            if (data.staminaRegenUpgrade)       upgradesManager.BuyStaminaRegenUpgrade();
+            if (data.speedUpgrade)              upgradesManager.BuySpeedUpgrade();
+            if (data.injuryShieldUpgrade)       upgradesManager.BuyInjuryShieldUpgrade();
+            if (data.severeInjuryShieldUpgrade) upgradesManager.BuySevereInjuryShieldUpgrade();
+            if (data.potionEffectUpgrade)       upgradesManager.BuyPotionEffectUpgrade();
+            if (data.choppingSpeedUpgrade)      upgradesManager.BuyChoppingSpeedUpgrade();
+            if (data.choppingStaminaUpgrade)    upgradesManager.BuyChoppingStaminaUpgrade();
+        }
+
+        // Osvježi praćene vrijednosti
+        previousMoney          = currencyManager.CurrentMoney;
+        previousPlayerPosition = player.transform.position;
+        UpdateItemCounts();
+        previousUpgrades       = GetCurrentUpgradeStates();
+        isLoading = false; 
     }
 }
 
+
+// Klase za JSON
 [System.Serializable]
 public class PlayerSaveData
 {
@@ -204,6 +250,15 @@ public class PlayerSaveData
     public float rotY;
     public int currentMoney;
     public List<InventoryItemData> inventoryItems;
+
+    // Upgrade booleani
+    public bool staminaRegenUpgrade;
+    public bool speedUpgrade;
+    public bool injuryShieldUpgrade;
+    public bool severeInjuryShieldUpgrade;
+    public bool potionEffectUpgrade;
+    public bool choppingSpeedUpgrade;
+    public bool choppingStaminaUpgrade;
 }
 
 [System.Serializable]

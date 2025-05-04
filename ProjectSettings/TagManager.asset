@@ -10,6 +10,8 @@ TagManager:
   - Bed
   - InventorySlot
   - Shop
+  - Boat
+  - NPC
   layers:
   - Default
   - TransparentFX

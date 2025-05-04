@@ -3,26 +3,37 @@ using UnityEngine;
 public class NPCInteractable : MonoBehaviour
 {
     public float interactionDistance = 3f;
-    public string npcName = "Shopkeeper"; // Ime NPC-a
-    public string dialog = "Welcome to my shop!";
+    public string npcName = "Shopkeeper";
+
+    [TextArea]
+    public string[] dialogLines; // Niz rečenica za prikaz
+
     public DialogSystem dialogSystem;
-    
+
+    private bool dialogStarted = false;
+
     private void Update()
     {
         if (Vector3.Distance(transform.position, Camera.main.transform.position) < interactionDistance)
         {
-            // Prikazivanje indikatora da igrač može pritisnuti 'F' za razgovor
-            if (Input.GetKeyDown(KeyCode.F))
+            if (Input.GetKeyDown(KeyCode.F) && !dialogStarted)
             {
-                OpenDialog();
-                dialogSystem.ShowDialog(dialog);
+                StartDialog();
             }
+        }
+        else
+        {
+            dialogStarted = false;
         }
     }
 
-    private void OpenDialog()
+    private void StartDialog()
     {
-        // Ovdje možeš otvoriti dijalog sistem
+        dialogStarted = true;
         Debug.Log($"Talking to {npcName}");
+
+        dialogSystem.dialogLines = dialogLines;
+        dialogSystem.enabled = true; // osiguraj da je komponenta aktivna
+        dialogSystem.SendMessage("OnTriggerEnter", Camera.main.GetComponent<Collider>(), SendMessageOptions.DontRequireReceiver);
     }
 }

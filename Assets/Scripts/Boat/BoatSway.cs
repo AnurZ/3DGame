@@ -1,8 +1,39 @@
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 using System.Collections;
 
 public class BoatSway : MonoBehaviour
 {
+    public TMP_Text popupText2;
+    
+    [Header("Ending Sequence")]
+    public CanvasGroup fadeCanvas;           // CanvasGroup za fade in/out
+    public float fadeDuration = 1f;          // trajanje fadea
+    [TextArea]
+    public string[] endingLines;             // par linija koje će se prikazivati
+    public float lineDuration = 3f;          // koliko svaka linija ostaje na ekranu
+
+    public GameObject creditsPanel;          // Panel koji sadrži sve credits
+    public RectTransform creditsText;        // RectTransform teksta unutar scroll panela
+    public float creditsScrollSpeed = 20f;   // brzina skrolanja creditsa
+    
+    private bool endingStarted = false;
+    
+    
+    // --- Ticket UI ---
+    [Header("Ticket UI")]
+    public GameObject ticketPopup;
+    public TMP_Text popupText;
+    public Button yesButton;
+    public Button noButton;
+    public int ticketPrice = 100;
+
+    // --- Animator Controllers ---
+    [Header("Animator Controllers")]
+    public RuntimeAnimatorController normalAnimatorController;
+    public RuntimeAnimatorController endingAnimatorController;
+
     // --- Player refs ---
     private Transform playerTransform;
     private Rigidbody playerRigidbody;
@@ -10,29 +41,31 @@ public class BoatSway : MonoBehaviour
 
     private bool playerInside = false;
     private bool movementStarted = false;
+    private bool awaitingPurchase = false;
 
     [Header("Boat Teleport Point")]
-    public Transform boatTeleportPoint;  // Gdje igrač stoji dok plovi
+    public Transform boatTeleportPoint; // Gdje igrač stoji dok plovi
 
     [Header("Bridge Event Settings")]
-    // Bridge 1
+    public Transform enterPoint1;
     public Transform walkToBridgePoint1;
     public Transform bridgeLookPoint1;
     public Transform returnToBoatPoint1;
-    // Bridge 2
+
+    public Transform enterPoint2;
     public Transform walkToBridgePoint2;
     public Transform bridgeLookPoint2;
     public Transform returnToBoatPoint2;
 
     public Animator playerAnimator;
-    public float chopDuration = 3f;
+    public float chopDuration = 0.03f;
 
     public GameObject Bridge1;
     public GameObject Bridge2;
 
     [Header("Boat Movement Settings")]
     public Transform[] waypoints;
-    public int[] pauseIndices;     // npr. [1, 3]
+    public int[] pauseIndices;    // npr. [1, 3]
     public float moveSpeed = 2f;
     public float rotationSpeed = 90f;
     public float waypointThreshold = 0.5f;
@@ -58,6 +91,11 @@ public class BoatSway : MonoBehaviour
             Debug.LogError("Assign at least two waypoints and two pauseIndices!");
             enabled = false;
         }
+
+        // Hide popup at start and wire up buttons
+        ticketPopup.SetActive(false);
+        yesButton.onClick.AddListener(OnTicketYes);
+        noButton.onClick.AddListener(OnTicketNo);
     }
 
     void Update()
@@ -65,37 +103,108 @@ public class BoatSway : MonoBehaviour
         ApplyBobbing();
         ApplyTilt();
 
+        // Dok ploviš, teleportiraj igrača na deck svakog framea
         if (movementStarted && !isBridgeEventRunning && playerTransform != null)
         {
-            // svaki frame teleport igrač na boatTeleportPoint
             playerTransform.position = boatTeleportPoint.position;
             playerTransform.rotation = boatTeleportPoint.rotation;
         }
 
+        // Plovidba
         if (movementStarted && !reachedEnd && !isPaused)
         {
             RotateTowardsWaypoint();
             MoveTowardsWaypoint();
         }
 
-        if (playerInside && !movementStarted && Input.GetKeyDown(KeyCode.F))
+        // Ulazak u brod i F za kupnju ulaznice
+        if (playerInside && !movementStarted && !awaitingPurchase && Input.GetKeyDown(KeyCode.F))
         {
+            ShowTicketPopup();
+        }
+        
+        if (reachedEnd && !endingStarted)
+        {
+            endingStarted = true;
+            StartCoroutine(PlayEndingSequence());
+        }
+    }
+
+    IEnumerator PlayEndingSequence()
+    {
+        // 1) Fade to black
+        float t = 0f;
+        fadeCanvas.gameObject.SetActive(true);
+        while (t < 1f)
+        {
+            t += Time.deltaTime / fadeDuration;
+            fadeCanvas.alpha = t;
+            yield return null;
+        }
+
+        creditsPanel.SetActive(false);
+        // 2) Prikaži linije teksta
+        for (int i = 0; i < endingLines.Length; i++)
+        {
+            popupText2.text = endingLines[i];           // iskoristi postojeći popupText ili dodaj novi TextMeshProUGUI
+            popupText2.gameObject.SetActive(true);
+            yield return new WaitForSeconds(lineDuration);
+        }
+        // sakrij text
+        popupText2.gameObject.SetActive(false);
+
+        // 3) Pokaži credits panel i scroll
+        creditsPanel.SetActive(true);
+        // postavi creditsText na početnu poziciju (ispod ekrana)
+        creditsText.anchoredPosition = new Vector2(0, -creditsPanel.GetComponent<RectTransform>().rect.height);
+    
+        // scroll dok ne dođe do vrha
+        float endPos = creditsText.rect.height;
+        while (creditsText.anchoredPosition.y < endPos)
+        {
+            creditsText.anchoredPosition += Vector2.up * (creditsScrollSpeed * Time.deltaTime);
+            yield return null;
+        }
+    }
+
+    
+    public void ShowTicketPopup()
+    {
+        awaitingPurchase = true;
+        ticketPopup.SetActive(true);
+        popupText.text = $"Do you want to buy the ticket for {ticketPrice} coins?";
+    }
+
+    public void OnTicketYes()
+    {
+        // Koristi CurrencyManager za potrošnju
+        if (CurrencyManager.Instance.TrySpendMoney(ticketPrice))
+        {
+            CurrencyManager.Instance.SetMoneyText();
+            ticketPopup.SetActive(false);
+            awaitingPurchase = false;
+            FindObjectOfType<DialogSystem>()?.gameObject.SetActive(false);
+
             StartCoroutine(BoardBoat());
         }
+        else
+        {
+            popupText.text = "Not enough coins!";
+        }
+    }
+
+    public void OnTicketNo()
+    {
+        ticketPopup.SetActive(false);
+        awaitingPurchase = false;
     }
 
     IEnumerator BoardBoat()
     {
         movementStarted = true;
 
-        // 1) teleport na boatTeleportPoint
-        playerTransform.SetParent(null, true);
-        playerTransform.position = boatTeleportPoint.position;
-        playerTransform.rotation = boatTeleportPoint.rotation;
-
-        // 2) disable input + fizika
+        // Disable player movement and physics
         DisablePlayerMovement();
-
         yield return null;
     }
 
@@ -159,20 +268,22 @@ public class BoatSway : MonoBehaviour
 
     IEnumerator HandleBridgeEvent(bool isFirst)
     {
-        // 1) teleport s broda na point povratka
-        EnablePlayerMovement();
-        playerTransform.SetParent(null, true);
-        var retEnter = isFirst ? returnToBoatPoint1 : returnToBoatPoint2;
-        // prvo teleport na dismount da resetira klizanje
-        playerTransform.position = retEnter.position;
-        playerTransform.rotation = retEnter.rotation;
+        // Swap to ending controller
+        playerAnimator.runtimeAnimatorController = endingAnimatorController;
 
+        // 1) teleport sa broda na obalu
+        playerTransform.SetParent(null, true);
+        var exitPoint = isFirst ? enterPoint1 : enterPoint2;
+        playerTransform.position = exitPoint.position;
+        playerTransform.rotation = exitPoint.rotation;
+        EnablePlayerMovement();
         yield return null;
 
         // 2) hod do mosta
         playerAnimator.SetBool("IsWalking", true);
+        yield return null; // da Animator uhvati parametar
         var wp = isFirst ? walkToBridgePoint1 : walkToBridgePoint2;
-        while (Vector3.Distance(playerTransform.position, wp.position) > 0.1f)
+        while (Vector3.Distance(playerTransform.position, wp.position) > 0.01f)
         {
             playerTransform.position = Vector3.MoveTowards(
                 playerTransform.position, wp.position, moveSpeed * Time.deltaTime);
@@ -180,25 +291,33 @@ public class BoatSway : MonoBehaviour
         }
         playerAnimator.SetBool("IsWalking", false);
 
-        // 3) okret i sječa
+        // 3) rotacija i sječa
         var look = isFirst ? bridgeLookPoint1 : bridgeLookPoint2;
-        playerTransform.LookAt(look.position);
-        playerAnimator.SetTrigger("IsChopping");
-        yield return new WaitForSeconds(chopDuration);
+        Vector3 dir = (look.position - playerTransform.position).normalized;
+        dir.y = 0f;
+        playerTransform.rotation = Quaternion.Slerp(playerTransform.rotation,
+            Quaternion.LookRotation(dir), Time.deltaTime * 10f);
 
-        // 4) uništi bridge
+        for (int i = 0; i < 3; i++)
+        {
+            playerAnimator.SetTrigger("IsChopping");
+            yield return new WaitForSeconds(chopDuration);
+            
+        }
+
+        // 4) uništi most
         if (isFirst) Destroy(Bridge1);
         else Destroy(Bridge2);
-
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.13f);
 
         // 5) povratak
         playerAnimator.SetBool("IsWalking", true);
-        retEnter = isFirst ? returnToBoatPoint1 : returnToBoatPoint2;
-        while (Vector3.Distance(playerTransform.position, retEnter.position) > 0.1f)
+        yield return null;
+        var ret = isFirst ? returnToBoatPoint1 : returnToBoatPoint2;
+        while (Vector3.Distance(playerTransform.position, ret.position) > 0.01f)
         {
             playerTransform.position = Vector3.MoveTowards(
-                playerTransform.position, retEnter.position, moveSpeed * Time.deltaTime);
+                playerTransform.position, ret.position, moveSpeed * Time.deltaTime);
             yield return null;
         }
         playerAnimator.SetBool("IsWalking", false);
@@ -206,6 +325,9 @@ public class BoatSway : MonoBehaviour
         // 6) ukrcaj i disable
         playerTransform.SetParent(boatBody, true);
         DisablePlayerMovement();
+
+        // Restore original controller
+        playerAnimator.runtimeAnimatorController = normalAnimatorController;
     }
 
     private void OnTriggerEnter(Collider other)

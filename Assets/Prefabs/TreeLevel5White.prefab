@@ -73,6 +73,10 @@ PrefabInstance:
       value: TreeLevel5White
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: c88c1634fd0d6214ca77da72c300a7f7, type: 3}
+      propertyPath: m_Layer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: c88c1634fd0d6214ca77da72c300a7f7, type: 3}
       propertyPath: m_TagString
       value: Tree
       objectReference: {fileID: 0}
@@ -92,6 +96,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c88c1634fd0d6214ca77da72c300a7f7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7268821355387470442}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c88c1634fd0d6214ca77da72c300a7f7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2839732907827880170}
   m_SourcePrefab: {fileID: 100100000, guid: c88c1634fd0d6214ca77da72c300a7f7, type: 3}
 --- !u!1 &5191481413652199432 stripped
 GameObject:
@@ -132,8 +139,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbb5bdc2fda2468439df7e9f725fa436, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  swaySpeed: 1
-  swayAmount: 0.1
+  swaySpeed: 5
+  swayAmount: 1
   swayRandomness: 0.2
 --- !u!114 &7520296827498776027
 MonoBehaviour:
@@ -177,3 +184,17 @@ CapsuleCollider:
   m_Height: 10.48392
   m_Direction: 1
   m_Center: {x: -0.01644389, y: 4.78, z: -0.47572264}
+--- !u!114 &2839732907827880170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5191481413652199432}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ff925ae4d071704bab058438b424cde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  originalMaterial: {fileID: 2100000, guid: 14c9fd1ef92b17541a42ed0c06ff5409, type: 2}
+  transparentMaterial: {fileID: 2100000, guid: fafc791c63c8c4a43be4da8905704774, type: 2}

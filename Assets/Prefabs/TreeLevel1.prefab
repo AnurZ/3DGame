@@ -16,7 +16,8 @@ GameObject:
   - component: {fileID: 5192601651284018991}
   - component: {fileID: 1951700210506906963}
   - component: {fileID: 7950240235183517634}
-  m_Layer: 0
+  - component: {fileID: -7269188578297669042}
+  m_Layer: 1
   m_Name: TreeLevel1
   m_TagString: Tree
   m_Icon: {fileID: 0}
@@ -146,8 +147,8 @@ MonoBehaviour:
   timeBetweenChops: 1
   dropPrefab: {fileID: 8954913584420728692, guid: fab2d1b5174baf14d82aabbd3fbe5e2b, type: 3}
   choppingDuration: 1
-  ChoppingGameObject: {fileID: 0}
-  choppingImage: {fileID: 0}
+  playerController: {fileID: 0}
+  treeType: 0
 --- !u!136 &1951700210506906963
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -194,3 +195,17 @@ CapsuleCollider:
   m_Height: 6.182359
   m_Direction: 1
   m_Center: {x: -0.0329085, y: 3, z: -0.023456395}
+--- !u!114 &-7269188578297669042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 86714133389632869}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ff925ae4d071704bab058438b424cde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  originalMaterial: {fileID: 2100000, guid: 14c9fd1ef92b17541a42ed0c06ff5409, type: 2}
+  transparentMaterial: {fileID: 2100000, guid: fafc791c63c8c4a43be4da8905704774, type: 2}

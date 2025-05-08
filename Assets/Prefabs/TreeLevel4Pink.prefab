@@ -14,19 +14,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f3f798fe389c6ae4cb643125a019e893, type: 3}
       propertyPath: m_LocalScale.x
-      value: 3.6036
+      value: 1.4781079
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f3f798fe389c6ae4cb643125a019e893, type: 3}
       propertyPath: m_LocalScale.y
-      value: 3.6036
+      value: 2.3513741
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f3f798fe389c6ae4cb643125a019e893, type: 3}
       propertyPath: m_LocalScale.z
-      value: 3.6036
+      value: 1.4781079
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f3f798fe389c6ae4cb643125a019e893, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 148.36
+      value: 174.55
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f3f798fe389c6ae4cb643125a019e893, type: 3}
       propertyPath: m_LocalPosition.y
@@ -34,7 +34,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f3f798fe389c6ae4cb643125a019e893, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 120.44
+      value: 141.2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f3f798fe389c6ae4cb643125a019e893, type: 3}
       propertyPath: m_LocalRotation.w
@@ -73,6 +73,10 @@ PrefabInstance:
       value: TreeLevel4Pink
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: f3f798fe389c6ae4cb643125a019e893, type: 3}
+      propertyPath: m_Layer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: f3f798fe389c6ae4cb643125a019e893, type: 3}
       propertyPath: m_TagString
       value: Tree
       objectReference: {fileID: 0}
@@ -92,6 +96,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f3f798fe389c6ae4cb643125a019e893, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1299344787771834007}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f3f798fe389c6ae4cb643125a019e893, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4029973009528503414}
   m_SourcePrefab: {fileID: 100100000, guid: f3f798fe389c6ae4cb643125a019e893, type: 3}
 --- !u!1 &5420711483085053774 stripped
 GameObject:
@@ -135,7 +142,7 @@ MonoBehaviour:
   health: 100
   highlightMaterial: {fileID: 2100000, guid: 54589bcc3464d6e4eb3c1a95b45fa88b, type: 2}
   timeBetweenChops: 1
-  dropPrefab: {fileID: 0}
+  dropPrefab: {fileID: 7905600428221956616, guid: 4e8d6694065d1b043bf4dcd6279fee20, type: 3}
   choppingDuration: 6
   playerController: {fileID: 0}
   treeType: 1
@@ -151,8 +158,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbb5bdc2fda2468439df7e9f725fa436, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  swaySpeed: 1
-  swayAmount: 0.1
+  swaySpeed: 5
+  swayAmount: 1
   swayRandomness: 0.2
 --- !u!136 &1299344787771834007
 CapsuleCollider:
@@ -173,7 +180,21 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.62110204
-  m_Height: 5.3795595
+  m_Radius: 1.1617649
+  m_Height: 5.379559
   m_Direction: 1
-  m_Center: {x: 0.14, y: 2.675414, z: -0.16}
+  m_Center: {x: 0.14000003, y: 2.6754138, z: -0.70066243}
+--- !u!114 &4029973009528503414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5420711483085053774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ff925ae4d071704bab058438b424cde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  originalMaterial: {fileID: 2100000, guid: 14c9fd1ef92b17541a42ed0c06ff5409, type: 2}
+  transparentMaterial: {fileID: 2100000, guid: fafc791c63c8c4a43be4da8905704774, type: 2}

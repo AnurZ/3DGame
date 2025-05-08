@@ -14,19 +14,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7424d45a698023849bd966a8dc47d923, type: 3}
       propertyPath: m_LocalScale.x
-      value: 2.4990222
+      value: 2.193024
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7424d45a698023849bd966a8dc47d923, type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.4990222
+      value: 2.193024
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7424d45a698023849bd966a8dc47d923, type: 3}
       propertyPath: m_LocalScale.z
-      value: 2.4990222
+      value: 2.193024
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7424d45a698023849bd966a8dc47d923, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 164.97
+      value: 184.08
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7424d45a698023849bd966a8dc47d923, type: 3}
       propertyPath: m_LocalPosition.y
@@ -34,7 +34,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7424d45a698023849bd966a8dc47d923, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 132.73
+      value: 140.6
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7424d45a698023849bd966a8dc47d923, type: 3}
       propertyPath: m_LocalRotation.w
@@ -77,6 +77,10 @@ PrefabInstance:
       value: TreeLevel3Blue
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 7424d45a698023849bd966a8dc47d923, type: 3}
+      propertyPath: m_Layer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 7424d45a698023849bd966a8dc47d923, type: 3}
       propertyPath: m_TagString
       value: Tree
       objectReference: {fileID: 0}
@@ -96,6 +100,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7424d45a698023849bd966a8dc47d923, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3940551591148380578}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7424d45a698023849bd966a8dc47d923, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -1209777536908196716}
   m_SourcePrefab: {fileID: 100100000, guid: 7424d45a698023849bd966a8dc47d923, type: 3}
 --- !u!1 &3481150544104519291 stripped
 GameObject:
@@ -139,7 +146,7 @@ MonoBehaviour:
   health: 100
   highlightMaterial: {fileID: 2100000, guid: 54589bcc3464d6e4eb3c1a95b45fa88b, type: 2}
   timeBetweenChops: 1
-  dropPrefab: {fileID: 0}
+  dropPrefab: {fileID: 6714765344677469172, guid: f1eebe6c63f9b3c4a98bc71b16c80fd6, type: 3}
   choppingDuration: 6
   playerController: {fileID: 0}
   treeType: 2
@@ -155,8 +162,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbb5bdc2fda2468439df7e9f725fa436, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  swaySpeed: 1
-  swayAmount: 0.1
+  swaySpeed: 5
+  swayAmount: 1
   swayRandomness: 0.2
 --- !u!136 &3940551591148380578
 CapsuleCollider:
@@ -181,3 +188,17 @@ CapsuleCollider:
   m_Height: 7.8641963
   m_Direction: 1
   m_Center: {x: 0.080000125, y: 3.932095, z: -0.06}
+--- !u!114 &-1209777536908196716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3481150544104519291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ff925ae4d071704bab058438b424cde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  originalMaterial: {fileID: 8975480819012031255, guid: 0805565610f2027478c26a7a1e569b85, type: 3}
+  transparentMaterial: {fileID: 2100000, guid: fafc791c63c8c4a43be4da8905704774, type: 2}

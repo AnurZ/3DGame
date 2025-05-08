@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class UpgradesManager : MonoBehaviour
 {
@@ -60,9 +61,13 @@ public class UpgradesManager : MonoBehaviour
     [HideInInspector] public bool hasChoppingSpeed;
     [HideInInspector] public bool hasChoppingStamina;
 
+    
+    public TMP_Text interactionText;
+
+    public CurrencyManager CurrencyManager;
     private void Start()
     {
-        
+        CurrencyManager =  FindObjectOfType<CurrencyManager>();
     }
 
     private void Awake()
@@ -88,7 +93,7 @@ public class UpgradesManager : MonoBehaviour
         // 1) Postavi internu logiku
         applyLogic();
 
-        // 2) Obojaj UI
+        // 2) Oboji UI
         Color32 purchasedColor = new Color32(0xc1, 0xc1, 0xc1, 0xff);
         buyButton.GetComponent<Image>().color = purchasedColor;
         bg.color       = purchasedColor;
@@ -104,92 +109,169 @@ public class UpgradesManager : MonoBehaviour
 
     public void BuyStaminaRegenUpgrade()
     {
-        PerformBuy(
-            () => { /* nema dodatne logike */ },
-            ref hasStaminaRegen,
-            staminaRegenBuyButton,
-            staminaRegenBackground,
-            staminaRegenIcon,
-            staminaRegenInfoBackground
-        );
-        Debug.Log("Buying Stamina Regen");
+        if (CurrencyManager.TrySpendMoney(1))
+        {
+            PerformBuy(
+                () =>
+                {
+                    /* nema dodatne logike */
+                },
+                ref hasStaminaRegen,
+                staminaRegenBuyButton,
+                staminaRegenBackground,
+                staminaRegenIcon,
+                staminaRegenInfoBackground
+            );
+            Debug.Log("Buying Stamina Regen");
+        }
+        else
+        {
+            interactionText.gameObject.SetActive(true);
+            interactionText.text = "You do not have enough money to buy this potion!";
+            interactionText.color = Color.red;
+            staminaRegenBuyButton.SetActive(false);
+        }
     }
 
     public void BuySpeedUpgrade()
     {
-        PerformBuy(
-            () => { playerController.speed = 10f; },
-            ref hasSpeed,
-            speedBuyButton,
-            speedBackground,
-            speedIcon,
-            speedInfoBackground
-        );
-        Debug.Log("Buying Speed");
+        if (CurrencyManager.TrySpendMoney(1500))
+        {
+            PerformBuy(
+                () => { playerController.speed = 10f; },
+                ref hasSpeed,
+                speedBuyButton,
+                speedBackground,
+                speedIcon,
+                speedInfoBackground
+            );
+            Debug.Log("Buying Speed");
+        }
+        else
+        {
+            Debug.Log("Nema dobvoljno");
+            interactionText.gameObject.SetActive(true);
+            interactionText.text = "You do not have enough money to buy this potion!";
+            interactionText.color = Color.red;
+            speedBuyButton.SetActive(false);
+        }
     }
 
     public void BuyInjuryShieldUpgrade()
     {
-        PerformBuy(
-            () => { playerController.injuryShieldUpgrade = true; },
-            ref hasInjuryShield,
-            injuryShieldBuyButton,
-            injuryShieldBackground,
-            injuryShieldIcon,
-            injuryShieldInfoBackground
-        );
-        Debug.Log("Buying Injury Shield");
+        if (CurrencyManager.TrySpendMoney(1000))
+        {
+            PerformBuy(
+                () => { playerController.injuryShieldUpgrade = true; },
+                ref hasInjuryShield,
+                injuryShieldBuyButton,
+                injuryShieldBackground,
+                injuryShieldIcon,
+                injuryShieldInfoBackground
+            );
+            Debug.Log("Buying Injury Shield");
+        }
+        else
+        {
+            interactionText.gameObject.SetActive(true);
+            interactionText.text = "You do not have enough money to buy this potion!";
+            interactionText.color = Color.red;
+            injuryShieldBuyButton.SetActive(false);
+        }
     }
 
     public void BuySevereInjuryShieldUpgrade()
     {
-        PerformBuy(
-            () => { playerController.severeInjuryShieldUpgrade = true; },
-            ref hasSevereInjuryShield,
-            severeInjuryShieldBuyButton,
-            severeInjuryShieldBackground,
-            severeInjuryShieldIcon,
-            severeInjuryShieldInfoBackground
-        );
-        Debug.Log("Buying Severe Injury Shield");
+        if (CurrencyManager.TrySpendMoney(3000))
+        {
+            PerformBuy(
+                () => { playerController.severeInjuryShieldUpgrade = true; },
+                ref hasSevereInjuryShield,
+                severeInjuryShieldBuyButton,
+                severeInjuryShieldBackground,
+                severeInjuryShieldIcon,
+                severeInjuryShieldInfoBackground
+            );
+            Debug.Log("Buying Severe Injury Shield");
+        }
+        else
+        {
+            interactionText.gameObject.SetActive(true);
+            interactionText.text = "You do not have enough money to buy this potion!";
+            interactionText.color = Color.red;
+            severeInjuryShieldBuyButton.SetActive(false);
+        }
     }
 
     public void BuyPotionEffectUpgrade()
     {
-        PerformBuy(
-            () => { /* nema dodatne logike */ },
-            ref hasPotionEffect,
-            potionEffectBuyButton,
-            potionEffectBackground,
-            potionEffectIcon,
-            potionEffectInfoBackground
-        );
-        Debug.Log("Buying Potion Effect");
+        if (CurrencyManager.TrySpendMoney(1000))
+        {
+            PerformBuy(
+                () =>
+                {
+                    /* nema dodatne logike */
+                },
+                ref hasPotionEffect,
+                potionEffectBuyButton,
+                potionEffectBackground,
+                potionEffectIcon,
+                potionEffectInfoBackground
+            );
+            Debug.Log("Buying Potion Effect");
+        }
+        else
+        {
+            interactionText.gameObject.SetActive(true);
+            interactionText.text = "You do not have enough money to buy this potion!";
+            interactionText.color = Color.red;
+            potionEffectBuyButton.SetActive(false);
+        }
     }
 
     public void BuyChoppingSpeedUpgrade()
     {
-        PerformBuy(
-            () => { playerController.choppingSpeedUpgrade = true; },
-            ref hasChoppingSpeed,
-            choppingSpeedBuyButton,
-            choppingSpeedBackground,
-            choppingSpeedIcon,
-            choppingSpeedInfoBackground
-        );
-        Debug.Log("Buying Chopping Speed");
+        if (CurrencyManager.TrySpendMoney(1500))
+        {
+            PerformBuy(
+                () => { playerController.choppingSpeedUpgrade = true; },
+                ref hasChoppingSpeed,
+                choppingSpeedBuyButton,
+                choppingSpeedBackground,
+                choppingSpeedIcon,
+                choppingSpeedInfoBackground
+            );
+            Debug.Log("Buying Chopping Speed");
+        }
+        else
+        {
+            interactionText.gameObject.SetActive(true);
+            interactionText.text = "You do not have enough money to buy this potion!";
+            interactionText.color = Color.red;
+            choppingSpeedBuyButton.SetActive(false);
+        }
     }
 
     public void BuyChoppingStaminaUpgrade()
     {
-        PerformBuy(
-            () => { staminaController.staminaReductionRate *= 0.8f; },
-            ref hasChoppingStamina,
-            choppingStaminaBuyButton,
-            choppingStaminaBackground,
-            choppingStaminaIcon,
-            choppingStaminaInfoBackground
-        );
-        Debug.Log("Buying Chopping Stamina");
+        if (CurrencyManager.TrySpendMoney(2000))
+        {
+            PerformBuy(
+                () => { staminaController.staminaReductionRate *= 0.8f; },
+                ref hasChoppingStamina,
+                choppingStaminaBuyButton,
+                choppingStaminaBackground,
+                choppingStaminaIcon,
+                choppingStaminaInfoBackground
+            );
+            Debug.Log("Buying Chopping Stamina");
+        }
+        else
+        {
+            interactionText.gameObject.SetActive(true);
+            interactionText.text = "You do not have enough money to buy this potion!";
+            interactionText.color = Color.red;
+            choppingStaminaBuyButton.SetActive(false);
+        }
     }
 }

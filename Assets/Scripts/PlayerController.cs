@@ -60,7 +60,7 @@ public class PlayerController : MonoBehaviour
     public bool severeInjuryShieldUpgrade = false;
     public bool injuryShieldUpgrade = false;
     
-    
+    public TransparencyController transparencyManager;
     
     private void Awake()
     {
@@ -114,6 +114,7 @@ public class PlayerController : MonoBehaviour
         dayNightCycle = FindObjectOfType<SimpleDayNightCycle>();
         potionManager = FindObjectOfType<PotionManager>();
         staminaController = FindObjectOfType<StaminaController>();
+        transparencyManager = FindObjectOfType<TransparencyController>();
         
         if (injuryStateText != null)
             injuryStateText.gameObject.SetActive(true);
@@ -491,6 +492,8 @@ public class PlayerController : MonoBehaviour
             if (nearbyTree != null)
             {
                 nearbyTree.StopHighlighting();
+                transparencyManager.ResetAndReapplyTransparency();
+                Debug.Log("TREBALO BI DA RADI");
                 nearbyTree = null;
             }
 

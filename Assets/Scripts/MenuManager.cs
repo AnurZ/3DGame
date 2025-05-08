@@ -14,32 +14,35 @@ public class MenuManager : MonoBehaviour
     public GameObject optionsPanel;
     public GameObject helpPanel;
     public Image blackScreen;
+    public Image blackScreenNewGame;
+    public Image blackScreenOnLoad;
     public float fadeDuration = 1f;
     public NewGameInventoryManager newGameInventoryManager;
+    public Image logoImage;
+
+    
     private string savePath;
 
     private void Start()
     {
         savePath = Application.persistentDataPath + "/savefile.json";
 
-        // Disable Continue if no save file
-        if (!File.Exists(savePath))
-        {
-            continueButton.interactable = false;
-        }
-        else
-        {
-            continueButton.interactable = true;
-        }
+        continueButton.interactable = File.Exists(savePath);
 
-        // Hide options and help panels at start
         if (optionsPanel != null) optionsPanel.SetActive(false);
         if (helpPanel != null) helpPanel.SetActive(false);
 
-        // Start with black screen, fade in
-        blackScreen.gameObject.SetActive(true);
-        StartCoroutine(FadeFromBlack());
+        blackScreen.gameObject.SetActive(false);
+        blackScreenNewGame.gameObject.SetActive(false);
+
+        // Only activate and fade out the on-load screen here
+        if (blackScreenOnLoad != null)
+        {
+            blackScreenOnLoad.gameObject.SetActive(true);
+            StartCoroutine(FadeFromBlack());
+        }
     }
+
 
     public void OnContinue()
     {
@@ -130,17 +133,34 @@ public class MenuManager : MonoBehaviour
 
     IEnumerator FadeFromBlack()
     {
-        Color color = blackScreen.color;
+        // Fade out black screen
+        Color blackColor = blackScreenOnLoad.color;
+        logoImage.gameObject.SetActive(true);
+        Color logoColor = logoImage.color;
+        logoColor.a = 0f;
+        logoImage.color = logoColor;
         for (float t = 0; t < fadeDuration; t += Time.deltaTime)
         {
-            color.a = Mathf.Lerp(1f, 0f, t / fadeDuration);
-            blackScreen.color = color;
+            blackColor.a = Mathf.Lerp(1f, 0f, t / fadeDuration);
+            logoColor.a = Mathf.Lerp(0f, 1f, t / fadeDuration);
+            logoImage.color = logoColor;
+            blackScreenOnLoad.color = blackColor;
             yield return null;
         }
-        color.a = 0f;
-        blackScreen.color = color;
-        blackScreen.gameObject.SetActive(false);
+        blackColor.a = 0f;
+        blackScreenOnLoad.color = blackColor;
+        blackScreenOnLoad.gameObject.SetActive(false);
+
+        // Fade in logo
+      
+            
+
+            
+            logoColor.a = 1f;
+            logoImage.color = logoColor;
+        
     }
+
 
     IEnumerator LoadGameWithFade()
     {
@@ -150,7 +170,7 @@ public class MenuManager : MonoBehaviour
 
     IEnumerator StartNewGameWithFade()
     {
-        yield return StartCoroutine(FadeToBlack());
+        yield return StartCoroutine(FadeToBlackNewGame());
         Debug.Log("🌑 Fade završen. Učitavanje scene...");
         SceneManager.LoadScene("IGRICASCENE");
     }
@@ -163,10 +183,24 @@ public class MenuManager : MonoBehaviour
         for (float t = 0; t < fadeDuration; t += Time.deltaTime)
         {
             color.a = Mathf.Lerp(0f, 1f, t / fadeDuration);
+            blackScreenOnLoad.color = color;
+            yield return null;
+        }
+        color.a = 1f;
+        blackScreenOnLoad.color = color;
+    }IEnumerator FadeToBlackNewGame()
+    {
+        blackScreenNewGame.gameObject.SetActive(true);
+        Color color = blackScreen.color;
+        for (float t = 0; t < fadeDuration; t += Time.deltaTime)
+        {
+            color.a = Mathf.Lerp(0f, 1f, t / fadeDuration);
             blackScreen.color = color;
             yield return null;
         }
         color.a = 1f;
         blackScreen.color = color;
     }
+    
+    
 }

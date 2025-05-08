@@ -22,6 +22,9 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
     // For showing price
     public GameObject pricePopupPrefab;  // Assign prefab with a Text component
     private GameObject pricePopupInstance;
+    
+    [Header("Popup Text References")]
+    public string itemDisplayName;
 
     void Start()
     {
@@ -45,39 +48,33 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
 
     public void OnHoverEnter()
     {
-        // Highlight: yellow + outline
         SetAllColors(hoverColor);
         if (outline != null) outline.enabled = true;
 
-        // Show the price popup
         if (pricePopupPrefab != null)
         {
-            // Instantiate the price popup at the item's position
             pricePopupInstance = Instantiate(pricePopupPrefab, transform.position, Quaternion.identity);
 
-            // Find the Text (or TMP_Text) component inside the popup instance
-            var priceText = pricePopupInstance.GetComponentInChildren<TMP_Text>();  // or TMP_Text if you're using TextMesh Pro
-        
+            // Find children with specific names
+            var nameText = pricePopupInstance.transform.Find("ItemNameText")?.GetComponent<TMP_Text>();
+            var priceText = pricePopupInstance.transform.Find("ItemPriceText")?.GetComponent<TMP_Text>();
+
+            if (nameText != null)
+                nameText.text = itemDisplayName;
+
             if (priceText != null)
-            {
-                priceText.text = "$" + cost.ToString();  // Set the price text
-            }
-            else
-            {
-                Debug.LogWarning("Text component not found in pricePopupPrefab.");
-            }
+                priceText.text = "$" + cost;
 
-            // Set the parent to the MoneyUI's transform (replace 'MoneyUI' with your actual GameObject name or reference)
-            pricePopupInstance.transform.SetParent(GameObject.Find("MoneyUI").transform);  // Set the parent to MoneyUI
-
-            // Optionally adjust the local position if needed
-            pricePopupInstance.transform.localPosition = Vector3.zero;  // Adjust this as needed
+            pricePopupInstance.transform.SetParent(GameObject.Find("MoneyUI").transform, false);
+            pricePopupInstance.transform.localPosition = Vector3.zero; // Adjust if needed
         }
         else
         {
             Debug.LogWarning("pricePopupPrefab is not assigned in the Inspector.");
         }
     }
+
+
 
 
 

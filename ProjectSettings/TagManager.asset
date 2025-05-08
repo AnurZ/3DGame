@@ -12,6 +12,7 @@ TagManager:
   - Shop
   - Boat
   - NPC
+  - Shop2
   layers:
   - Default
   - TransparentFX

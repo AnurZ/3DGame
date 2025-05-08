@@ -1,12 +1,18 @@
+using System;
 using TMPro;
 using UnityEngine;
 
 public class CurrencyManager : MonoBehaviour
 {
     public int CurrentMoney { get; set; } = 150;
-    public CurrencyManager currencyManager;
     public TMP_Text moneyText;
     public static CurrencyManager Instance { get; private set; }
+    public AchievementsController achievementsController;
+
+    public void Start()
+    {
+        achievementsController = FindObjectOfType<AchievementsController>();
+    }
 
     private void Awake()
     {
@@ -38,6 +44,11 @@ public class CurrencyManager : MonoBehaviour
         {
             CurrentMoney -= amount;
             Debug.Log("Potrošeno: " + amount + " | Preostalo: " + CurrentMoney);
+            if(achievementsController != null)
+                achievementsController.SpendMoney += amount;
+            else
+            {
+            }
             return true;
         }
         else

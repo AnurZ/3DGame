@@ -63,11 +63,14 @@ public class UpgradesManager : MonoBehaviour
 
     
     public TMP_Text interactionText;
+    
+    public AchievementsController achievementsController;
 
     public CurrencyManager CurrencyManager;
     private void Start()
     {
         CurrencyManager =  FindObjectOfType<CurrencyManager>();
+        achievementsController = FindObjectOfType<AchievementsController>();
     }
 
     private void Awake()
@@ -100,6 +103,8 @@ public class UpgradesManager : MonoBehaviour
         icon.color     = purchasedColor;
         infoBg.color   = purchasedColor;
 
+        achievementsController.UnlockAllUpgrades++;
+        
         // 3) Označi flag
         hasFlag = true;
 

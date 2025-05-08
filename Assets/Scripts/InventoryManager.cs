@@ -18,8 +18,14 @@ public class InventoryManager : MonoBehaviour
     public TMP_Text textMeshPro;
     public GameObject uipanel;
 
+    public TMP_Text ItemNameText;
+    public GameObject ItemNamePanel;
+    
+    public AchievementsController achievementsController;
+    
     private void Start()
     {
+        achievementsController = FindObjectOfType<AchievementsController>();
         ChangeSelectedSlot(0);
         if (InventoryIsEmpty())
         {
@@ -76,6 +82,15 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
+    private IEnumerator DisplayItemName()
+    {
+        ItemNamePanel.SetActive(true);
+        ItemNameText.text = GetSelectedItem(false).itemName;
+        yield return new WaitForSeconds(2f);
+        ItemNameText.text = "";
+        ItemNamePanel.SetActive(false);
+    }
+    
     private IEnumerator ShowTextCoroutine()
     {
         uipanel.SetActive(true);
@@ -103,7 +118,7 @@ public class InventoryManager : MonoBehaviour
             Item currentItem = GetSelectedItem(false);
             if (currentItem != null)
             {
-                Debug.Log("JE LI POTION: " + currentItem.isPotion);
+                StartCoroutine(DisplayItemName());
                 if (currentItem.isPotion)
                 {
                     StartCoroutine(ShowTextCoroutine());
@@ -118,6 +133,10 @@ public class InventoryManager : MonoBehaviour
     {
         if (currentHeldItem != null)
         {
+            if (GetSelectedItem(false).isPotion)
+            {
+                achievementsController.UsePotions++;
+            }
             Destroy(currentHeldItem); // Remove the held item visually
             currentHeldItem = null;
         }

@@ -62,6 +62,8 @@ public class PlayerController : MonoBehaviour
     
     public TransparencyController transparencyManager;
     
+    public AchievementsController achievementsController;
+    
     private void Awake()
     {
         Local = this;
@@ -76,6 +78,7 @@ public class PlayerController : MonoBehaviour
             if (daysToRecover <= 0)
             {
                 currentInjury = InjuryStatus.Healthy;
+                achievementsController.HealFromInjury = 1;
                 injuryEffectMultiplier = 1;
             }
             
@@ -115,6 +118,7 @@ public class PlayerController : MonoBehaviour
         potionManager = FindObjectOfType<PotionManager>();
         staminaController = FindObjectOfType<StaminaController>();
         transparencyManager = FindObjectOfType<TransparencyController>();
+        achievementsController = FindObjectOfType<AchievementsController>();
         
         if (injuryStateText != null)
             injuryStateText.gameObject.SetActive(true);

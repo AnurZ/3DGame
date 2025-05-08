@@ -20,6 +20,11 @@ public class PotionManager : MonoBehaviour
     public int FocusPotionDays = 0;
     public GameObject FocusPotionInfo;
     public Text FocusPotionText;
+
+    public GameObject Prompt;
+    public TextMeshProUGUI promptText;
+    
+    public AchievementsController achievementsController;
     
     public enum PotionType
     {
@@ -48,6 +53,7 @@ public class PotionManager : MonoBehaviour
     {
         playerController = FindObjectOfType<PlayerController>();
         staminaController = FindObjectOfType<StaminaController>();
+        achievementsController = FindObjectOfType<AchievementsController>();
     }
 
     private void Update()
@@ -116,7 +122,7 @@ public class PotionManager : MonoBehaviour
                     Debug.Log("Unknown potion type.");
                     break;
             }
-
+            
             // After drinking, reset the potion state
             isPotionHeld = false;
         }
@@ -127,7 +133,12 @@ public class PotionManager : MonoBehaviour
     private void ReduceInjury()
     {
         if (playerController.currentInjury == PlayerController.InjuryStatus.Healthy)
+        {
+            Prompt.SetActive(true);
+            promptText.text = "You are already healthy!";
+            achievementsController.HealFromInjury = 1;
             return;
+        }
         // If the player is not severely injured, reduce the injury
         if (playerController.currentInjury == PlayerController.InjuryStatus.Severe)
         {
@@ -154,6 +165,12 @@ public class PotionManager : MonoBehaviour
 
     private void IncreaseStamina()
     {
+        if (staminaController.playerStamina == 100)
+        {
+            Prompt.SetActive(true);
+            promptText.text = "Your stamina is already full!";
+            return;
+        }
         staminaController.playerStamina += 50;
         if (staminaController.playerStamina >= 100)
             staminaController.playerStamina = 100;

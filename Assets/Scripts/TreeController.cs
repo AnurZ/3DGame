@@ -33,6 +33,8 @@ public class TreeController : MonoBehaviour
     
     public TreeTypes treeType;
     
+    public AchievementsController achievementsController;
+    
     private void Start()
     {
         treeRenderer = GetComponent<Renderer>();
@@ -41,6 +43,7 @@ public class TreeController : MonoBehaviour
 
         treeSway = GetComponent<TreeSway>(); // Get reference to TreeSway component
         playerController = FindObjectOfType<PlayerController>();
+        achievementsController = FindObjectOfType<AchievementsController>();
     }
 
     public void StartHighlighting()
@@ -106,17 +109,21 @@ public class TreeController : MonoBehaviour
                 playerController.choppingImage.fillAmount = 0f;
                 DropPrefab();
                 PlayerController.Local.OnTreeChoppedDown();
+                //if(achievementsController.TreesChopped < achievementsController.TreesChoppedLevels[achievementsController.TreesChoppedCurrentLevel])
+                    achievementsController.TreesChopped++;
+                switch (treeType)
+                {
+                    case TreeTypes.Level1: achievementsController.TreeType1 = 1; break;
+                    case TreeTypes.Level2: achievementsController.TreeType2 = 1; break;
+                    case TreeTypes.Level3: achievementsController.TreeType3 = 1; break;
+                    case TreeTypes.Level4: achievementsController.TreeType4 = 1; break;
+                    case TreeTypes.Level5: achievementsController.TreeType5 = 1; break;
+                }
+                achievementsController.ChopAllTreeTypes = achievementsController.TreeType1 +  achievementsController.TreeType2 + achievementsController.TreeType3
+                    +  achievementsController.TreeType4 + achievementsController.TreeType5;
                 Destroy(gameObject);
             }
-
-            health -= injuryRisk * Time.deltaTime;
-
-            if (health <= 0f)
-            {
-                DropPrefab();
-                PlayerController.Local.OnTreeChoppedDown();
-                Destroy(gameObject);
-            }
+            
         }
     }
 

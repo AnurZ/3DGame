@@ -220,18 +220,25 @@ public class InventoryManager : MonoBehaviour
 
     public bool AddItem(Item item)
     {
-        for (int i = 0; i < inventorySlots.Length; i++)
+        bool isStackable = !(item.isAxe || item.isPotion);
+
+        // First, try to stack in existing slot
+        if (isStackable)
         {
-            InventorySlot slot = inventorySlots[i];
-            InventoryItem itemInSlot = slot.GetComponentInChildren<InventoryItem>();
-            if (itemInSlot != null && itemInSlot.item == item)
+            for (int i = 0; i < inventorySlots.Length; i++)
             {
-                itemInSlot.count++;
-                itemInSlot.RefreshCount();
-                return true;
+                InventorySlot slot = inventorySlots[i];
+                InventoryItem itemInSlot = slot.GetComponentInChildren<InventoryItem>();
+                if (itemInSlot != null && itemInSlot.item == item && itemInSlot.count < 50)
+                {
+                    itemInSlot.count++;
+                    itemInSlot.RefreshCount();
+                    return true;
+                }
             }
         }
 
+        // Then, try to add to a new slot
         for (int i = 0; i < inventorySlots.Length; i++)
         {
             InventorySlot slot = inventorySlots[i];
@@ -242,6 +249,7 @@ public class InventoryManager : MonoBehaviour
                 return true;
             }
         }
+
         return false;
     }
 

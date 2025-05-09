@@ -46,9 +46,6 @@ public class CurrencyManager : MonoBehaviour
             Debug.Log("Potrošeno: " + amount + " | Preostalo: " + CurrentMoney);
             if(achievementsController != null)
                 achievementsController.SpendMoney += amount;
-            else
-            {
-            }
             return true;
         }
         else

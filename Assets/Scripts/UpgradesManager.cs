@@ -114,7 +114,7 @@ public class UpgradesManager : MonoBehaviour
 
     public void BuyStaminaRegenUpgrade()
     {
-        if (CurrencyManager.TrySpendMoney(1))
+        if (CurrencyManager.TrySpendMoney(2000))
         {
             PerformBuy(
                 () =>

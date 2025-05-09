@@ -21,6 +21,10 @@ public class PotionManager : MonoBehaviour
     public GameObject FocusPotionInfo;
     public Text FocusPotionText;
 
+    public int UpgradePotionDays = 0;
+    public GameObject UpgradePotionInfo;
+    public Text UpgradePotionText;
+    
     public GameObject Prompt;
     public TextMeshProUGUI promptText;
     
@@ -58,6 +62,15 @@ public class PotionManager : MonoBehaviour
 
     private void Update()
     {
+        if (FocusPotionDays <= 0)
+        {
+            UpgradePotionInfo.SetActive(false);
+        }
+        else
+        {
+            UpgradePotionText.text = UpgradePotionDays + " day" + (UpgradePotionDays > 1 ? "s left" : " left");
+            UpgradePotionInfo.SetActive(true);
+        }
         if (FocusPotionDays <= 0)
         {
             FocusPotionInfo.SetActive(false);
@@ -136,7 +149,6 @@ public class PotionManager : MonoBehaviour
         {
             Prompt.SetActive(true);
             promptText.text = "You are already healthy!";
-            achievementsController.HealFromInjury = 1;
             return;
         }
         // If the player is not severely injured, reduce the injury
@@ -152,6 +164,7 @@ public class PotionManager : MonoBehaviour
             playerController.currentInjury = PlayerController.InjuryStatus.Healthy;
             playerController.daysToRecover = 0; // Instant recovery
             playerController.UpdateInjuryStateText();
+            achievementsController.HealFromInjury = 1;
             Debug.Log("Potion healed minor injury.");
         }
         else if (playerController.currentInjury == PlayerController.InjuryStatus.Moderate)
@@ -193,5 +206,11 @@ public class PotionManager : MonoBehaviour
         inventoryManager.RemoveItemFromHand();
     }
 
-    private void UpgradePotion() => throw new System.NotImplementedException();
+    private void UpgradePotion()
+    { 
+        UpgradePotionDays += 1;
+        UpgradePotionText.text = UpgradePotionDays + " day" + (UpgradePotionDays > 1 ? "s left" : " left");
+        UpgradePotionInfo.SetActive(true);
+        inventoryManager.RemoveItemFromHand();
+    }
 }

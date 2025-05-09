@@ -136,6 +136,7 @@ public class InventoryManager : MonoBehaviour
             if (GetSelectedItem(false).isPotion)
             {
                 achievementsController.UsePotions++;
+                achievementsController.potionDrankThatDay = true;
             }
             Destroy(currentHeldItem); // Remove the held item visually
             currentHeldItem = null;

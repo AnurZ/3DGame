@@ -63,6 +63,11 @@ public class PlayerController : MonoBehaviour
     public TransparencyController transparencyManager;
     
     public AchievementsController achievementsController;
+
+    public bool isUpgradePotionActive = false;
+    public bool isStaminaRegenUpgrade = false;
+    private float passiveStaminaTimer = 0f;
+
     
     private void Awake()
     {
@@ -181,7 +186,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
         Item selectedItem = inventoryManager.GetSelectedItem(false);
-        if (!IsHoldingAxe() || (int)nearbyTree.treeType > (int)selectedItem.currentAxeType)
+        if (!IsHoldingAxe() || (int)nearbyTree.treeType > (int)selectedItem.currentAxeType + (isUpgradePotionActive ? 1 : 0))
         {
             interactionText.text = "You need a higher level axe to chop this tree!";
             interactionText.color = Color.red;
@@ -361,6 +366,22 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (isStaminaRegenUpgrade && !isChopping && !animator.GetBool("IsWalking") && !canSleep)
+        {
+            passiveStaminaTimer += Time.deltaTime;
+
+            if (passiveStaminaTimer >= 10f)
+            {
+                staminaController.playerStamina = Mathf.Min(staminaController.playerStamina + 5f, 100f);
+                passiveStaminaTimer = 0f; // Reset timer
+                Debug.Log("Passive stamina regenerated +5");
+            }
+        }
+        else
+        {
+            passiveStaminaTimer = 0f; // Reset if conditions not met
+        }
+        
         if (isInShop)
             return;
 

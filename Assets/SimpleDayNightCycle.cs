@@ -27,12 +27,15 @@ public class SimpleDayNightCycle : MonoBehaviour
     public PlayerController playerInjurySystem;
 
     public PotionManager potionManager;
+    
+    public AchievementsController achievementsController;
 
     void Start()
     {
         timeOfDay = GetTimeNormalizedFromHour(8);
         currentDay = PlayerPrefs.GetInt("Day", 1);
         potionManager = FindObjectOfType<PotionManager>();
+        achievementsController = FindObjectOfType<AchievementsController>();
         UpdateDayText();
     }
     private bool yawningPlayed = false; // Flag to track if yawning has played
@@ -48,7 +51,8 @@ public class SimpleDayNightCycle : MonoBehaviour
         if (timeOfDay >= 1f)
         {
             timeOfDay -= 1f;
-            currentDay++;
+            
+
             PlayerPrefs.SetInt("Day", currentDay);
             UpdateDayText();
         }
@@ -171,8 +175,23 @@ public class SimpleDayNightCycle : MonoBehaviour
     {
         dayText.text = "Day: " + currentDay.ToString();
         Debug.Log("Novi dan");
+        if (achievementsController != null)
+        {
+            if (achievementsController.DrinkPotionsDaily != 10)
+            {
+                if (achievementsController.potionDrankThatDay)
+                    achievementsController.DrinkPotionsDaily++;
+                else
+                    achievementsController.DrinkPotionsDaily = 0;
+                achievementsController.potionDrankThatDay = false;
+            }
+        }
+        
+        currentDay++;
         if (playerInjurySystem != null)
             playerInjurySystem.OnDayPassed();
+        if(potionManager.UpgradePotionDays>0)
+            potionManager.UpgradePotionDays--;
         if(potionManager.ShieldPotionDays>0)
             potionManager.ShieldPotionDays--;
         if(potionManager.FocusPotionDays>0)

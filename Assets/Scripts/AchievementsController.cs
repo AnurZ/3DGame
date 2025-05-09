@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 public class AchievementsController : MonoBehaviour
 {
@@ -106,7 +107,20 @@ public class AchievementsController : MonoBehaviour
     public int[] InteractWithNPCSLevel = new int[3] { 10, 20, 50 };
     public int InteractWithNPCsCurrentLevel = 0;
     
+    // DrinkPotionsDaily
+    public Image DrinkPotionsDailySlider;
+    public TextMeshProUGUI DrinkPotionsDailyFillAmount;
+    public int DrinkPotionsDaily = 0;
+    [SerializeField] private int DrinkPotionsDailyGoal = 10;
+    public Image DrinkPotionsDailyIconBackground;
+    public Image DrinkPotionsDailyIcon;
+    public Image DrinkPotionsDailyCoin;
+    public Image DrinkPotionsDailyBoughtIcon;
+    public TextMeshProUGUI DrinkPotionsDailyText;
+    
     private int dummyInt = 0;
+    
+    public bool potionDrankThatDay = false;
 
     public void increaseChoppedTreesCurrentGoal()
     {
@@ -309,6 +323,9 @@ public class AchievementsController : MonoBehaviour
         InteractWithNPCsCoin,
         InteractWithNPCsBoughtIcon
     );
+    
+    UpdateSliderFill(DrinkPotionsDaily,  DrinkPotionsDailyGoal,   DrinkPotionsDailySlider, DrinkPotionsDailyFillAmount, ref dummyInt,
+        null,  DrinkPotionsDailyIcon, DrinkPotionsDailyIconBackground,DrinkPotionsDailyCoin, DrinkPotionsDailyBoughtIcon);
 }
 
 

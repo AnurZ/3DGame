@@ -114,7 +114,7 @@ public class UpgradesManager : MonoBehaviour
 
     public void BuyStaminaRegenUpgrade()
     {
-        if (CurrencyManager.TrySpendMoney(2000))
+        if (CurrencyManager.TrySpendMoney(1))
         {
             PerformBuy(
                 () =>
@@ -127,7 +127,7 @@ public class UpgradesManager : MonoBehaviour
                 staminaRegenIcon,
                 staminaRegenInfoBackground
             );
-            Debug.Log("Buying Stamina Regen");
+            playerController.isStaminaRegenUpgrade = true;
         }
         else
         {

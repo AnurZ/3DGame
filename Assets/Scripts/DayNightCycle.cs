@@ -144,7 +144,7 @@ public class DayNightCycle : MonoBehaviour
     {
         dayCounter++;
         UpdateDayCounter();
-        Debug.Log("POTIONMANAGER: " + potionManager.ShieldPotionDays);
+        Debug.Log("POTIONMANAGER: " + potionManager.ShieldPotionHours);
         PlayerPrefs.SetInt("CurrentDay", dayCounter);
         Debug.Log("Novi dan");
         if (playerInjurySystem != null)

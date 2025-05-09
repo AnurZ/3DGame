@@ -15,21 +15,33 @@ public class NPCProximityInteraction : MonoBehaviour
     public bool useWobbleEffect = false;
     public bool useColorizeText = true;
 
+    [Header("Cooldown Settings")]
+    public float cooldownTime = 30f;
+    private float lastInteractionTime = -Mathf.Infinity;
+
     private GameObject floatingTextInstance;
     private int lastIndex = -1;
     private List<int> shuffledIndices = new List<int>();
     private int shufflePointer = 0;
 
+    public AchievementsController achievementsController;
+
     private void Start()
     {
+        achievementsController = FindObjectOfType<AchievementsController>();
         ShuffleIndices();
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (sentences.Length == 0) return;
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && Time.time - lastInteractionTime >= cooldownTime)
         {
+            lastInteractionTime = Time.time;
+
+            if (achievementsController.InteractWithNPCs < achievementsController.InteractWithNPCsGoal)
+                achievementsController.InteractWithNPCs++;
+
             ShowRandomSentence();
         }
     }
@@ -132,7 +144,7 @@ public class NPCProximityInteraction : MonoBehaviour
         {
             tmp.transform.localScale = baseScale + new Vector3(
                 Mathf.Sin(Time.time * 1f) * 0.05f,
-                Mathf.Cos(Time.time * 1) * 0.05f,
+                Mathf.Cos(Time.time * 1f) * 0.05f,
                 0f
             );
             t += Time.deltaTime;

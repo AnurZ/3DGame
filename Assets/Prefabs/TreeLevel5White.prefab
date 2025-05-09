@@ -160,7 +160,8 @@ MonoBehaviour:
   dropPrefab: {fileID: 8137669601094962300, guid: 46dde8f815278684cb3e294fcb6983dc, type: 3}
   choppingDuration: 6
   playerController: {fileID: 0}
-  treeType: 4
+  treeType: 5
+  achievementsController: {fileID: 0}
 --- !u!136 &7268821355387470442
 CapsuleCollider:
   m_ObjectHideFlags: 0

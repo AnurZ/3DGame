@@ -186,7 +186,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
         Item selectedItem = inventoryManager.GetSelectedItem(false);
-        if (!IsHoldingAxe() || (int)nearbyTree.treeType > (int)selectedItem.currentAxeType + (isUpgradePotionActive ? 1 : 0))
+        if (!IsHoldingAxe() || (int)nearbyTree.treeType > (int)selectedItem.currentAxeType + (potionManager.UpgradePotionHours > 0 ? 1 : 0))
         {
             interactionText.text = "You need a higher level axe to chop this tree!";
             interactionText.color = Color.red;
@@ -194,7 +194,7 @@ public class PlayerController : MonoBehaviour
         }
         
         chopInjuryChance = InjurySystem.CalculateChance(currentInjury, StaminaController.Instance.playerStamina);
-        if (potionManager.ShieldPotionDays > 0)
+        if (potionManager.ShieldPotionHours > 0)
         {
             chopInjuryChance.minorChance *= 0.5f;
             chopInjuryChance.moderateChance *= 0.5f;
@@ -225,7 +225,7 @@ public class PlayerController : MonoBehaviour
         else if (currentInjury == InjuryStatus.Healthy)
             chopDurationMultiplier = 1f;
         
-        if(potionManager.FocusPotionDays > 0)
+        if(potionManager.FocusPotionHours > 0)
             chopDurationMultiplier *= 0.5f;
         
         if(choppingSpeedUpgrade)
@@ -366,15 +366,17 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+            Debug.Log("Regeneracija " + isStaminaRegenUpgrade + !isChopping + !animator.GetBool("IsWalking") + !canSleep);
         if (isStaminaRegenUpgrade && !isChopping && !animator.GetBool("IsWalking") && !canSleep)
         {
             passiveStaminaTimer += Time.deltaTime;
 
             if (passiveStaminaTimer >= 10f)
             {
-                staminaController.playerStamina = Mathf.Min(staminaController.playerStamina + 5f, 100f);
+                staminaController.playerStamina += 5f;
+                staminaController.playerStamina = staminaController.playerStamina > 100 ? 100 : staminaController.playerStamina;
                 passiveStaminaTimer = 0f; // Reset timer
-                Debug.Log("Passive stamina regenerated +5");
+                Debug.Log("Passive stamina regenerated +5 " + staminaController.playerStamina);
             }
         }
         else
@@ -517,8 +519,6 @@ public class PlayerController : MonoBehaviour
             if (nearbyTree != null)
             {
                 nearbyTree.StopHighlighting();
-                transparencyManager.ResetAndReapplyTransparency();
-                Debug.Log("TREBALO BI DA RADI");
                 nearbyTree = null;
             }
 

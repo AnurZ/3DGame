@@ -30,6 +30,10 @@ public class SimpleDayNightCycle : MonoBehaviour
     
     public AchievementsController achievementsController;
 
+    public int lastHour = -1;
+    public StaminaController staminaRegenController;
+    
+    
     void Start()
     {
         timeOfDay = GetTimeNormalizedFromHour(8);
@@ -112,7 +116,7 @@ public class SimpleDayNightCycle : MonoBehaviour
     private IEnumerator SleepRoutine()
     {
         isSleeping = true;
-
+        StaminaController.Instance.RestoreFullStamina();
         // Fade to black
         yield return StartCoroutine(FadeCanvasGroup(0f, 1f, 2.5f));
 
@@ -167,6 +171,16 @@ public class SimpleDayNightCycle : MonoBehaviour
     {
         float totalHours = timeOfDay * 24f;
         int hours = Mathf.FloorToInt(totalHours);
+        if (lastHour != hours)
+        {
+            if(potionManager.UpgradePotionHours>0)
+                potionManager.UpgradePotionHours--;
+            if(potionManager.ShieldPotionHours>0)
+                potionManager.ShieldPotionHours--;
+            if(potionManager.FocusPotionHours>0)
+                potionManager.FocusPotionHours--;
+        }
+        lastHour = hours;
         int minutes = Mathf.FloorToInt((totalHours - hours) * 60f);
         timeText.text = string.Format("{0:00}:{1:00}", hours, minutes);
     }
@@ -190,12 +204,6 @@ public class SimpleDayNightCycle : MonoBehaviour
         currentDay++;
         if (playerInjurySystem != null)
             playerInjurySystem.OnDayPassed();
-        if(potionManager.UpgradePotionDays>0)
-            potionManager.UpgradePotionDays--;
-        if(potionManager.ShieldPotionDays>0)
-            potionManager.ShieldPotionDays--;
-        if(potionManager.FocusPotionDays>0)
-            potionManager.FocusPotionDays--;
     }
 
     float GetTimeNormalizedFromHour(int hour)

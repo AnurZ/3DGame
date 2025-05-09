@@ -5,23 +5,22 @@ public class StaminaController : MonoBehaviour
 {
     public static StaminaController Instance;
 
-    // Change this to Image
+    [Header("UI")]
     public Image staminaBar;
+
+    [Header("Stamina Settings")]
     public float playerStamina = 100f;
     private float maxStamina = 100f;
-
-    // Variables for visual smooth transition
-    private float currentFillAmount;
-    private float targetFillAmount;
-    public float smoothTime = 2f; // Time to smoothly update the stamina bar (seconds)
-
-    // Timer for updating the visual slider
-    private float smoothTimer;
-
-    // Stamina reduction rate per second (1 stamina per second)
     public float staminaReductionRate = 1f;
 
-    // Track whether the player is chopping or not
+    [Header("Smooth Settings")]
+    private float currentFillAmount;
+    private float targetFillAmount;
+    public float smoothTime = 2f;
+    private float smoothTimer;
+
+    private float previousStamina;
+
     private bool isChopping = false;
 
     private void Awake()
@@ -31,93 +30,99 @@ public class StaminaController : MonoBehaviour
 
     private void Start()
     {
-        currentFillAmount = playerStamina / maxStamina; // Set initial value
-        targetFillAmount = currentFillAmount; // Set target to initial value
-        UpdateStaminaBar();
+        currentFillAmount = playerStamina / maxStamina;
+        targetFillAmount = currentFillAmount;
+        previousStamina = playerStamina;
+        UpdateStaminaBar(forceInstantColor: true);
     }
 
     private void Update()
     {
-        // If the player is chopping, reduce stamina
+        // Handle stamina drain while chopping
         if (isChopping && playerStamina > 0)
         {
-            playerStamina -= staminaReductionRate * Time.deltaTime; // Reduce stamina by 1 per second
-            playerStamina = Mathf.Clamp(playerStamina, 0f, maxStamina); // Clamp to prevent negative stamina
+            playerStamina -= staminaReductionRate * Time.deltaTime;
+            playerStamina = Mathf.Clamp(playerStamina, 0f, maxStamina);
         }
 
-        // Update the target fill amount based on the current stamina
+        // Update target fill amount
         targetFillAmount = playerStamina / maxStamina;
 
-        // If there's a difference between current and target, smooth the transition
+        // Smooth fill transition
         if (Mathf.Abs(currentFillAmount - targetFillAmount) > 0.01f)
         {
             smoothTimer += Time.deltaTime;
-            float t = Mathf.Clamp01(smoothTimer / smoothTime); // Calculate time ratio (0 to 1)
-            currentFillAmount = Mathf.Lerp(currentFillAmount, targetFillAmount, t); // Smooth transition
-            UpdateStaminaBar();
+            float t = Mathf.Clamp01(smoothTimer / smoothTime);
+            currentFillAmount = Mathf.Lerp(currentFillAmount, targetFillAmount, t);
+            UpdateStaminaBar(forceInstantColor: false);
         }
+
+        // Check if stamina was instantly changed (e.g. after sleeping)
+        if (Mathf.Abs(playerStamina - previousStamina) > 20f)
+        {
+            currentFillAmount = targetFillAmount;
+            UpdateStaminaBar(forceInstantColor: true);
+        }
+
+        previousStamina = playerStamina;
     }
 
-    // Call this method when the player starts chopping
     public void StartChopping()
     {
-        isChopping = true; // Player is chopping
+        isChopping = true;
     }
 
-    // Call this method when the player stops chopping
     public void StopChopping()
     {
-        isChopping = false; // Player is not chopping, so stop stamina reduction
+        isChopping = false;
     }
 
     public void ReduceStamina(float amount)
     {
-        // Instantly reduce stamina by the given amount
-        playerStamina -= amount; // Instant stamina reduction
-
-        // Clamp the player stamina between 0 and max
+        playerStamina -= amount;
         playerStamina = Mathf.Clamp(playerStamina, 0f, maxStamina);
-
-        // Update the target fill amount
         targetFillAmount = playerStamina / maxStamina;
-
-        // Reset smooth timer to start the transition
         smoothTimer = 0f;
     }
 
-    private void UpdateStaminaBar()
+    public void RestoreFullStamina()
     {
-        if (staminaBar != null)
-        {
-            // Update the fill amount of the stamina bar smoothly
-            staminaBar.fillAmount = currentFillAmount;
-
-            // Define target color based on the player's stamina
-            Color targetColor;
-
-            if (playerStamina > 60)
-            {
-                // From 100 to 60: Green to Yellow
-                float t = Mathf.InverseLerp(60f, 100f, playerStamina); // t goes from 0 (green) to 1 (yellow)
-                targetColor = Color.Lerp(Color.yellow, Color.green, t);
-            }
-            else if (playerStamina > 30)
-            {
-                // From 60 to 30: Yellow to Red
-                float t = Mathf.InverseLerp(30f, 60f, playerStamina); // t goes from 0 (yellow) to 1 (red)
-                targetColor = Color.Lerp(Color.red, Color.yellow, t);
-            }
-            else
-            {
-                // Below 30: Red
-                targetColor = Color.red;
-            }
-
-            // Smoothly transition to the target color
-            staminaBar.color = Color.Lerp(staminaBar.color, targetColor, Time.deltaTime * 5f); // Adjust the transition speed
-        }
+        playerStamina = maxStamina;
+        targetFillAmount = 1f;
+        smoothTimer = 0f;
     }
 
+    private void UpdateStaminaBar(bool forceInstantColor)
+    {
+        if (staminaBar == null) return;
 
+        staminaBar.fillAmount = currentFillAmount;
 
+        // Determine target color
+        Color targetColor;
+        if (playerStamina > 60)
+        {
+            float t = Mathf.InverseLerp(60f, 100f, playerStamina);
+            targetColor = Color.Lerp(Color.yellow, Color.green, t);
+        }
+        else if (playerStamina > 30)
+        {
+            float t = Mathf.InverseLerp(30f, 60f, playerStamina);
+            targetColor = Color.Lerp(Color.red, Color.yellow, t);
+        }
+        else
+        {
+            targetColor = Color.red;
+        }
+
+        // Smooth or instant color update
+        if (forceInstantColor)
+        {
+            staminaBar.color = targetColor;
+        }
+        else
+        {
+            staminaBar.color = Color.Lerp(staminaBar.color, targetColor, Time.deltaTime * 5f);
+        }
+    }
 }

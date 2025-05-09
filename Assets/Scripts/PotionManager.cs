@@ -12,16 +12,16 @@ public class PotionManager : MonoBehaviour
 
     public StaminaController staminaController;
 
-    public int ShieldPotionDays = 0;
+    public int ShieldPotionHours = 0;
     public GameObject shieldPotionInfo;
     public Text shieldPotionText;
     
     
-    public int FocusPotionDays = 0;
+    public int FocusPotionHours = 0;
     public GameObject FocusPotionInfo;
     public Text FocusPotionText;
 
-    public int UpgradePotionDays = 0;
+    public int UpgradePotionHours = 0;
     public GameObject UpgradePotionInfo;
     public Text UpgradePotionText;
     
@@ -62,31 +62,31 @@ public class PotionManager : MonoBehaviour
 
     private void Update()
     {
-        if (FocusPotionDays <= 0)
+        if (UpgradePotionHours <= 0)
         {
             UpgradePotionInfo.SetActive(false);
         }
         else
         {
-            UpgradePotionText.text = UpgradePotionDays + " day" + (UpgradePotionDays > 1 ? "s left" : " left");
+            UpgradePotionText.text = UpgradePotionHours + " hour" + (UpgradePotionHours > 1 ? "s left" : " left");
             UpgradePotionInfo.SetActive(true);
         }
-        if (FocusPotionDays <= 0)
+        if (FocusPotionHours <= 0)
         {
             FocusPotionInfo.SetActive(false);
         }
         else
         {
-            FocusPotionText.text = FocusPotionDays + " day" + (FocusPotionDays > 1 ? "s left" : " left");
+            FocusPotionText.text = FocusPotionHours + " hour" + (FocusPotionHours > 1 ? "s left" : " left");
             FocusPotionInfo.SetActive(true);
         }
-        if (ShieldPotionDays <= 0)
+        if (ShieldPotionHours <= 0)
         {
             shieldPotionInfo.SetActive(false);
         }
         else
         {
-            shieldPotionText.text = ShieldPotionDays + " day" + (ShieldPotionDays > 1 ? "s left" : " left");
+            shieldPotionText.text = ShieldPotionHours + " hour" + (ShieldPotionHours > 1 ? "s left" : " left");
             shieldPotionInfo.SetActive(true);
         }
         isPotionHeld = IsHoldingPotion();
@@ -94,11 +94,6 @@ public class PotionManager : MonoBehaviour
         {
             DrinkPotion();
         }
-    }
-
-    public void reduceShieldPotionDays()
-    {
-        ShieldPotionDays--;
     }
 
     private void DrinkPotion()
@@ -192,24 +187,24 @@ public class PotionManager : MonoBehaviour
 
     private void ActivateShield()
     {
-        ShieldPotionDays += 1;
-        shieldPotionText.text = ShieldPotionDays + " day" + (ShieldPotionDays > 1 ? "s left" : " left");
+        ShieldPotionHours += 24;
+        shieldPotionText.text = ShieldPotionHours + " hour" + (ShieldPotionHours > 1 ? "s left" : " left");
         shieldPotionInfo.SetActive(true);
         inventoryManager.RemoveItemFromHand();
     }
     
     private void IncreaseFocus()
     {
-        FocusPotionDays += 1;
-        FocusPotionText.text = FocusPotionDays + " day" + (FocusPotionDays > 1 ? "s left" : " left");
+        FocusPotionHours += 24;
+        FocusPotionText.text = FocusPotionHours + " hour" + (FocusPotionHours > 1 ? "s left" : " left");
         FocusPotionInfo.SetActive(true);
         inventoryManager.RemoveItemFromHand();
     }
 
     private void UpgradePotion()
     { 
-        UpgradePotionDays += 1;
-        UpgradePotionText.text = UpgradePotionDays + " day" + (UpgradePotionDays > 1 ? "s left" : " left");
+        UpgradePotionHours += 24;
+        UpgradePotionText.text = UpgradePotionHours + " hour" + (UpgradePotionHours > 1 ? "s left" : " left");
         UpgradePotionInfo.SetActive(true);
         inventoryManager.RemoveItemFromHand();
     }

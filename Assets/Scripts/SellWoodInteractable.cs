@@ -1,4 +1,7 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 using System.Linq;
 
 [RequireComponent(typeof(Collider))]
@@ -21,10 +24,21 @@ public class SellWoodInteractable : MonoBehaviour, IShopInteractable
     private Renderer[] rends;
     private Color[] originalColors;
 
+    private TextMeshPro countText;
+
     private void Start()
     {
         rends = GetComponentsInChildren<Renderer>();
         originalColors = rends.Select(r => r.material.color).ToArray();
+
+        // Try to find a child named "Count" with TextMeshPro
+        Transform countTransform = transform.Find("Count");
+        if (countTransform != null)
+        {
+            countText = countTransform.GetComponent<TextMeshPro>();
+        }
+
+        UpdateCountDisplay();
     }
 
     // IShopInteractable implementation
@@ -66,10 +80,20 @@ public class SellWoodInteractable : MonoBehaviour, IShopInteractable
         }
         else
         {
-            Debug.Log("No wood to sell.");
+            MoneyPopupManager.Instance.ShowPopup(-87, Input.mousePosition);
         }
+
+        // Delay update by a frame to allow inventory changes to apply
+        StartCoroutine(DelayedCountUpdate());
     }
 
+    private IEnumerator DelayedCountUpdate()
+    {
+        yield return null; // wait one frame
+        UpdateCountDisplay();
+    }
+
+    
     // Helpers
     private void SetAllColors(Color color)
     {
@@ -81,5 +105,20 @@ public class SellWoodInteractable : MonoBehaviour, IShopInteractable
     {
         for (int i = 0; i < rends.Length; i++)
             rends[i].material.color = originalColors[i];
+    }
+
+    public void UpdateCountDisplay()
+    {
+        if (countText == null) return;
+
+        int totalAmount = 0;
+        var inv = InventoryManager.Instance;
+
+        foreach (var wp in woodPrices)
+        {
+            totalAmount += inv.GetTotalCountOfItem(wp.woodItem);
+        }
+
+        countText.text = totalAmount.ToString();
     }
 }

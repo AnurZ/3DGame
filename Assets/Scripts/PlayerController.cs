@@ -366,7 +366,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-            Debug.Log("Regeneracija " + isStaminaRegenUpgrade + !isChopping + !animator.GetBool("IsWalking") + !canSleep);
+           // Debug.Log("Regeneracija " + isStaminaRegenUpgrade + !isChopping + !animator.GetBool("IsWalking") + !canSleep);
         if (isStaminaRegenUpgrade && !isChopping && !animator.GetBool("IsWalking") && !canSleep)
         {
             passiveStaminaTimer += Time.deltaTime;

@@ -15,6 +15,10 @@ public class ShopTrigger : MonoBehaviour
         if (playerInside && Input.GetKeyDown(KeyCode.Space))
         {
             zoomTransition.ZoomToShop();
+            foreach (var interactable in FindObjectsOfType<SellWoodInteractable>())
+            {
+                interactable.UpdateCountDisplay();
+            }
             if (PlayerController.Local != null && PlayerController.Local.gameObject.activeInHierarchy)
                 PlayerController.Local.isInShop = true;
             

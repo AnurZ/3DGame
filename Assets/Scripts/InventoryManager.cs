@@ -129,6 +129,23 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
+    public int GetTotalCountOfItem(Item item)
+    {
+        int total = 0;
+
+        foreach (var slot in inventorySlots)
+        {
+            var invItem = slot.GetComponentInChildren<InventoryItem>();
+            if (invItem != null && invItem.item == item)
+            {
+                total += invItem.count;
+            }
+        }
+
+        return total;
+    }
+
+    
     public void RemoveItemFromHand()
     {
         if (currentHeldItem != null)

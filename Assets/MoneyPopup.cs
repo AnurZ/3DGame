@@ -21,8 +21,14 @@ public class MoneyPopup : MonoBehaviour
         // Check if popupText is assigned
         if (popupText != null)
         {
+            if (amount == -87)
+                popupText.text = "No wood to sell!";
+            if(amount > 0)
+                popupText.text = "+" + amount.ToString();
+            if (amount < 0 && amount != -87)
+                popupText.text = "" + amount.ToString();
             // Set the text to show the amount, adding a '+' sign for positive values
-            popupText.text = (amount > 0 ? "+" : "") + amount.ToString();
+            //popupText.text = (amount > 0 ? "+" : "") + amount.ToString();
 
             // Set the color to green for positive amounts, red for negative
             popupText.color = (amount > 0) ? Color.green : Color.red;

@@ -7,6 +7,8 @@ using Outline = cakeslice.Outline; // For UI text
 [RequireComponent(typeof(Collider))]
 public class ItemShopInteractable : MonoBehaviour, IShopInteractable
 {
+    [SerializeField] private CursorManager CursorManager;
+    
     [Header("Buy Settings")]
     public Item itemToGive;
     public int cost = 10;
@@ -45,9 +47,20 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
     }
 
     // IShopInteractable ↓
-
+    private bool cursorChanged = false;
     public void OnHoverEnter()
     {
+        if (itemToGive.itemName.ToLower().Contains("axe"))
+        {
+            CursorManager.SetCursorByIndex(2);
+            cursorChanged = true;
+        }
+        else if (itemToGive.itemName.ToLower().Contains("potion"))
+        {
+            CursorManager.SetCursorByIndex(1);
+            cursorChanged = true;
+        }
+
         SetAllColors(hoverColor);
         if (outline != null) outline.enabled = true;
 
@@ -80,6 +93,12 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
 
     public void OnHoverExit()
     {
+        if (cursorChanged)
+        {
+            CursorManager.SetCursorByIndex(0);
+            cursorChanged = false;
+        }
+
         // If owned, keep gray; otherwise revert to original
         if (InventoryManager.Instance.HasItem(itemToGive))
             SetAllColors(grayOutColor);

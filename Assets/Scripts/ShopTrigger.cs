@@ -1,10 +1,11 @@
 using UnityEngine;
+using Cursor = UnityEngine.WSA.Cursor;
 
 public class ShopTrigger : MonoBehaviour
 {
     private bool playerInside = false;
     [SerializeField] private ZoomTransition zoomTransition;
-
+    
     void Start()
     {
         zoomTransition = FindObjectOfType<ZoomTransition>();

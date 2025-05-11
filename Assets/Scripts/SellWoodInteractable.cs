@@ -7,6 +7,7 @@ using System.Linq;
 [RequireComponent(typeof(Collider))]
 public class SellWoodInteractable : MonoBehaviour, IShopInteractable
 {
+    
     [System.Serializable]
     public struct WoodPrice
     {
@@ -30,15 +31,19 @@ public class SellWoodInteractable : MonoBehaviour, IShopInteractable
     {
         rends = GetComponentsInChildren<Renderer>();
 
-        List<Color> colors = new List<Color>();
-        foreach (Renderer r in rends)
+        originalColors = new Color[rends.Length];
+        for (int i = 0; i < rends.Length; i++)
         {
-            if (r.material.HasProperty("_Color"))
+            if (rends[i].material.HasProperty("_Color"))
             {
-                colors.Add(r.material.color);
+                originalColors[i] = rends[i].material.color;
+            }
+            else
+            {
+                originalColors[i] = Color.white; // default fallback boja
             }
         }
-        originalColors = colors.ToArray();
+
 
         // Try to find a child named "Count" with TextMeshPro
         Transform countTransform = transform.Find("Count");
@@ -54,6 +59,7 @@ public class SellWoodInteractable : MonoBehaviour, IShopInteractable
     // IShopInteractable implementation
     public void OnHoverEnter()
     {
+        
         SetAllColors(hoverColor);
     }
 

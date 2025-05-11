@@ -531,6 +531,8 @@ public class PlayerController : MonoBehaviour
         else if (other.CompareTag("Bed"))
         {
             canSleep = false;
+            if (uiPanel.activeSelf)
+                uiPanel.SetActive(false);
         }
         else if (other.CompareTag("Shop"))
         {

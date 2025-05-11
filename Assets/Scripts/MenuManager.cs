@@ -3,9 +3,16 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.IO;
+using TMPro;
 
 public class MenuManager : MonoBehaviour
 {
+    
+    public AudioSource backgroundMusic;       // Assign in Inspector
+    public AudioSource typewriterAudioSource; // Separate AudioSource for typing effect
+    public AudioClip typewriterClip;          // Short click sound for each letter
+
+    
     public Button continueButton;
     public Button newGameButton;
     public Button optionsButton;
@@ -172,7 +179,7 @@ public class MenuManager : MonoBehaviour
     {
         yield return StartCoroutine(FadeToBlackNewGame());
         Debug.Log("🌑 Fade završen. Učitavanje scene...");
-        SceneManager.LoadScene("IGRICASCENE");
+        //SceneManager.LoadScene("IGRICASCENE");
     }
 
 
@@ -188,19 +195,85 @@ public class MenuManager : MonoBehaviour
         }
         color.a = 1f;
         blackScreenOnLoad.color = color;
-    }IEnumerator FadeToBlackNewGame()
+    }
+    public TextMeshProUGUI dialogueText;
+    public float dialogueDisplayTime = 3f;
+    public float typeSpeed = 0.05f;
+
+    public string[] introLines = new string[]
+    {
+        "Hello there... can you hear the trees whispering?",
+        "They've been waiting for someone... like you.",
+        "Chop the ancient wood. Trade it for coin.",
+        "And with enough, buy your passage... away from this place.",
+        "But remember — no one truly leaves the forest unchanged."
+    };
+
+    public IEnumerator FadeToBlackNewGame()
     {
         blackScreenNewGame.gameObject.SetActive(true);
+        dialogueText.gameObject.SetActive(false);
         Color color = blackScreen.color;
         for (float t = 0; t < fadeDuration; t += Time.deltaTime)
         {
             color.a = Mathf.Lerp(0f, 1f, t / fadeDuration);
-            blackScreen.color = color;
+            blackScreenNewGame.color = color;
             yield return null;
         }
         color.a = 1f;
-        blackScreen.color = color;
+        blackScreenNewGame.color = color;
+        
+       
+        if (backgroundMusic != null)
+        {
+            backgroundMusic.Stop();
+        }
+
+        dialogueText.gameObject.SetActive(true);
+
+
+        // Show each line with typewriter effect
+        foreach (string line in introLines)
+        {
+            yield return StartCoroutine(TypeSentence(line, typeSpeed));
+            yield return new WaitForSeconds(dialogueDisplayTime);
+        }
+
+        // Hide dialogue
+        dialogueText.gameObject.SetActive(false);
+
+        // Fade to black
+        Debug.Log("Set blackscreennewGame.gameObject.SetActive");
+        
+
+        // Load scene
+        SceneManager.LoadScene("IGRICASCENE");
     }
+    IEnumerator TypeSentence(string sentence, float typeSpeed = 0.05f)
+    {
+        dialogueText.text = "";
+
+        int counter = 0;
+        foreach (char letter in sentence.ToCharArray())
+        {
+            dialogueText.text += letter;
+
+            if (typewriterAudioSource != null && typewriterClip != null && counter % 2 == 0)
+            {
+                typewriterAudioSource.PlayOneShot(typewriterClip);
+            }
+
+            counter++;
+            yield return new WaitForSeconds(typeSpeed);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Ensure we're unsubscribing when the object is destroyed
+        SceneManager.sceneLoaded -= OnSceneLoadedNewGame;
+    }
+
     
     
 }

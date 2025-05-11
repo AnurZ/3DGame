@@ -18,7 +18,9 @@ public class MysticNPCTrade : MonoBehaviour
     [Header("Typewriter Effect")]
     public bool useTypewriterEffect = true;
     public float typewriterSpeed = 0.03f;  // Seconds per character
-
+    public AudioSource typewriterAudioSource; // The AudioSource for typewriter sound
+    public AudioClip typewriterClip;    
+    
     private GameObject floatingTextInstance;
     private TextMeshPro textMesh;
 
@@ -183,9 +185,19 @@ public class MysticNPCTrade : MonoBehaviour
     private IEnumerator TypeText(string sentence)
     {
         textMesh.text = "";
+        int counter = 0;
+
         foreach (char c in sentence)
         {
             textMesh.text += c;
+            
+            // Play the typewriter sound every second or third character
+            if (typewriterAudioSource != null && typewriterClip != null && counter % 3 == 0) // Adjust % 3 for frequency
+            {
+                typewriterAudioSource.PlayOneShot(typewriterClip);
+            }
+
+            counter++;
             yield return new WaitForSeconds(typewriterSpeed);
         }
     }

@@ -5,6 +5,12 @@ using TMPro;
 
 public class NPCProximityInteraction : MonoBehaviour
 {
+    [Header("Typewriter Sound")]
+    public AudioSource typewriterAudioSource;
+    public AudioClip typewriterClip;
+    public int clicksPerCharacter = 3;  // play one click every N chars
+
+    
     [Header("Dialogue Settings")]
     public string[] sentences;
     public GameObject floatingTextPrefab;
@@ -129,12 +135,23 @@ public class NPCProximityInteraction : MonoBehaviour
     IEnumerator TypeText(TextMeshPro tmp, string sentence)
     {
         tmp.text = "";
+        int counter = 0;
         foreach (char c in sentence)
         {
             tmp.text += c;
+
+            if (typewriterAudioSource != null 
+                && typewriterClip != null 
+                && counter % clicksPerCharacter == 0)
+            {
+                typewriterAudioSource.PlayOneShot(typewriterClip);
+            }
+
+            counter++;
             yield return new WaitForSeconds(0.03f);
         }
     }
+
 
     IEnumerator WobbleText(TextMeshPro tmp)
     {

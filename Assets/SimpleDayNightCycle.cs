@@ -1,16 +1,34 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using System.Collections.Generic;
 
 public class SimpleDayNightCycle : MonoBehaviour
 {
+    [Header("UI to Hide During Sleep")]
+    public GameObject[] uiToHide;
+
     public Light sunLight;
     public Gradient lightColor;
     public float fullDayLengthInSeconds = 480f;
     
     public AudioSource audioSource;
     public AudioClip yawningSound;
+    //Anur
+    private List<string> goodQueue;
+    private List<string> badQueue;
+    [Header("Dream Sequence")]
+    public TextMeshProUGUI dreamText;             // TMP polje u canvasu, isključeno na startu
+    public AudioSource typewriterAudioSource;     // AudioSource za typewriter klik
+    public AudioClip typewriterClip;
+    public AudioSource thunderAudioSource;        // AudioSource za grmljavinu
+    public AudioClip thunderClip;
+    public float typingSpeed = 0.05f;             // brzina slova
 
+    [TextArea(2,5)]
+    public string[] goodDreamLines;               // popuni u Inspectoru
+    [TextArea(2,5)]
+    public string[] badDreamLines;
     
     public GameObject sleepIcon;
     
@@ -33,6 +51,45 @@ public class SimpleDayNightCycle : MonoBehaviour
     public int lastHour = -1;
     public StaminaController staminaRegenController;
     
+    
+    private void Shuffle<T>(List<T> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            T temp = list[i];
+            list[i] = list[j];
+            list[j] = temp;
+        }
+    }
+    
+    private void Awake()
+    {
+        // … postojeći Awake kod …
+
+        // Napuni i promiješaj queue-e
+        goodQueue = new List<string>(goodDreamLines);
+        Shuffle(goodQueue);
+
+        badQueue  = new List<string>(badDreamLines);
+        Shuffle(badQueue);
+    }
+    
+    private string GetNextDream(bool isBad)
+    {
+        var queue = isBad ? badQueue : goodQueue;
+        if (queue.Count == 0)
+        {
+            // Queue je prazan → refill i shuffle
+            var source = isBad ? badDreamLines : goodDreamLines;
+            queue.AddRange(source);
+            Shuffle(queue);
+        }
+        // Uzmi prvi i ukloni ga
+        string line = queue[0];
+        queue.RemoveAt(0);
+        return line;
+    }
     
     void Start()
     {
@@ -113,7 +170,7 @@ public class SimpleDayNightCycle : MonoBehaviour
         }
     }
 
-    private IEnumerator SleepRoutine()
+    /*private IEnumerator SleepRoutine()
     {
         isSleeping = true;
         StaminaController.Instance.RestoreFullStamina();
@@ -134,6 +191,71 @@ public class SimpleDayNightCycle : MonoBehaviour
 
         isSleeping = false;
     }
+    */
+    private IEnumerator TypeText(string sentence)
+    {
+        dreamText.text = "";
+        for (int i = 0; i < sentence.Length; i++)
+        {
+            dreamText.text += sentence[i];
+            if (typewriterAudioSource != null && typewriterClip != null && i % 3 == 0)
+                typewriterAudioSource.PlayOneShot(typewriterClip);
+            yield return new WaitForSeconds(typingSpeed);
+        }
+    }
+
+    private IEnumerator SleepRoutine()
+    {
+        isSleeping = true;
+        foreach (var go in uiToHide)
+                if (go != null) go.SetActive(false);
+        
+        StaminaController.Instance.RestoreFullStamina();
+
+        // 1) Fade to black
+        yield return StartCoroutine(FadeCanvasGroup(0f, 1f, 2.5f));
+
+        // 2) --- DREAM SEQUENCE START ---
+        if (dreamText != null)
+            dreamText.gameObject.SetActive(true);
+
+        // advance time to 8 AM and increment day
+        timeOfDay   = GetTimeNormalizedFromHour(8);
+        currentDay++;
+        PlayerPrefs.SetInt("Day", currentDay);
+        UpdateDayText();
+
+        // IMMEDIATELY snap sun & color
+        RotateSun();
+        UpdateLightColor();
+
+        // play dream text...
+        bool isBadDream = Random.value < 0.5f;
+        string line    = GetNextDream(isBadDream);
+        yield return StartCoroutine(TypeText(line));
+
+        if (isBadDream && thunderAudioSource != null && thunderClip != null)
+        {
+            yield return new WaitForSeconds(0.5f);
+            thunderAudioSource.PlayOneShot(thunderClip);
+        }
+
+        yield return new WaitForSeconds(2f);
+        if (dreamText != null) dreamText.gameObject.SetActive(false);
+        // 2) --- DREAM SEQUENCE END ---
+
+        yield return new WaitForSeconds(0.5f);
+
+        // 3) Fade back in — the world is already at new day
+        yield return StartCoroutine(FadeCanvasGroup(1f, 0f, 2.5f));
+        
+        foreach (var go in uiToHide)
+            if (go != null) go.SetActive(true);
+        
+        isSleeping = false;
+    }
+
+
 
     public bool IsSleepTime()
     {
@@ -201,7 +323,7 @@ public class SimpleDayNightCycle : MonoBehaviour
             }
         }
         
-        currentDay++;
+        //currentDay++;
         if (playerInjurySystem != null)
             playerInjurySystem.OnDayPassed();
     }

@@ -29,7 +29,16 @@ public class SellWoodInteractable : MonoBehaviour, IShopInteractable
     private void Start()
     {
         rends = GetComponentsInChildren<Renderer>();
-        originalColors = rends.Select(r => r.material.color).ToArray();
+
+        List<Color> colors = new List<Color>();
+        foreach (Renderer r in rends)
+        {
+            if (r.material.HasProperty("_Color"))
+            {
+                colors.Add(r.material.color);
+            }
+        }
+        originalColors = colors.ToArray();
 
         // Try to find a child named "Count" with TextMeshPro
         Transform countTransform = transform.Find("Count");
@@ -40,6 +49,7 @@ public class SellWoodInteractable : MonoBehaviour, IShopInteractable
 
         UpdateCountDisplay();
     }
+
 
     // IShopInteractable implementation
     public void OnHoverEnter()

@@ -68,6 +68,7 @@ public class PlayerController : MonoBehaviour
     public bool isStaminaRegenUpgrade = false;
     private float passiveStaminaTimer = 0f;
 
+    public TreeSpawner treeSpawner;
     
     private void Awake()
     {
@@ -124,6 +125,8 @@ public class PlayerController : MonoBehaviour
         staminaController = FindObjectOfType<StaminaController>();
         transparencyManager = FindObjectOfType<TransparencyController>();
         achievementsController = FindObjectOfType<AchievementsController>();
+        treeSpawner = FindObjectOfType<TreeSpawner>();
+        treeSpawner.SpawnTrees();
         
         if (injuryStateText != null)
             injuryStateText.gameObject.SetActive(true);

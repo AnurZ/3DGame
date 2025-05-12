@@ -51,6 +51,8 @@ public class ZoomTransition : MonoBehaviour
         Camera tempCam = tempCamObj.AddComponent<Camera>();
         tempCam.CopyFrom(fromCam);
 
+        tempCamObj.AddComponent<AudioListener>();
+        
         // Remove AudioListener to avoid duplication warning
         AudioListener listener = tempCam.GetComponent<AudioListener>();
         if (listener != null)

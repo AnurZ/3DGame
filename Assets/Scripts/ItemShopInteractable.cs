@@ -7,6 +7,10 @@ using Outline = cakeslice.Outline; // For UI text
 [RequireComponent(typeof(Collider))]
 public class ItemShopInteractable : MonoBehaviour, IShopInteractable
 {
+    [SerializeField] private AudioClip hoverSoundClip;
+    [SerializeField] private AudioClip buySoundClip;
+
+
     [SerializeField] private CursorManager CursorManager;
     
     [Header("Buy Settings")]
@@ -50,6 +54,24 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
     private bool cursorChanged = false;
     public void OnHoverEnter()
     {
+        
+        var playerObj = GameObject.FindWithTag("AudioPlayer");
+        // ili ako nemaš tag, po imenu:
+        if (playerObj == null)
+            playerObj = GameObject.Find("AudioPlayer");
+
+        if (playerObj != null)
+        {
+            var sfxSource = playerObj.GetComponent<AudioSource>();
+            if (sfxSource != null && hoverSoundClip != null)
+                sfxSource.PlayOneShot(hoverSoundClip);
+        }
+        else
+        {
+            Debug.LogWarning("AudioPlayer GameObject nije pronađen u sceni!");
+        }
+
+        
         if (itemToGive.itemName.ToLower().Contains("axe"))
         {
             CursorManager.SetCursorByIndex(2);
@@ -128,6 +150,14 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
             InventoryManager.Instance.AddItem(itemToGive);
             Debug.Log($"Kupio si {itemToGive.name}!");
             MoneyPopupManager.Instance.ShowPopup(-cost, Input.mousePosition);
+            
+            var playerObj = GameObject.FindWithTag("AudioPlayer") 
+                            ?? GameObject.Find("AudioPlayer");
+            if (playerObj != null && buySoundClip != null)
+            {
+                var sfxSource = playerObj.GetComponent<AudioSource>();
+                sfxSource?.PlayOneShot(buySoundClip);
+            }
         }
         else
         {

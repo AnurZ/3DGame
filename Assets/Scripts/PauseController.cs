@@ -65,6 +65,7 @@ public class PauseController : MonoBehaviour
 
     public void OnQuitButton()
     {
+        FindAnyObjectByType<SaveManager>().SaveGame();
         Application.Quit();
     }
 }

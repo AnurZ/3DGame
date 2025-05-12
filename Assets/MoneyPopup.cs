@@ -3,12 +3,15 @@ using UnityEngine;
 
 public class MoneyPopup : MonoBehaviour
 {
-    public TextMeshProUGUI popupText; // Reference to the TextMeshProUGUI component for the amount text
-    public float moveUpSpeed = 30f;  // Speed at which the popup moves upwards
-    public float fadeDuration = 1f;  // Duration for the fading effect
+    public TextMeshProUGUI popupText;   // Reference to the TextMeshProUGUI component for the amount text
+    public float moveUpSpeed = 30f;     // Speed at which the popup moves upwards
+    public float fadeDuration = 1f;     // Duration for the fading effect
 
-    private float lifetime = 1.5f;   // How long the popup will stay visible
-    private CanvasGroup canvasGroup; // To control the fading effect
+    [Header("SFX Clips")]
+    [SerializeField] private AudioClip errorSoundClip;  // Assign your “no wood” SFX here
+
+    private float lifetime = 1.5f;      // How long the popup will stay visible
+    private CanvasGroup canvasGroup;    // To control the fading effect
 
     private void Awake()
     {
@@ -22,13 +25,18 @@ public class MoneyPopup : MonoBehaviour
         if (popupText != null)
         {
             if (amount == -87)
+            {
                 popupText.text = "No wood to sell!";
-            if(amount > 0)
+                PlayErrorSfx();  // <- pozivamo error zvuk
+            }
+            else if (amount > 0)
+            {
                 popupText.text = "+" + amount.ToString();
-            if (amount < 0 && amount != -87)
-                popupText.text = "" + amount.ToString();
-            // Set the text to show the amount, adding a '+' sign for positive values
-            //popupText.text = (amount > 0 ? "+" : "") + amount.ToString();
+            }
+            else if (amount < 0)
+            {
+                popupText.text = amount.ToString();
+            }
 
             // Set the color to green for positive amounts, red for negative
             popupText.color = (amount > 0) ? Color.green : Color.red;
@@ -36,6 +44,24 @@ public class MoneyPopup : MonoBehaviour
         else
         {
             Debug.LogError("Popup text is not assigned!");
+        }
+    }
+
+    private void PlayErrorSfx()
+    {
+        if (errorSoundClip == null) return;
+
+        // Pronađemo AudioPlayer object u sceni
+        var playerObj = GameObject.FindWithTag("AudioPlayer") ?? GameObject.Find("AudioPlayer");
+        if (playerObj != null)
+        {
+            var sfxSource = playerObj.GetComponent<AudioSource>();
+            if (sfxSource != null)
+                sfxSource.PlayOneShot(errorSoundClip);
+        }
+        else
+        {
+            Debug.LogWarning("AudioPlayer GameObject nije pronađen u sceni za error SFX!");
         }
     }
 

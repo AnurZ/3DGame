@@ -7,6 +7,15 @@ using System.Collections;
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField] private AudioClip grassWalkClip;
+    [SerializeField] private AudioClip woodWalkClip;
+    [SerializeField] private AudioClip choppingClip;
+    private bool isOnBridge = false;
+
+    
+    private AudioSource walkingSource;
+    private AudioSource choppingSource;
+    
     public float speed = 5f;
     private Vector2 move;
     private Animator animator;
@@ -113,6 +122,11 @@ public class PlayerController : MonoBehaviour
     
     private void Start()
     {
+        
+        var sources = GetComponents<AudioSource>();
+        walkingSource  = sources[0];
+        choppingSource = sources.Length > 1 ? sources[1] : walkingSource;
+        
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         rb.constraints = RigidbodyConstraints.FreezeRotation;
@@ -163,6 +177,15 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private IEnumerator ChopSoundLoop()
+    {
+        while (isChopping)
+        {
+            if (choppingSource != null && choppingClip != null)
+                choppingSource.PlayOneShot(choppingClip);
+            yield return new WaitForSeconds(chopSoundInterval);
+        }
+    }
     private bool IsHoldingAxe()
     {
         if (inventoryManager == null) return false;
@@ -178,8 +201,9 @@ public class PlayerController : MonoBehaviour
         StartChopping(injuryRisk);
     }
 
-    
-    
+    [SerializeField] private float chopSoundInterval = 0.5f; // koliko sekundi čekaš između udaraca
+    private Coroutine chopSfxCoroutine;
+    //[SerializeField] private float chopSoundDelay = 0f;
     private void StartChopping(float risk)
     {
         if (nearbyTree == null) return;
@@ -188,6 +212,7 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Cannot chop while severely injured!");
             return;
         }
+        
         Item selectedItem = inventoryManager.GetSelectedItem(false);
         if (!IsHoldingAxe() || (int)nearbyTree.treeType > (int)selectedItem.currentAxeType + (potionManager.UpgradePotionHours > 0 ? 1 : 0))
         {
@@ -195,6 +220,11 @@ public class PlayerController : MonoBehaviour
             interactionText.color = Color.red;
             return;
         }
+        
+       
+
+
+        
         
         chopInjuryChance = InjurySystem.CalculateChance(currentInjury, StaminaController.Instance.playerStamina);
         if (potionManager.ShieldPotionHours > 0)
@@ -252,12 +282,18 @@ public class PlayerController : MonoBehaviour
         rb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationY;
 
         nearbyTree.StartChopping(risk, adjustedChopTime);
+        
+        if (chopSfxCoroutine != null) 
+            StopCoroutine(chopSfxCoroutine);
+        chopSfxCoroutine = StartCoroutine(ChopSoundLoop());
 
         if (interactionText != null)
         {
             interactionText.text = "Press Space to Stop Chopping";
             interactionText.color = Color.red;
         }
+        
+        
     }
 
     public void OnTreeChoppedDown()
@@ -352,6 +388,12 @@ public class PlayerController : MonoBehaviour
     {
         if (!isChopping) return;
 
+        if (chopSfxCoroutine != null)
+        {
+            StopCoroutine(chopSfxCoroutine);
+            chopSfxCoroutine = null;
+        }
+        
         isChopping = false;
         animator.SetBool("isChopping", false);
         animator.SetBool("IsWalking", false);
@@ -366,6 +408,8 @@ public class PlayerController : MonoBehaviour
             interactionText.color = Color.white;
         }
     }
+    [SerializeField] private float grassWalkVolume = 0.5f;
+    [SerializeField] private float woodWalkVolume  = 0.7f;
 
     private void Update()
     {
@@ -401,6 +445,26 @@ public class PlayerController : MonoBehaviour
             UpdateAnimations();
         }
         
+        if (move != Vector2.zero && !isChopping)
+        {
+            AudioClip clipToUse = isOnBridge ? woodWalkClip : grassWalkClip;
+            float   volume    = isOnBridge ? woodWalkVolume : grassWalkVolume;
+
+            if (walkingSource.clip != clipToUse || !walkingSource.isPlaying)
+            {
+                walkingSource.clip   = clipToUse;
+                walkingSource.loop   = true;
+                walkingSource.volume = volume;      // postavi glasnoću
+                walkingSource.Play();
+            }
+        }
+        else
+        {
+            if (walkingSource.isPlaying)
+                walkingSource.Stop();
+        }
+
+
        
         
         if (!isChopping && !isInShop && canSleep && Input.GetKeyDown(KeyCode.Space))
@@ -513,6 +577,11 @@ public class PlayerController : MonoBehaviour
             }
             
         }
+        if (other.CompareTag("Bridge"))
+        {
+            Debug.Log("Usao na bridge");
+            isOnBridge = true;
+        }
     }
 
     private void OnTriggerExit(Collider other)
@@ -548,6 +617,10 @@ public class PlayerController : MonoBehaviour
                 Debug.Log("Exited shop.");
             }
             
+        }
+        if (other.CompareTag("Bridge"))
+        {
+            isOnBridge = false;
         }
     }
 

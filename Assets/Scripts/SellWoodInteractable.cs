@@ -7,7 +7,8 @@ using System.Linq;
 [RequireComponent(typeof(Collider))]
 public class SellWoodInteractable : MonoBehaviour, IShopInteractable
 {
-    
+    [SerializeField] private AudioClip sellSoundClip;
+
     [System.Serializable]
     public struct WoodPrice
     {
@@ -93,6 +94,13 @@ public class SellWoodInteractable : MonoBehaviour, IShopInteractable
             CurrencyManager.Instance.AddMoney(totalEarned);
             SetAllColors(soldColor);
             MoneyPopupManager.Instance.ShowPopup(totalEarned, Input.mousePosition);
+            
+            var playerObj = GameObject.Find("AudioPlayer");
+            if (playerObj != null && sellSoundClip != null)
+            {
+                var sfx = playerObj.GetComponent<AudioSource>();
+                sfx?.PlayOneShot(sellSoundClip);
+            }
         }
         else
         {

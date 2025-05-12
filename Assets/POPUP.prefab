@@ -201,3 +201,4 @@ MonoBehaviour:
   popupText: {fileID: 7437590037655530467}
   moveUpSpeed: 30
   fadeDuration: 1
+  errorSoundClip: {fileID: 8300000, guid: ace3c80a7ab19b948b994a6caf3852f9, type: 3}

@@ -86,6 +86,7 @@ public class InventoryManager : MonoBehaviour
     {
         uipanel.SetActive(true);
         textMeshPro.text = text;
+        textMeshPro.color = Color.white;
         yield return new WaitForSeconds(5f);
         textMeshPro.text = "";
         uipanel.SetActive(false);

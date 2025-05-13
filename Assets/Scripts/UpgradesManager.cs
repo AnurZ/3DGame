@@ -5,6 +5,15 @@ using TMPro;
 
 public class UpgradesManager : MonoBehaviour
 {
+    
+    public int staminaUpgradeCost = 0;
+    public int SpeedCost = 0;
+    public int InjuryShieldCost = 0;
+    public int SevereInjuryShieldCost = 0;
+    public int PotionEffectCost = 0;
+    public int ChoppingSpeedCost = 0;
+    public int ChoppingStaminaCost = 0;
+    
     [Header("References")]
     public PlayerController playerController;
     public StaminaController staminaController;
@@ -15,42 +24,50 @@ public class UpgradesManager : MonoBehaviour
     public Image staminaRegenIcon;
     public Image staminaRegenInfoBackground;
     public GameObject staminaRegenBuyButton;
+    public GameObject staminaRegenBoughtButton; // ← NOVO
 
     [Header("Speed UI")]
     public Image speedBackground;
     public Image speedIcon;
     public Image speedInfoBackground;
     public GameObject speedBuyButton;
+    public GameObject speedBoughtButton; // ← NOVO
 
     [Header("Injury Shield UI")]
     public Image injuryShieldBackground;
     public Image injuryShieldIcon;
     public Image injuryShieldInfoBackground;
     public GameObject injuryShieldBuyButton;
+    public GameObject injuryShieldBoughtButton; // ← NOVO
 
     [Header("Severe Injury Shield UI")]
     public Image severeInjuryShieldBackground;
     public Image severeInjuryShieldIcon;
     public Image severeInjuryShieldInfoBackground;
     public GameObject severeInjuryShieldBuyButton;
+    public GameObject severeInjuryShieldBoughtButton; // ← NOVO
 
     [Header("Potion Effect UI")]
     public Image potionEffectBackground;
     public Image potionEffectIcon;
     public Image potionEffectInfoBackground;
     public GameObject potionEffectBuyButton;
+    public GameObject potionEffectBoughtButton; // ← NOVO
 
     [Header("Chopping Speed UI")]
     public Image choppingSpeedBackground;
     public Image choppingSpeedIcon;
     public Image choppingSpeedInfoBackground;
     public GameObject choppingSpeedBuyButton;
+    public GameObject choppingSpeedBoughtButton; // ← NOVO
 
     [Header("Chopping Stamina UI")]
     public Image choppingStaminaBackground;
     public Image choppingStaminaIcon;
     public Image choppingStaminaInfoBackground;
     public GameObject choppingStaminaBuyButton;
+    public GameObject choppingStaminaBoughtButton; // ← NOVO
+
 
     // Interni flagovi
     [HideInInspector] public bool hasStaminaRegen;
@@ -72,21 +89,123 @@ public class UpgradesManager : MonoBehaviour
     
     private void Start()
     {
-        CurrencyManager =  FindObjectOfType<CurrencyManager>();
-        achievementsController = FindObjectOfType<AchievementsController>();
-        potionManager = FindObjectOfType<PotionManager>();
+       // CurrencyManager =  FindObjectOfType<CurrencyManager>();
+       // achievementsController = FindObjectOfType<AchievementsController>();
+        //potionManager = FindObjectOfType<PotionManager>();
     }
+    
+    public void ApplyUpgradeUI(
+        GameObject buyButton,
+        GameObject boughtButton,
+        Image bg,
+        Image icon,
+        Image infoBg)
+    {
+        Debug.Log("RefreshingUpgradeUI");
+        
+        Color32 purchasedColor = new Color32(0xc1, 0xc1, 0xc1, 0xff);
+        // Oboji sve elemente
+        bg.color     = purchasedColor;
+        icon.color   = purchasedColor;
+        infoBg.color = purchasedColor;
+
+        // Onemogući stari buy button
+        buyButton.SetActive(false);
+
+        // Aktiviraj bought‑button (checkmark)
+        if(boughtButton != null)
+            boughtButton.SetActive(true);
+    }
+
+
 
     private void Awake()
     {
-        if (playerController == null) 
-            playerController = FindObjectOfType<PlayerController>();
-        if (staminaController == null) 
-            staminaController = FindObjectOfType<StaminaController>();
-        if (saveManager == null)
-            saveManager = FindObjectOfType<SaveManager>();
+       // Debug.Log("[UpgradesManager.Awake] Binding references…");
+
+        playerController      = playerController      ?? FindObjectOfType<PlayerController>();
+        staminaController     = staminaController     ?? FindObjectOfType<StaminaController>();
+        potionManager         = potionManager         ?? FindObjectOfType<PotionManager>();
+        CurrencyManager       = CurrencyManager       ?? FindObjectOfType<CurrencyManager>();
+        achievementsController= achievementsController?? FindObjectOfType<AchievementsController>();
+        saveManager           = saveManager           ?? FindObjectOfType<SaveManager>();
+
+        //Debug.Log($"[UpgradesManager.Awake] potionManager = {(potionManager==null?"NULL":"OK")}");
     }
 
+
+    [ContextMenu("Refresh All Upgrades UI")]
+    public void RefreshAllUpgradesUI()
+    {
+        Debug.Log("RefreshAllUpgradesUI");
+
+        if (hasStaminaRegen)
+            ApplyUpgradeUI(
+                staminaRegenBuyButton,
+                staminaRegenBoughtButton,
+                staminaRegenBackground,
+                staminaRegenIcon,
+                staminaRegenInfoBackground
+            );
+
+        if (hasSpeed)
+            ApplyUpgradeUI(
+                speedBuyButton,
+                speedBoughtButton,
+                speedBackground,
+                speedIcon,
+                speedInfoBackground
+            );
+
+        if (hasInjuryShield)
+            ApplyUpgradeUI(
+                injuryShieldBuyButton,
+                injuryShieldBoughtButton,
+                injuryShieldBackground,
+                injuryShieldIcon,
+                injuryShieldInfoBackground
+            );
+
+        if (hasSevereInjuryShield)
+            ApplyUpgradeUI(
+                severeInjuryShieldBuyButton,
+                severeInjuryShieldBoughtButton,
+                severeInjuryShieldBackground,
+                severeInjuryShieldIcon,
+                severeInjuryShieldInfoBackground
+            );
+
+        if (hasPotionEffect)
+            ApplyUpgradeUI(
+                potionEffectBuyButton,
+                potionEffectBoughtButton,
+                potionEffectBackground,
+                potionEffectIcon,
+                potionEffectInfoBackground
+            );
+
+        if (hasChoppingSpeed)
+            ApplyUpgradeUI(
+                choppingSpeedBuyButton,
+                choppingSpeedBoughtButton,
+                choppingSpeedBackground,
+                choppingSpeedIcon,
+                choppingSpeedInfoBackground
+            );
+
+        if (hasChoppingStamina)
+            ApplyUpgradeUI(
+                choppingStaminaBuyButton,
+                choppingStaminaBoughtButton,
+                choppingStaminaBackground,
+                choppingStaminaIcon,
+                choppingStaminaInfoBackground
+            );
+    }
+
+
+
+    
     private void PerformBuy(Action applyLogic, 
                             ref bool hasFlag,
                             GameObject buyButton, Image bg, Image icon, Image infoBg)
@@ -116,9 +235,11 @@ public class UpgradesManager : MonoBehaviour
         saveManager?.SaveGame();
     }
 
+    
+    
     public void BuyStaminaRegenUpgrade()
     {
-        if (CurrencyManager.TrySpendMoney(1))
+        if (CurrencyManager.TrySpendMoney(staminaUpgradeCost))
         {
             PerformBuy(
                 () =>
@@ -135,7 +256,7 @@ public class UpgradesManager : MonoBehaviour
         else
         {
             interactionText.gameObject.SetActive(true);
-            interactionText.text = "You do not have enough money to buy this potion!";
+            interactionText.text = "You do not have enough money to buy this upgrade!";
             interactionText.color = Color.red;
             staminaRegenBuyButton.SetActive(false);
         }
@@ -143,7 +264,7 @@ public class UpgradesManager : MonoBehaviour
 
     public void BuySpeedUpgrade()
     {
-        if (CurrencyManager.TrySpendMoney(1500))
+        if (CurrencyManager.TrySpendMoney(SpeedCost))
         {
             PerformBuy(
                 () => { playerController.speed = 10f; },
@@ -159,7 +280,7 @@ public class UpgradesManager : MonoBehaviour
         {
             Debug.Log("Nema dobvoljno");
             interactionText.gameObject.SetActive(true);
-            interactionText.text = "You do not have enough money to buy this potion!";
+            interactionText.text = "You do not have enough money to buy this upgrade!";
             interactionText.color = Color.red;
             speedBuyButton.SetActive(false);
         }
@@ -167,7 +288,7 @@ public class UpgradesManager : MonoBehaviour
 
     public void BuyInjuryShieldUpgrade()
     {
-        if (CurrencyManager.TrySpendMoney(1000))
+        if (CurrencyManager.TrySpendMoney(InjuryShieldCost))
         {
             PerformBuy(
                 () => { playerController.injuryShieldUpgrade = true; },
@@ -182,7 +303,7 @@ public class UpgradesManager : MonoBehaviour
         else
         {
             interactionText.gameObject.SetActive(true);
-            interactionText.text = "You do not have enough money to buy this potion!";
+            interactionText.text = "You do not have enough money to buy this upgrade!";
             interactionText.color = Color.red;
             injuryShieldBuyButton.SetActive(false);
         }
@@ -190,7 +311,7 @@ public class UpgradesManager : MonoBehaviour
 
     public void BuySevereInjuryShieldUpgrade()
     {
-        if (CurrencyManager.TrySpendMoney(3000))
+        if (CurrencyManager.TrySpendMoney(SevereInjuryShieldCost))
         {
             PerformBuy(
                 () => { playerController.severeInjuryShieldUpgrade = true; },
@@ -205,7 +326,7 @@ public class UpgradesManager : MonoBehaviour
         else
         {
             interactionText.gameObject.SetActive(true);
-            interactionText.text = "You do not have enough money to buy this potion!";
+            interactionText.text = "You do not have enough money to buy this upgrade!";
             interactionText.color = Color.red;
             severeInjuryShieldBuyButton.SetActive(false);
         }
@@ -213,7 +334,7 @@ public class UpgradesManager : MonoBehaviour
 
     public void BuyPotionEffectUpgrade()
     {
-        if (CurrencyManager.TrySpendMoney(1000))
+        if (CurrencyManager.TrySpendMoney(PotionEffectCost))
         {
             PerformBuy(
                 () =>
@@ -231,7 +352,7 @@ public class UpgradesManager : MonoBehaviour
         else
         {
             interactionText.gameObject.SetActive(true);
-            interactionText.text = "You do not have enough money to buy this potion!";
+            interactionText.text = "You do not have enough money to buy this upgrade!";
             interactionText.color = Color.red;
             potionEffectBuyButton.SetActive(false);
         }
@@ -239,7 +360,7 @@ public class UpgradesManager : MonoBehaviour
 
     public void BuyChoppingSpeedUpgrade()
     {
-        if (CurrencyManager.TrySpendMoney(1500))
+        if (CurrencyManager.TrySpendMoney(ChoppingSpeedCost))
         {
             PerformBuy(
                 () => { playerController.choppingSpeedUpgrade = true; },
@@ -254,7 +375,7 @@ public class UpgradesManager : MonoBehaviour
         else
         {
             interactionText.gameObject.SetActive(true);
-            interactionText.text = "You do not have enough money to buy this potion!";
+            interactionText.text = "You do not have enough money to buy this upgrade!";
             interactionText.color = Color.red;
             choppingSpeedBuyButton.SetActive(false);
         }
@@ -262,7 +383,7 @@ public class UpgradesManager : MonoBehaviour
 
     public void BuyChoppingStaminaUpgrade()
     {
-        if (CurrencyManager.TrySpendMoney(2000))
+        if (CurrencyManager.TrySpendMoney(ChoppingStaminaCost))
         {
             PerformBuy(
                 () => { staminaController.staminaReductionRate *= 0.8f; },
@@ -272,12 +393,12 @@ public class UpgradesManager : MonoBehaviour
                 choppingStaminaIcon,
                 choppingStaminaInfoBackground
             );
-            Debug.Log("Buying Chopping Stamina");
+            //Debug.Log("Buying Chopping Stamina");
         }
         else
         {
             interactionText.gameObject.SetActive(true);
-            interactionText.text = "You do not have enough money to buy this potion!";
+            interactionText.text = "You do not have enough money to buy this upgrade!";
             interactionText.color = Color.red;
             choppingStaminaBuyButton.SetActive(false);
         }

@@ -158,7 +158,7 @@ MonoBehaviour:
   highlightMaterial: {fileID: 2100000, guid: 54589bcc3464d6e4eb3c1a95b45fa88b, type: 2}
   timeBetweenChops: 1
   dropPrefab: {fileID: 8137669601094962300, guid: 46dde8f815278684cb3e294fcb6983dc, type: 3}
-  choppingDuration: 6
+  choppingDuration: 12
   playerController: {fileID: 0}
   treeType: 5
   achievementsController: {fileID: 0}

@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
@@ -12,6 +13,7 @@ public class SaveManager : MonoBehaviour
     private bool isLoading = false; 
 
     [Header("References")]
+    public PotionManager potionManager;
     public UpgradesManager upgradesManager;  // Postavi u Inspectoru
     public GameObject player;
     public CurrencyManager currencyManager;
@@ -27,6 +29,9 @@ public class SaveManager : MonoBehaviour
 
     private IEnumerator Start()
     {
+        
+        
+        
         // Ako nije ručno postavljeno, pronađi automatski
         if (upgradesManager == null)
             upgradesManager = FindObjectOfType<UpgradesManager>();
@@ -110,6 +115,12 @@ public class SaveManager : MonoBehaviour
             currentMoney = currencyManager.CurrentMoney,
             inventoryItems = new List<InventoryItemData>()
         };
+        
+        // debug start
+        Debug.Log($"[LoadGame DEBUG] player={(player==null?"NULL":"OK")}, currencyManager={(currencyManager==null?"NULL":"OK")}");
+        Debug.Log($"[LoadGame DEBUG] InventoryManager.Instance={(InventoryManager.Instance==null?"NULL":"OK")}, slots count={(InventoryManager.Instance?.inventorySlots?.Length.ToString() ?? "N/A")}");
+        Debug.Log($"[LoadGame DEBUG] upgradesManager={(upgradesManager==null?"NULL":"OK")}, upMgr.playerController={(upgradesManager?.playerController==null?"NULL":"OK")}, upMgr.staminaController={(upgradesManager?.staminaController==null?"NULL":"OK")}, upMgr.potionManager={(upgradesManager?.potionManager==null?"NULL":"OK")}");
+
 
         // Spremi inventar
         foreach (var slot in slots)
@@ -166,79 +177,164 @@ public class SaveManager : MonoBehaviour
         return false;
     }
 
-    public void LoadGame()
+   public void LoadGame()
+{
+    // --- Početni debug ---
+    //Debug.Log($"[LoadGame] player={(player==null?"NULL":"OK")}, currencyManager={(currencyManager==null?"NULL":"OK")}, InventoryManager={(InventoryManager.Instance==null?"NULL":"OK")}, upgradesManager={(upgradesManager==null?"NULL":"OK")}");
+    
+    if (IsNewGame)
     {
-        if (IsNewGame)
-        {
-            Debug.Log("🟢 Nova igra, preskačem učitavanje podataka.");
-            return;
-        }
+        //Debug.Log("🟢 Nova igra – preskačem učitavanje.");
+        return;
+    }
+    if (!File.Exists(_path))
+    {
+        Debug.LogWarning($"SaveManager: nema save file na {_path}");
+        FindObjectOfType<NewGameInventoryManager>()?.CreateDefaultInventory();
+        return;
+    }
 
-        if (!File.Exists(_path))
-        {
-            Debug.LogWarning($"SaveManager: nema save file na {_path}");
-            FindObjectOfType<NewGameInventoryManager>()?.CreateDefaultInventory();
-            return;
-        }
-        
-        isLoading = true; 
+    isLoading = true;
+    var json = File.ReadAllText(_path);
+    var data = JsonUtility.FromJson<PlayerSaveData>(json);
+    Debug.Log($"SaveManager: učitano →\n{json}");
 
-        string json = File.ReadAllText(_path);
-        var data = JsonUtility.FromJson<PlayerSaveData>(json);
-        Debug.Log($"SaveManager: učitano →\n{json}");
-
-        // Postavi player i novac
+    // 1) Player
+    if (player != null)
+    {
+        //Debug.Log("[LoadGame] Setting player transform");
         player.transform.position    = new Vector3(data.posX, data.posY, data.posZ);
         player.transform.eulerAngles = new Vector3(0, data.rotY, 0);
+    }
+    //else Debug.LogError("[LoadGame] player = NULL");
+
+    // 2) Money
+    if (currencyManager != null)
+    {
+        //Debug.Log("[LoadGame] Setting currency");
         currencyManager.CurrentMoney = data.currentMoney;
         currencyManager.SetMoneyText();
+    }
+    //else Debug.LogError("[LoadGame] currencyManager = NULL");
 
-        // Očisti i reinstanciraj inventar
+    // 3) Inventory
+    if (InventoryManager.Instance != null)
+    {
+      //  Debug.Log("[LoadGame] Clearing inventory");
         var slots = InventoryManager.Instance.inventorySlots;
         foreach (var slot in slots)
             foreach (Transform t in slot.transform.Cast<Transform>().ToList())
                 Destroy(t.gameObject);
 
+       // Debug.Log("[LoadGame] Recreating inventory items");
         for (int i = 0; i < slots.Length && i < data.inventoryItems.Count; i++)
         {
-            var itemData = data.inventoryItems[i];
-            if (string.IsNullOrEmpty(itemData.itemName) || itemData.amount <= 0)
-                continue;
-
-            var item = Resources.Load<Item>($"Items/{itemData.itemName}");
+            var it = data.inventoryItems[i];
+            if (string.IsNullOrEmpty(it.itemName) || it.amount <= 0) continue;
+            var item = Resources.Load<Item>($"Items/{it.itemName}");
             if (item != null)
             {
                 var go = Instantiate(
                     InventoryManager.Instance.inventoryItemPrefab,
                     slots[i].transform
                 );
-                go.GetComponent<InventoryItem>().InitialiseItem(item, itemData.amount);
+                go.GetComponent<InventoryItem>().InitialiseItem(item, it.amount);
             }
-            else
-            {
-                Debug.LogWarning($"SaveManager: '{itemData.itemName}' nije pronađen u Resources/Items/");
-            }
+           // else Debug.LogWarning($"[LoadGame] Item '{it.itemName}' nije pronađen");
         }
-
-        // Učitaj upgradeove pomoću Buy… metoda
-        if (upgradesManager != null)
-        {
-            if (data.staminaRegenUpgrade)       upgradesManager.BuyStaminaRegenUpgrade();
-            if (data.speedUpgrade)              upgradesManager.BuySpeedUpgrade();
-            if (data.injuryShieldUpgrade)       upgradesManager.BuyInjuryShieldUpgrade();
-            if (data.severeInjuryShieldUpgrade) upgradesManager.BuySevereInjuryShieldUpgrade();
-            if (data.potionEffectUpgrade)       upgradesManager.BuyPotionEffectUpgrade();
-            if (data.choppingSpeedUpgrade)      upgradesManager.BuyChoppingSpeedUpgrade();
-            if (data.choppingStaminaUpgrade)    upgradesManager.BuyChoppingStaminaUpgrade();
-        }
-
-        // Osvježi praćene vrijednosti
-        previousMoney          = currencyManager.CurrentMoney;
-        previousPlayerPosition = player.transform.position;
-        UpdateItemCounts();
-        previousUpgrades       = GetCurrentUpgradeStates();
-        isLoading = false; 
     }
+    //else Debug.LogError("[LoadGame] InventoryManager.Instance = NULL");
+
+    // 4) Flags
+    if (upgradesManager != null)
+    {
+       // Debug.Log("[LoadGame] Applying upgrade flags");
+        upgradesManager.hasStaminaRegen       = data.staminaRegenUpgrade;
+        upgradesManager.hasSpeed              = data.speedUpgrade;
+        upgradesManager.hasInjuryShield       = data.injuryShieldUpgrade;
+        upgradesManager.hasSevereInjuryShield = data.severeInjuryShieldUpgrade;
+        upgradesManager.hasPotionEffect       = data.potionEffectUpgrade;
+        upgradesManager.hasChoppingSpeed      = data.choppingSpeedUpgrade;
+        upgradesManager.hasChoppingStamina    = data.choppingStaminaUpgrade;
+    }
+    //else Debug.LogError("[LoadGame] upgradesManager = NULL");
+
+    // 5) Effects
+    if (upgradesManager != null)
+    {
+        //Debug.Log("[LoadGame] Applying upgrade effects");
+        // Stamina Regen
+        if (upgradesManager.hasStaminaRegen)
+        {
+            if (upgradesManager.playerController != null)
+                upgradesManager.playerController.isStaminaRegenUpgrade = true;
+            //else Debug.LogError("[LoadGame] playerController = NULL");
+        }
+        // Speed
+        if (upgradesManager.hasSpeed)
+        {
+            if (upgradesManager.playerController != null)
+                upgradesManager.playerController.speed = 10f;
+            //else Debug.LogError("[LoadGame] playerController = NULL");
+        }
+        // Injury Shield
+        if (upgradesManager.hasInjuryShield)
+        {
+            if (upgradesManager.playerController != null)
+                upgradesManager.playerController.injuryShieldUpgrade = true;
+           // else Debug.LogError("[LoadGame] playerController = NULL");
+        }
+        // Severe
+        if (upgradesManager.hasSevereInjuryShield)
+        {
+            if (upgradesManager.playerController != null)
+                upgradesManager.playerController.severeInjuryShieldUpgrade = true;
+           // else Debug.LogError("[LoadGame] playerController = NULL");
+        }
+        // Potion Effect
+        if (upgradesManager.potionManager == null)
+            upgradesManager.potionManager = FindObjectOfType<PotionManager>();
+
+        
+        if (upgradesManager.hasPotionEffect)
+        {
+            if (upgradesManager.potionManager != null)
+                upgradesManager.potionManager.PotionEffectUpgradeBought = true;
+           // else Debug.LogError("[LoadGame] potionManager = NULL");
+        }
+        // Chopping Speed
+        if (upgradesManager.hasChoppingSpeed)
+        {
+            if (upgradesManager.playerController != null)
+                upgradesManager.playerController.choppingSpeedUpgrade = true;
+           // else Debug.LogError("[LoadGame] playerController = NULL");
+        }
+        // Chopping Stamina
+        if (upgradesManager.hasChoppingStamina)
+        {
+            if (upgradesManager.staminaController != null)
+                upgradesManager.staminaController.staminaReductionRate *= 0.8f;
+           // else Debug.LogError("[LoadGame] staminaController = NULL");
+        }
+    }
+
+    // 6) UI
+    if (upgradesManager != null)
+    {
+        //Debug.Log("[LoadGame] Refreshing upgrade UI");
+        upgradesManager.RefreshAllUpgradesUI();
+    }
+    //else Debug.LogError("[LoadGame] upgradesManager = NULL at UI refresh");
+
+    // 7) Trackers
+    previousMoney          = currencyManager?.CurrentMoney ?? previousMoney;
+    previousPlayerPosition = player?.transform.position ?? previousPlayerPosition;
+    UpdateItemCounts();
+    previousUpgrades       = GetCurrentUpgradeStates();
+
+    isLoading = false;
+}
+
 }
 
 
@@ -257,7 +353,7 @@ public class PlayerSaveData
     public bool injuryShieldUpgrade;
     public bool severeInjuryShieldUpgrade;
     public bool potionEffectUpgrade;
-    public bool choppingSpeedUpgrade;
+    public bool choppingSpeedUpgrade; 
     public bool choppingStaminaUpgrade;
 }
 

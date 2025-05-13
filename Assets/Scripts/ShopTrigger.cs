@@ -1,67 +1,73 @@
-using UnityEngine;
-using Cursor = UnityEngine.WSA.Cursor;
+    using UnityEngine;
+    using Cursor = UnityEngine.WSA.Cursor;
 
-public class ShopTrigger : MonoBehaviour
-{
-    private bool playerInside = false;
-    [SerializeField] private ZoomTransition zoomTransition;
-    
-    void Start()
+    public class ShopTrigger : MonoBehaviour
     {
-        zoomTransition = FindObjectOfType<ZoomTransition>();
-    }
-
-    void Update()
-    {
-        if (playerInside && Input.GetKeyDown(KeyCode.Space))
+        private bool playerInside = false;
+        [SerializeField] private ZoomTransition zoomTransition;
+        
+        void Start()
         {
-            zoomTransition.ZoomToShop();
-            foreach (var interactable in FindObjectsOfType<SellWoodInteractable>())
+            zoomTransition = FindObjectOfType<ZoomTransition>();
+        }
+
+        void Update()
+        {
+            if (playerInside && Input.GetKeyDown(KeyCode.Space))
             {
-                interactable.UpdateCountDisplay();
+                zoomTransition.ZoomToShop();
+                foreach (var interactable in FindObjectsOfType<SellWoodInteractable>())
+                {
+                    interactable.UpdateCountDisplay();
+                }
+                if (PlayerController.Local != null && PlayerController.Local.gameObject.activeInHierarchy)
+                    PlayerController.Local.isInShop = true;
+                
+                var pc = PlayerController.Local;
+                pc.isInShop = true;
+
+                // **immediately hide** any prompt
+                pc.uiPanel.SetActive(false);
+                pc.interactionText.text = "";
+                
+                PlayerController.Local.SetVisible(false);
+                PlayerController.Local.EnterShop();
             }
-            if (PlayerController.Local != null && PlayerController.Local.gameObject.activeInHierarchy)
-                PlayerController.Local.isInShop = true;
-            
-            var pc = PlayerController.Local;
-            pc.isInShop = true;
 
-            // **immediately hide** any prompt
-            pc.uiPanel.SetActive(false);
-            pc.interactionText.text = "";
-            
-            PlayerController.Local.SetVisible(false);
-            PlayerController.Local.EnterShop();
+            if (playerInside && Input.GetKeyDown(KeyCode.Escape))
+            {
+                Debug.Log("ESC pritisnut - pokušavam zoom u shop.");
+                zoomTransition.ZoomBackToPlayer();
+                if (PlayerController.Local != null)
+                    PlayerController.Local.isInShop = false;
+
+                PlayerController.Local.SetVisible(true);
+                PlayerController.Local.ExitShop();
+                var obj = GameObject.FindGameObjectWithTag("PricePopup");
+                if (obj != null)
+                {
+                    Destroy(obj);
+                    Debug.Log("Destroyed PricePopup!");
+                }
+            }
         }
 
-        if (playerInside && Input.GetKeyDown(KeyCode.Escape))
+        private void OnTriggerEnter(Collider other)
         {
-            Debug.Log("ESC pritisnut - pokušavam zoom u shop.");
-            zoomTransition.ZoomBackToPlayer();
-            if (PlayerController.Local != null)
-                PlayerController.Local.isInShop = false;
+            if (other.CompareTag("Player"))
+            {
+                Debug.Log("Player je ušao u shop trigger.");
+                playerInside = true;
+            }
+        }
 
-            PlayerController.Local.SetVisible(true);
-            PlayerController.Local.ExitShop();
+        private void OnTriggerExit(Collider other)
+        {
+            if (other.CompareTag("Player"))
+            {
+                playerInside = false;
+                FindObjectOfType<PlayerController>().isInShop = false;
+                zoomTransition.ZoomBackToPlayer();
+            }
         }
     }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            Debug.Log("Player je ušao u shop trigger.");
-            playerInside = true;
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            playerInside = false;
-            FindObjectOfType<PlayerController>().isInShop = false;
-            zoomTransition.ZoomBackToPlayer();
-        }
-    }
-}

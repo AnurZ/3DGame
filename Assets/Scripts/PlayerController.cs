@@ -108,6 +108,10 @@ public class PlayerController : MonoBehaviour
         uiPanel.SetActive(false);
         DialogueManager.Instance.StartDialogue();
         
+        if (walkingSource.isPlaying)
+            walkingSource.Stop();
+
+        
         Debug.Log("Entered shop.");
     }
 

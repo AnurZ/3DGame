@@ -50,7 +50,7 @@ public class SimpleDayNightCycle : MonoBehaviour
 
     public int lastHour = -1;
     public StaminaController staminaRegenController;
-    
+    public TreeSpawner treeSpawner;
     
     private void Shuffle<T>(List<T> list)
     {
@@ -97,6 +97,7 @@ public class SimpleDayNightCycle : MonoBehaviour
         currentDay = PlayerPrefs.GetInt("Day", 1);
         potionManager = FindObjectOfType<PotionManager>();
         achievementsController = FindObjectOfType<AchievementsController>();
+        treeSpawner = FindObjectOfType<TreeSpawner>();
         UpdateDayText();
     }
     private bool yawningPlayed = false; // Flag to track if yawning has played
@@ -211,7 +212,7 @@ public class SimpleDayNightCycle : MonoBehaviour
                 if (go != null) go.SetActive(false);
         
         StaminaController.Instance.RestoreFullStamina();
-        
+        treeSpawner.SpawnTrees();
         
         // 1) Fade to black
         yield return StartCoroutine(FadeCanvasGroup(0f, 1f, 2.5f));

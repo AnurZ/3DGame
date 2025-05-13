@@ -81,21 +81,12 @@ public class InventoryManager : MonoBehaviour
             UpdateHeldItem(); // Call when item changes
         }
     }
-
-    private IEnumerator DisplayItemName()
-    {
-        ItemNamePanel.SetActive(true);
-        ItemNameText.text = GetSelectedItem(false).itemName;
-        yield return new WaitForSeconds(2f);
-        ItemNameText.text = "";
-        ItemNamePanel.SetActive(false);
-    }
     
-    private IEnumerator ShowTextCoroutine()
+    private IEnumerator ShowTextCoroutine(string text)
     {
         uipanel.SetActive(true);
-        textMeshPro.text = "Press [SPACEBAR] to drink the potion";
-        yield return new WaitForSeconds(2f);
+        textMeshPro.text = text;
+        yield return new WaitForSeconds(5f);
         textMeshPro.text = "";
         uipanel.SetActive(false);
     }
@@ -118,11 +109,10 @@ public class InventoryManager : MonoBehaviour
             Item currentItem = GetSelectedItem(false);
             if (currentItem != null)
             {
-                StartCoroutine(DisplayItemName());
                 if (currentItem.isPotion)
-                {
-                    StartCoroutine(ShowTextCoroutine());
-                }
+                    StartCoroutine(ShowTextCoroutine(currentItem.ItemDisplayName + ("Press [SPACEBAR] to drink")));
+                else
+                    StartCoroutine(ShowTextCoroutine(currentItem.ItemDisplayName));
             }
 
             UpdateHeldItem();

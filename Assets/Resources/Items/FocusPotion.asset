@@ -23,3 +23,5 @@ MonoBehaviour:
   inHandScale: {x: 0.3, y: 0.3, z: 0.3}
   isAxe: 0
   isPotion: 1
+  ItemDisplayName: Focus Potion
+  currentAxeType: 0

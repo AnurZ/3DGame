@@ -33,7 +33,7 @@ public class Item : ScriptableObject
     public bool isAxe = false;
     public bool isPotion = false;
 
-    
+    public string ItemDisplayName = "ITEM_NAME";
     
     public  AxeTypeState currentAxeType;
     

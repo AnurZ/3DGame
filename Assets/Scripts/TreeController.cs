@@ -127,29 +127,12 @@ public class TreeController : MonoBehaviour
         }
     }
 
-
-    private void Chop()
-    {
-        if (StaminaController.Instance != null)
-            StaminaController.Instance.ReduceStamina(StaminaController.Instance.staminaReductionRate);
-
-        float injuryRoll = Random.Range(0f, 100f);
-
-        health -= 10f;
-        if (health <= 0f)
-        {
-            Debug.Log("Tree chopped down!");
-            DropPrefab();
-            PlayerController.Local.OnTreeChoppedDown(); // <-- Injury roll here too (just in case this path is ever used)
-            Destroy(gameObject);
-        }
-    }
-
     private void DropPrefab()
     {
         if (dropPrefab != null && !hasDroppedPrefab)
         {
-            Instantiate(dropPrefab, transform.position, Quaternion.identity);
+            Vector3 dropPosition = new Vector3(transform.position.x, 0.5f, transform.position.z);
+            Instantiate(dropPrefab, dropPosition, Quaternion.identity);
             Debug.Log("Prefab dropped!");
             hasDroppedPrefab = true;  // Set flag to true to ensure item is dropped only once
         }

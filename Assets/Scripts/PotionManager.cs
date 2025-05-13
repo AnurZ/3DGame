@@ -29,6 +29,8 @@ public class PotionManager : MonoBehaviour
     public TextMeshProUGUI promptText;
     
     public AchievementsController achievementsController;
+
+    public bool PotionEffectUpgradeBought = false;
     
     public enum PotionType
     {
@@ -168,6 +170,8 @@ public class PotionManager : MonoBehaviour
             playerController.currentInjury = PlayerController.InjuryStatus.Minor;
             playerController.UpdateInjuryStateText();
         }
+        if(PotionEffectUpgradeBought && playerController.daysToRecover > 0)
+            playerController.daysToRecover--;
         inventoryManager.RemoveItemFromHand();
     }
 
@@ -179,7 +183,7 @@ public class PotionManager : MonoBehaviour
             promptText.text = "Your stamina is already full!";
             return;
         }
-        staminaController.playerStamina += 50;
+        staminaController.playerStamina += (PotionEffectUpgradeBought ? 55 : 50);
         if (staminaController.playerStamina >= 100)
             staminaController.playerStamina = 100;
         inventoryManager.RemoveItemFromHand();
@@ -187,7 +191,7 @@ public class PotionManager : MonoBehaviour
 
     private void ActivateShield()
     {
-        ShieldPotionHours += 24;
+        ShieldPotionHours += (PotionEffectUpgradeBought ? 26 : 24);
         shieldPotionText.text = ShieldPotionHours + " hour" + (ShieldPotionHours > 1 ? "s left" : " left");
         shieldPotionInfo.SetActive(true);
         inventoryManager.RemoveItemFromHand();
@@ -195,7 +199,7 @@ public class PotionManager : MonoBehaviour
     
     private void IncreaseFocus()
     {
-        FocusPotionHours += 24;
+        FocusPotionHours += (PotionEffectUpgradeBought ? 26 : 24);
         FocusPotionText.text = FocusPotionHours + " hour" + (FocusPotionHours > 1 ? "s left" : " left");
         FocusPotionInfo.SetActive(true);
         inventoryManager.RemoveItemFromHand();
@@ -203,7 +207,7 @@ public class PotionManager : MonoBehaviour
 
     private void UpgradePotion()
     { 
-        UpgradePotionHours += 24;
+        UpgradePotionHours += (PotionEffectUpgradeBought ? 26 : 24);
         UpgradePotionText.text = UpgradePotionHours + " hour" + (UpgradePotionHours > 1 ? "s left" : " left");
         UpgradePotionInfo.SetActive(true);
         inventoryManager.RemoveItemFromHand();

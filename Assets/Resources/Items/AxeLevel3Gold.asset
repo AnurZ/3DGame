@@ -23,4 +23,5 @@ MonoBehaviour:
   inHandScale: {x: 1, y: 1, z: 1}
   isAxe: 1
   isPotion: 0
+  ItemDisplayName: Golden Axe
   currentAxeType: 4

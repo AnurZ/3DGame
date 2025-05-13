@@ -14,15 +14,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7424d45a698023849bd966a8dc47d923, type: 3}
       propertyPath: m_LocalScale.x
-      value: 2.193024
+      value: 2.2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7424d45a698023849bd966a8dc47d923, type: 3}
       propertyPath: m_LocalScale.y
-      value: 2.193024
+      value: 2.2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7424d45a698023849bd966a8dc47d923, type: 3}
       propertyPath: m_LocalScale.z
-      value: 2.193024
+      value: 2.2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7424d45a698023849bd966a8dc47d923, type: 3}
       propertyPath: m_LocalPosition.x
@@ -150,6 +150,7 @@ MonoBehaviour:
   choppingDuration: 6
   playerController: {fileID: 0}
   treeType: 2
+  achievementsController: {fileID: 0}
 --- !u!114 &7120747071932489644
 MonoBehaviour:
   m_ObjectHideFlags: 0

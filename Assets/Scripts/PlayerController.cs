@@ -299,7 +299,7 @@ public class PlayerController : MonoBehaviour
     public void OnTreeChoppedDown()
     {
         Debug.Log($"Ukupni chance {injuryRisk} Injury chance at chop start: Minor {chopInjuryChance.minorChance * 100}% | Moderate {chopInjuryChance.moderateChance * 100}% | Severe {chopInjuryChance.severeChance * 100}%");
-            TryApplyInjury();
+        TryApplyInjury();
     }
 
     private void TryApplyInjury()
@@ -307,7 +307,7 @@ public class PlayerController : MonoBehaviour
         float roll = Random.value;
         Debug.Log($"Injury Roll: {roll}");
         
-        int recoveryDays = 0;
+        int recoveryDays = daysToRecover;
 
         if (roll <= chopInjuryChance.severeChance)
         {
@@ -315,13 +315,13 @@ public class PlayerController : MonoBehaviour
             recoveryDays = Random.Range(6, 11);
             Debug.Log($"You suffered a <color=#C0392B>MINOR</color> injury! Recovery time: {recoveryDays} days.");
         }
-        else if (roll <= chopInjuryChance.severeChance + chopInjuryChance.moderateChance)
+        else if (roll <= chopInjuryChance.severeChance + chopInjuryChance.moderateChance && currentInjury != InjuryStatus.Moderate)
         {
             currentInjury = InjuryStatus.Moderate;
             recoveryDays = Random.Range(3, 6);
             Debug.Log($"You suffered a <color=#FFA500>MODERATE</color> injury! Recovery time: {recoveryDays} days.");
         }
-        else if (roll <= chopInjuryChance.severeChance + chopInjuryChance.moderateChance + chopInjuryChance.minorChance)
+        else if (roll <= chopInjuryChance.severeChance + chopInjuryChance.moderateChance + chopInjuryChance.minorChance && currentInjury != InjuryStatus.Minor &&  currentInjury != InjuryStatus.Moderate)
         {
             currentInjury = InjuryStatus.Minor;
             recoveryDays = Random.Range(1, 3);
@@ -329,8 +329,6 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            currentInjury = InjuryStatus.Healthy;
-            Debug.Log("No injury occurred.");
             if (playerInjuryAlert != null)
                 playerInjuryAlert.SetActive(false);
             return;

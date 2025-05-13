@@ -67,10 +67,14 @@ public class UpgradesManager : MonoBehaviour
     public AchievementsController achievementsController;
 
     public CurrencyManager CurrencyManager;
+    
+    public PotionManager potionManager;
+    
     private void Start()
     {
         CurrencyManager =  FindObjectOfType<CurrencyManager>();
         achievementsController = FindObjectOfType<AchievementsController>();
+        potionManager = FindObjectOfType<PotionManager>();
     }
 
     private void Awake()
@@ -119,7 +123,7 @@ public class UpgradesManager : MonoBehaviour
             PerformBuy(
                 () =>
                 {
-                    /* nema dodatne logike */
+                    playerController.isStaminaRegenUpgrade = true;
                 },
                 ref hasStaminaRegen,
                 staminaRegenBuyButton,
@@ -127,7 +131,6 @@ public class UpgradesManager : MonoBehaviour
                 staminaRegenIcon,
                 staminaRegenInfoBackground
             );
-            playerController.isStaminaRegenUpgrade = true;
         }
         else
         {
@@ -215,7 +218,7 @@ public class UpgradesManager : MonoBehaviour
             PerformBuy(
                 () =>
                 {
-                    /* nema dodatne logike */
+                    potionManager.PotionEffectUpgradeBought = true;
                 },
                 ref hasPotionEffect,
                 potionEffectBuyButton,

@@ -23,3 +23,5 @@ MonoBehaviour:
   inHandScale: {x: 0.5, y: 0.5, z: 0.5}
   isAxe: 0
   isPotion: 0
+  ItemDisplayName: Purple Log Bundle
+  currentAxeType: 0

@@ -137,7 +137,7 @@ public class AchievementsController : MonoBehaviour
     public void increaseChoppedTreesCurrentGoal()
     {
         TreesChoppedCurrentLevel++;
-        if (TreesChopped != TreesChoppedGoal)
+        if (TreesChopped < TreesChoppedGoal)
         {
             TreesChoppedIcon.gameObject.SetActive(true);
         }
@@ -153,7 +153,7 @@ public class AchievementsController : MonoBehaviour
     public void increaseUsePotionsCurrentGoal()
     {
         UsePotionsCurrentLevel++;
-        if (UsePotions != UsePotionsGoal)
+        if (UsePotions < UsePotionsGoal)
         {
             UsePotionsIcon.gameObject.SetActive(true);
         }
@@ -169,7 +169,7 @@ public class AchievementsController : MonoBehaviour
     public void increaseSpendMoneyCurrentGoal()
     {
         SpendMoneyCurrentLevel++;
-        if (SpendMoney != SpendMoneyGoal)
+        if (SpendMoney < SpendMoneyGoal)
         {
             SpendMoneyIcon.gameObject.SetActive(true);
         }
@@ -185,7 +185,7 @@ public class AchievementsController : MonoBehaviour
     public void increaseInteractWithNPCsCurrentGoal()
     {
         InteractWithNPCsCurrentLevel++;
-        if (InteractWithNPCs != InteractWithNPCsGoal)
+        if (InteractWithNPCs < InteractWithNPCsGoal)
         {
             InteractWithNPCsIcon.gameObject.SetActive(true);
         }
@@ -215,12 +215,16 @@ public class AchievementsController : MonoBehaviour
             if (background != null)
             {
                 Outline outline = background.GetComponent<Outline>();
-                outline.enabled = (goalAmount == currentAmount);
+                outline.enabled = (goalAmount <= currentAmount);
             }
+            text.text = $"{displayGoal}/{displayGoal}";
+            slider.fillAmount = Mathf.Clamp01((float)displayGoal / displayGoal);
         }
-
-        text.text = $"{currentAmount}/{displayGoal}";
-        slider.fillAmount = Mathf.Clamp01((float)currentAmount / displayGoal);
+        else
+        {
+            text.text = $"{currentAmount}/{displayGoal}";
+            slider.fillAmount = Mathf.Clamp01((float)currentAmount / displayGoal);
+        }
     }
 
     public void Update()

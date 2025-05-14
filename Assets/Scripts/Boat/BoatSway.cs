@@ -117,11 +117,8 @@ public class BoatSway : MonoBehaviour
             MoveTowardsWaypoint();
         }
 
-        // Ulazak u brod i F za kupnju ulaznice
-        if (playerInside && !movementStarted && !awaitingPurchase && Input.GetKeyDown(KeyCode.F))
-        {
-            ShowTicketPopup();
-        }
+        // Ulazak u brod i F za kupnju ulaznic
+        
         
         if (reachedEnd && !endingStarted)
         {
@@ -167,6 +164,7 @@ public class BoatSway : MonoBehaviour
         }
     }
 
+    public AudioClip Clip;
     
     public void ShowTicketPopup()
     {
@@ -189,6 +187,7 @@ public class BoatSway : MonoBehaviour
         }
         else
         {
+            GetComponent<AudioSource>().PlayOneShot(Clip);
             popupText.text = "Not enough coins!";
         }
     }

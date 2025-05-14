@@ -45,8 +45,8 @@ public class NPCProximityInteraction : MonoBehaviour
         {
             lastInteractionTime = Time.time;
 
-            if (achievementsController.InteractWithNPCs < achievementsController.InteractWithNPCsGoal)
-                achievementsController.InteractWithNPCs++;
+           if (achievementsController.InteractWithNPCs < achievementsController.InteractWithNPCsGoal)
+               achievementsController.InteractWithNPCs++;
 
             ShowRandomSentence();
         }

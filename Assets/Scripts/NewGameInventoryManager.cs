@@ -47,8 +47,8 @@ public class NewGameInventoryManager : MonoBehaviour
         }
 
         // Definiraj default iteme za početak
-        string[] defaultItemNames = { "AxeLevel1", "SaplingWood1" };
-        int[] defaultAmounts = { 1, 1 };
+        string[] defaultItemNames = { "AxeLevel1" };
+        int[] defaultAmounts = { 1 };
 
         // Dodaj default iteme u inventar
         for (int i = 0; i < defaultItemNames.Length && i < slots.Length; i++)
@@ -68,8 +68,11 @@ public class NewGameInventoryManager : MonoBehaviour
         }
 
         // Dodaj početni novac
-        currencyManager.CurrentMoney = 5;
+        currencyManager.CurrentMoney = 10;
         currencyManager.SetMoneyText();
+
+        FindObjectOfType<SimpleDayNightCycle>().SetFirstDay();
+
     }
 
 

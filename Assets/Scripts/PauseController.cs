@@ -5,6 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class PauseController : MonoBehaviour
 {
+    private PlayerController player;
+
+    
     [Header("UI References")]
     public GameObject pauseCanvas;      // Referenca na PauseCanvas
     public Button resumeButton;         // (opcionalno) fokus nakon pauze
@@ -15,11 +18,16 @@ public class PauseController : MonoBehaviour
     private void Start()
     {
         pauseCanvas.SetActive(false);
+        player = FindObjectOfType<PlayerController>();
+
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Tab))
+        if (player != null && player.isInShop)
+            return;
+
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             TogglePause();
         }

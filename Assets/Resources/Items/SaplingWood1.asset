@@ -23,4 +23,5 @@ MonoBehaviour:
   inHandScale: {x: 0.15, y: 0.15, z: 0.15}
   isAxe: 0
   isPotion: 0
+  ItemDisplayName: ITEM_NAME
   currentAxeType: 0

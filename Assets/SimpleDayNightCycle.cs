@@ -62,6 +62,13 @@ public class SimpleDayNightCycle : MonoBehaviour
             list[j] = temp;
         }
     }
+
+    public void SetFirstDay()
+    {
+        currentDay = 1;
+        UpdateDayText();
+        PlayerPrefs.SetInt("Day", currentDay);
+    }
     
     private void Awake()
     {

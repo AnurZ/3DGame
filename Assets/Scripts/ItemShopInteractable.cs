@@ -138,8 +138,10 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
 
     public void OnActivate()
     {
-        // Try to buy
-        if (InventoryManager.Instance.HasItem(itemToGive))
+        bool isPotion = itemToGive.itemName.ToLower().Contains("potion");
+
+        // If not a potion and already owned, prevent purchase
+        if (!isPotion && InventoryManager.Instance.HasItem(itemToGive))
         {
             Debug.Log("Već posjeduješ ovaj item!");
             return;
@@ -150,20 +152,24 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
             InventoryManager.Instance.AddItem(itemToGive);
             Debug.Log($"Kupio si {itemToGive.name}!");
             MoneyPopupManager.Instance.ShowPopup(-cost, Input.mousePosition);
-            
-            var playerObj = GameObject.FindWithTag("AudioPlayer") 
-                            ?? GameObject.Find("AudioPlayer");
+
+            var playerObj = GameObject.FindWithTag("AudioPlayer") ?? GameObject.Find("AudioPlayer");
             if (playerObj != null && buySoundClip != null)
             {
                 var sfxSource = playerObj.GetComponent<AudioSource>();
                 sfxSource?.PlayOneShot(buySoundClip);
             }
+
+            // If not a potion (i.e., one-time item), gray it out after purchase
+            if (!isPotion)
+                SetAllColors(grayOutColor);
         }
         else
         {
             Debug.Log("Nemaš dovoljno novca.");
         }
     }
+
 
     // Helpers ↓
 

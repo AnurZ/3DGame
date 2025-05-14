@@ -5796,7 +5796,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3efbdd0d0f15cc441a31b938806b1c56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  customCursor: {fileID: 2800000, guid: 2e71a8202d3b4a3448ec85ced5a40265, type: 3}
+  cursorTextures: []
   hotspot: {x: 0, y: 0}
   cursorMode: 0
 --- !u!4 &474793036
@@ -16967,9 +16967,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Controls\r\n\r\n- Pause ................ Tab\n- Movement ............
+  m_text: "Controls\r\n\r\n- Pause ................ ESC\n- Movement ............
     W / A / S / D  \r\n- Interact / Sleep .... Space  \r\n- Inventory ...........
-    E  \r\n- Next Dialogue ....... F / G  \r\n- Exit Panels ......... Esc\n\n\r\n"
+    E  \r\n- Next Dialogue ....... F  \r\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d24ecced6fa3138419f19d3461eeac42, type: 2}
   m_sharedMaterial: {fileID: 5411772031463209499, guid: d24ecced6fa3138419f19d3461eeac42, type: 2}

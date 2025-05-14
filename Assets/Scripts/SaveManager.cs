@@ -143,6 +143,21 @@ public class SaveManager : MonoBehaviour
         data.choppingSpeedUpgrade      = ups[5];
         data.choppingStaminaUpgrade    = ups[6];
 
+        data.staminaRegenUpgrade       = upgradesManager.hasStaminaRegen;
+        data.speedUpgrade              = upgradesManager.hasSpeed;
+        data.injuryShieldUpgrade       = upgradesManager.hasInjuryShield;
+        data.severeInjuryShieldUpgrade = upgradesManager.hasSevereInjuryShield;
+        data.potionEffectUpgrade       = upgradesManager.hasPotionEffect;
+        data.choppingSpeedUpgrade      = upgradesManager.hasChoppingSpeed;
+        data.choppingStaminaUpgrade    = upgradesManager.hasChoppingStamina;
+
+        // Debug prije pisanja:
+        Debug.Log($"[SaveManager] sprema upgradeove → " +
+                  $"staminaRegen={data.staminaRegenUpgrade}, speed={data.speedUpgrade}, " +
+                  $"injury={data.injuryShieldUpgrade}, severe={data.severeInjuryShieldUpgrade}, " +
+                  $"potion={data.potionEffectUpgrade}, chopSpeed={data.choppingSpeedUpgrade}, " +
+                  $"chopStam={data.choppingStaminaUpgrade}");
+        
         // Zapiši JSON
         string json = JsonUtility.ToJson(data, true);
         File.WriteAllText(_path, json);
@@ -185,6 +200,18 @@ public class SaveManager : MonoBehaviour
     if (IsNewGame)
     {
         //Debug.Log("🟢 Nova igra – preskačem učitavanje.");
+        var player = FindObjectOfType<PlayerController>()?.gameObject;
+        if (player != null)
+        {
+            player.transform.position = new Vector3(70f, 0f, 185f); // <-- PROMIJENI AKO IMAŠ KONKRETNU LOKACIJU
+            player.transform.eulerAngles = Vector3.zero;
+            Debug.Log("🟢 Postavljena početna pozicija igrača za novu igru.");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ Igrač nije pronađen prilikom postavljanja pozicije!");
+        }
+
         return;
     }
     if (!File.Exists(_path))

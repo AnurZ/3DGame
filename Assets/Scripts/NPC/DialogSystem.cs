@@ -1,10 +1,18 @@
 using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 
 public class DialogSystem : MonoBehaviour
 {
     public bool ticketPurchased = false;
+
+    [Header("Typewriter Settings")]
+    public float typewriterSpeed = 0.05f;
+    public AudioSource typewriterAudioSource;
+    public AudioClip typewriterClip;
+
+    private Coroutine typeTextCoroutine;
 
     
     [Header("Dialog Settings")]
@@ -17,7 +25,7 @@ public class DialogSystem : MonoBehaviour
         "Funny thing—my boat only sails for paying customers.",
         "Got exactly 15 thousand coins, or shall we keep chatting?"
     };
-    public KeyCode nextKey = KeyCode.G;
+    public KeyCode nextKey = KeyCode.F;
 
     private int currentLineIndex = 0;
     private bool isPlayerInRange = false;
@@ -25,6 +33,26 @@ public class DialogSystem : MonoBehaviour
 
     [Header("Boat")]
     public BoatSway boatSway; // Referenca na BoatSway
+
+    private IEnumerator TypeText(string sentence)
+    {
+        dialogText.text = "";
+        int counter = 0;
+
+        foreach (char c in sentence)
+        {
+            dialogText.text += c;
+
+            // Play the typewriter sound every 3rd character
+            if (typewriterAudioSource != null && typewriterClip != null && counter % 3 == 0)
+            {
+                typewriterAudioSource.PlayOneShot(typewriterClip);
+            }
+
+            counter++;
+            yield return new WaitForSeconds(typewriterSpeed);
+        }
+    }
 
     private void Start()
     {
@@ -80,8 +108,15 @@ public class DialogSystem : MonoBehaviour
     private void ShowDialogLine(int index)
     {
         dialogPanel.SetActive(true);
-        dialogText.text = dialogLines[index];
+
+        if (typeTextCoroutine != null)
+        {
+            StopCoroutine(typeTextCoroutine);
+        }
+
+        typeTextCoroutine = StartCoroutine(TypeText(dialogLines[index]));
     }
+
 
     public void CloseDialog()
     {

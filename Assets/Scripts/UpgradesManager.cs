@@ -5,69 +5,71 @@ using TMPro;
 
 public class UpgradesManager : MonoBehaviour
 {
-    
-    public int staminaUpgradeCost = 0;
-    public int SpeedCost = 0;
-    public int InjuryShieldCost = 0;
-    public int SevereInjuryShieldCost = 0;
-    public int PotionEffectCost = 0;
-    public int ChoppingSpeedCost = 0;
-    public int ChoppingStaminaCost = 0;
-    
+    [Header("Costs")]
+    public int staminaUpgradeCost      = 100;
+    public int speedUpgradeCost        = 1500;
+    public int injuryShieldCost        = 1000;
+    public int severeInjuryShieldCost  = 3000;
+    public int potionEffectCost        = 1000;
+    public int choppingSpeedCost       = 1500;
+    public int choppingStaminaCost     = 2000;
+
     [Header("References")]
     public PlayerController playerController;
     public StaminaController staminaController;
-    public SaveManager saveManager;  // ← postavi u Inspectoru!
+    public PotionManager potionManager;          // ← referenca na instancu
+    public SaveManager saveManager;
+    public CurrencyManager CurrencyManager;
+    public AchievementsController achievementsController;
 
     [Header("Stamina Regen UI")]
-    public Image staminaRegenBackground;
+    public Image staminaRegenRowBg;
     public Image staminaRegenIcon;
-    public Image staminaRegenInfoBackground;
+    public Image staminaRegenInfoBg;
     public GameObject staminaRegenBuyButton;
-    public GameObject staminaRegenBoughtButton; // ← NOVO
+    public GameObject staminaRegenBoughtButton;
 
     [Header("Speed UI")]
-    public Image speedBackground;
+    public Image speedRowBg;
     public Image speedIcon;
-    public Image speedInfoBackground;
+    public Image speedInfoBg;
     public GameObject speedBuyButton;
-    public GameObject speedBoughtButton; // ← NOVO
+    public GameObject speedBoughtButton;
 
     [Header("Injury Shield UI")]
-    public Image injuryShieldBackground;
+    public Image injuryShieldRowBg;
     public Image injuryShieldIcon;
-    public Image injuryShieldInfoBackground;
+    public Image injuryShieldInfoBg;
     public GameObject injuryShieldBuyButton;
-    public GameObject injuryShieldBoughtButton; // ← NOVO
+    public GameObject injuryShieldBoughtButton;
 
     [Header("Severe Injury Shield UI")]
-    public Image severeInjuryShieldBackground;
+    public Image severeInjuryShieldRowBg;
     public Image severeInjuryShieldIcon;
-    public Image severeInjuryShieldInfoBackground;
+    public Image severeInjuryShieldInfoBg;
     public GameObject severeInjuryShieldBuyButton;
-    public GameObject severeInjuryShieldBoughtButton; // ← NOVO
+    public GameObject severeInjuryShieldBoughtButton;
 
     [Header("Potion Effect UI")]
-    public Image potionEffectBackground;
+    public Image potionEffectRowBg;
     public Image potionEffectIcon;
-    public Image potionEffectInfoBackground;
+    public Image potionEffectInfoBg;
     public GameObject potionEffectBuyButton;
-    public GameObject potionEffectBoughtButton; // ← NOVO
+    public GameObject potionEffectBoughtButton;
 
     [Header("Chopping Speed UI")]
-    public Image choppingSpeedBackground;
+    public Image choppingSpeedRowBg;
     public Image choppingSpeedIcon;
-    public Image choppingSpeedInfoBackground;
+    public Image choppingSpeedInfoBg;
     public GameObject choppingSpeedBuyButton;
-    public GameObject choppingSpeedBoughtButton; // ← NOVO
+    public GameObject choppingSpeedBoughtButton;
 
     [Header("Chopping Stamina UI")]
-    public Image choppingStaminaBackground;
+    public Image choppingStaminaRowBg;
     public Image choppingStaminaIcon;
-    public Image choppingStaminaInfoBackground;
+    public Image choppingStaminaInfoBg;
     public GameObject choppingStaminaBuyButton;
-    public GameObject choppingStaminaBoughtButton; // ← NOVO
-
+    public GameObject choppingStaminaBoughtButton;
 
     // Interni flagovi
     [HideInInspector] public bool hasStaminaRegen;
@@ -78,329 +80,189 @@ public class UpgradesManager : MonoBehaviour
     [HideInInspector] public bool hasChoppingSpeed;
     [HideInInspector] public bool hasChoppingStamina;
 
-    
     public TMP_Text interactionText;
-    
-    public AchievementsController achievementsController;
-
-    public CurrencyManager CurrencyManager;
-    
-    public PotionManager potionManager;
-    
-    private void Start()
-    {
-       // CurrencyManager =  FindObjectOfType<CurrencyManager>();
-       // achievementsController = FindObjectOfType<AchievementsController>();
-        //potionManager = FindObjectOfType<PotionManager>();
-    }
-    
-    public void ApplyUpgradeUI(
-        GameObject buyButton,
-        GameObject boughtButton,
-        Image bg,
-        Image icon,
-        Image infoBg)
-    {
-        Debug.Log("RefreshingUpgradeUI");
-        
-        Color32 purchasedColor = new Color32(0xc1, 0xc1, 0xc1, 0xff);
-        // Oboji sve elemente
-        bg.color     = purchasedColor;
-        icon.color   = purchasedColor;
-        infoBg.color = purchasedColor;
-
-        // Onemogući stari buy button
-        buyButton.SetActive(false);
-
-        // Aktiviraj bought‑button (checkmark)
-        if(boughtButton != null)
-            boughtButton.SetActive(true);
-    }
-
-
-
+    public AudioSource AudioSource;
+    public AudioClip AudioClip;
+    public AudioClip AudioClip2;
     private void Awake()
     {
-       // Debug.Log("[UpgradesManager.Awake] Binding references…");
-
-        playerController      = playerController      ?? FindObjectOfType<PlayerController>();
-        staminaController     = staminaController     ?? FindObjectOfType<StaminaController>();
-        potionManager         = potionManager         ?? FindObjectOfType<PotionManager>();
-        CurrencyManager       = CurrencyManager       ?? FindObjectOfType<CurrencyManager>();
-        achievementsController= achievementsController?? FindObjectOfType<AchievementsController>();
-        saveManager           = saveManager           ?? FindObjectOfType<SaveManager>();
-
-        //Debug.Log($"[UpgradesManager.Awake] potionManager = {(potionManager==null?"NULL":"OK")}");
+        // Ako nisu postavljene u Inspectoru, pronađi ih
+        playerController       ??= FindObjectOfType<PlayerController>();
+        staminaController      ??= FindObjectOfType<StaminaController>();
+        potionManager          ??= FindObjectOfType<PotionManager>();
+        saveManager            ??= FindObjectOfType<SaveManager>();
+        CurrencyManager        ??= FindObjectOfType<CurrencyManager>();
+        achievementsController ??= FindObjectOfType<AchievementsController>();
     }
 
-
+    /// <summary>
+    /// Sinkroniziraj UI nakon LoadGame poziva.
+    /// </summary>
     [ContextMenu("Refresh All Upgrades UI")]
     public void RefreshAllUpgradesUI()
     {
-        Debug.Log("RefreshAllUpgradesUI");
-
-        if (hasStaminaRegen)
-            ApplyUpgradeUI(
-                staminaRegenBuyButton,
-                staminaRegenBoughtButton,
-                staminaRegenBackground,
-                staminaRegenIcon,
-                staminaRegenInfoBackground
-            );
-
-        if (hasSpeed)
-            ApplyUpgradeUI(
-                speedBuyButton,
-                speedBoughtButton,
-                speedBackground,
-                speedIcon,
-                speedInfoBackground
-            );
-
-        if (hasInjuryShield)
-            ApplyUpgradeUI(
-                injuryShieldBuyButton,
-                injuryShieldBoughtButton,
-                injuryShieldBackground,
-                injuryShieldIcon,
-                injuryShieldInfoBackground
-            );
-
-        if (hasSevereInjuryShield)
-            ApplyUpgradeUI(
-                severeInjuryShieldBuyButton,
-                severeInjuryShieldBoughtButton,
-                severeInjuryShieldBackground,
-                severeInjuryShieldIcon,
-                severeInjuryShieldInfoBackground
-            );
-
-        if (hasPotionEffect)
-            ApplyUpgradeUI(
-                potionEffectBuyButton,
-                potionEffectBoughtButton,
-                potionEffectBackground,
-                potionEffectIcon,
-                potionEffectInfoBackground
-            );
-
-        if (hasChoppingSpeed)
-            ApplyUpgradeUI(
-                choppingSpeedBuyButton,
-                choppingSpeedBoughtButton,
-                choppingSpeedBackground,
-                choppingSpeedIcon,
-                choppingSpeedInfoBackground
-            );
-
-        if (hasChoppingStamina)
-            ApplyUpgradeUI(
-                choppingStaminaBuyButton,
-                choppingStaminaBoughtButton,
-                choppingStaminaBackground,
-                choppingStaminaIcon,
-                choppingStaminaInfoBackground
-            );
+        if (hasStaminaRegen)    ApplyPurchasedUI(staminaRegenBuyButton,   staminaRegenBoughtButton,   staminaRegenRowBg,   staminaRegenIcon,   staminaRegenInfoBg);
+        if (hasSpeed)           ApplyPurchasedUI(speedBuyButton,          speedBoughtButton,          speedRowBg,          speedIcon,          speedInfoBg);
+        if (hasInjuryShield)    ApplyPurchasedUI(injuryShieldBuyButton,   injuryShieldBoughtButton,   injuryShieldRowBg,   injuryShieldIcon,   injuryShieldInfoBg);
+        if (hasSevereInjuryShield) ApplyPurchasedUI(severeInjuryShieldBuyButton, severeInjuryShieldBoughtButton, severeInjuryShieldRowBg, severeInjuryShieldIcon, severeInjuryShieldInfoBg);
+        if (hasPotionEffect)    ApplyPurchasedUI(potionEffectBuyButton,   potionEffectBoughtButton,   potionEffectRowBg,   potionEffectIcon,   potionEffectInfoBg);
+        if (hasChoppingSpeed)   ApplyPurchasedUI(choppingSpeedBuyButton,  choppingSpeedBoughtButton,  choppingSpeedRowBg,  choppingSpeedIcon,  choppingSpeedInfoBg);
+        if (hasChoppingStamina) ApplyPurchasedUI(choppingStaminaBuyButton,choppingStaminaBoughtButton,choppingStaminaRowBg,choppingStaminaIcon,choppingStaminaInfoBg);
     }
 
-
-
-    
-    private void PerformBuy(Action applyLogic, 
-                            ref bool hasFlag,
-                            GameObject buyButton, Image bg, Image icon, Image infoBg)
+    private void ApplyPurchasedUI(
+        GameObject buyBtn,
+        GameObject boughtBtn,
+        Image rowBg,
+        Image icon,
+        Image infoBg)
     {
-        if (playerController == null)
+        Color32 grey = new Color32(0xC1, 0xC1, 0xC1, 0xFF);
+        buyBtn.SetActive(false);
+        boughtBtn.SetActive(true);
+        rowBg.color   = grey;
+        icon.color    = grey;
+        infoBg.color  = grey;
+    }
+
+    /// <summary>
+    /// Centralna logika za kupnju + automatski save.
+    /// </summary>
+    private void PerformBuy(
+        int cost,
+        Action applyLogic,
+        ref bool hasFlag,
+        GameObject buyBtn,
+        GameObject boughtBtn,
+        Image rowBg,
+        Image icon,
+        Image infoBg)
+    {
+        // 1) Pokušaj skinuti pare
+        if (!CurrencyManager.TrySpendMoney(cost))
         {
-            Debug.LogError("UpgradesManager: playerController JE NULL!");
-            playerController = FindObjectOfType<PlayerController>();
-            if (playerController == null) return;
+            interactionText.gameObject.SetActive(true);
+            interactionText.text = "You do not have enough money!";
+            interactionText.color = Color.red;
+            
+            buyBtn.SetActive(true);
+            boughtBtn.SetActive(false);
+            AudioSource.PlayOneShot(AudioClip2);
+            return;
         }
-        // 1) Postavi internu logiku
+
+        // 2) Primijeni efekt
         applyLogic();
-
-        // 2) Oboji UI
-        Color32 purchasedColor = new Color32(0xc1, 0xc1, 0xc1, 0xff);
-        buyButton.GetComponent<Image>().color = purchasedColor;
-        bg.color       = purchasedColor;
-        icon.color     = purchasedColor;
-        infoBg.color   = purchasedColor;
-
-        achievementsController.UnlockAllUpgrades++;
-        
-        // 3) Označi flag
         hasFlag = true;
+        achievementsController.UnlockAllUpgrades++;
 
+        // 3) Osvježi UI na kupljeno
+        ApplyPurchasedUI(buyBtn, boughtBtn, rowBg, icon, infoBg);
+        AudioSource.PlayOneShot(AudioClip);
         // 4) Automatski spremi
         saveManager?.SaveGame();
     }
 
-    
-    
+    #region BuyMethods
+
     public void BuyStaminaRegenUpgrade()
     {
-        if (CurrencyManager.TrySpendMoney(staminaUpgradeCost))
-        {
-            PerformBuy(
-                () =>
-                {
-                    playerController.isStaminaRegenUpgrade = true;
-                },
-                ref hasStaminaRegen,
-                staminaRegenBuyButton,
-                staminaRegenBackground,
-                staminaRegenIcon,
-                staminaRegenInfoBackground
-            );
-        }
-        else
-        {
-            interactionText.gameObject.SetActive(true);
-            interactionText.text = "You do not have enough money to buy this upgrade!";
-            interactionText.color = Color.red;
-            staminaRegenBuyButton.SetActive(false);
-        }
+        PerformBuy(
+            staminaUpgradeCost,
+            () => playerController.isStaminaRegenUpgrade = true,
+            ref hasStaminaRegen,
+            staminaRegenBuyButton,
+            staminaRegenBoughtButton,
+            staminaRegenRowBg,
+            staminaRegenIcon,
+            staminaRegenInfoBg
+        );
     }
 
     public void BuySpeedUpgrade()
     {
-        if (CurrencyManager.TrySpendMoney(SpeedCost))
-        {
-            PerformBuy(
-                () => { playerController.speed = 10f; },
-                ref hasSpeed,
-                speedBuyButton,
-                speedBackground,
-                speedIcon,
-                speedInfoBackground
-            );
-            Debug.Log("Buying Speed");
-        }
-        else
-        {
-            Debug.Log("Nema dobvoljno");
-            interactionText.gameObject.SetActive(true);
-            interactionText.text = "You do not have enough money to buy this upgrade!";
-            interactionText.color = Color.red;
-            speedBuyButton.SetActive(false);
-        }
+        PerformBuy(
+            speedUpgradeCost,
+            () => playerController.speed = 10f,
+            ref hasSpeed,
+            speedBuyButton,
+            speedBoughtButton,
+            speedRowBg,
+            speedIcon,
+            speedInfoBg
+        );
     }
 
     public void BuyInjuryShieldUpgrade()
     {
-        if (CurrencyManager.TrySpendMoney(InjuryShieldCost))
-        {
-            PerformBuy(
-                () => { playerController.injuryShieldUpgrade = true; },
-                ref hasInjuryShield,
-                injuryShieldBuyButton,
-                injuryShieldBackground,
-                injuryShieldIcon,
-                injuryShieldInfoBackground
-            );
-            Debug.Log("Buying Injury Shield");
-        }
-        else
-        {
-            interactionText.gameObject.SetActive(true);
-            interactionText.text = "You do not have enough money to buy this upgrade!";
-            interactionText.color = Color.red;
-            injuryShieldBuyButton.SetActive(false);
-        }
+        PerformBuy(
+            injuryShieldCost,
+            () => playerController.injuryShieldUpgrade = true,
+            ref hasInjuryShield,
+            injuryShieldBuyButton,
+            injuryShieldBoughtButton,
+            injuryShieldRowBg,
+            injuryShieldIcon,
+            injuryShieldInfoBg
+        );
     }
 
     public void BuySevereInjuryShieldUpgrade()
     {
-        if (CurrencyManager.TrySpendMoney(SevereInjuryShieldCost))
-        {
-            PerformBuy(
-                () => { playerController.severeInjuryShieldUpgrade = true; },
-                ref hasSevereInjuryShield,
-                severeInjuryShieldBuyButton,
-                severeInjuryShieldBackground,
-                severeInjuryShieldIcon,
-                severeInjuryShieldInfoBackground
-            );
-            Debug.Log("Buying Severe Injury Shield");
-        }
-        else
-        {
-            interactionText.gameObject.SetActive(true);
-            interactionText.text = "You do not have enough money to buy this upgrade!";
-            interactionText.color = Color.red;
-            severeInjuryShieldBuyButton.SetActive(false);
-        }
+        PerformBuy(
+            severeInjuryShieldCost,
+            () => playerController.severeInjuryShieldUpgrade = true,
+            ref hasSevereInjuryShield,
+            severeInjuryShieldBuyButton,
+            severeInjuryShieldBoughtButton,
+            severeInjuryShieldRowBg,
+            severeInjuryShieldIcon,
+            severeInjuryShieldInfoBg
+        );
     }
 
     public void BuyPotionEffectUpgrade()
     {
-        if (CurrencyManager.TrySpendMoney(PotionEffectCost))
-        {
-            PerformBuy(
-                () =>
-                {
-                    potionManager.PotionEffectUpgradeBought = true;
-                },
-                ref hasPotionEffect,
-                potionEffectBuyButton,
-                potionEffectBackground,
-                potionEffectIcon,
-                potionEffectInfoBackground
-            );
-            Debug.Log("Buying Potion Effect");
-        }
-        else
-        {
-            interactionText.gameObject.SetActive(true);
-            interactionText.text = "You do not have enough money to buy this upgrade!";
-            interactionText.color = Color.red;
-            potionEffectBuyButton.SetActive(false);
-        }
+        // **Ovdje koristimo instancu potionManager, ne klasu**
+        PerformBuy(
+            potionEffectCost,
+            () => potionManager.PotionEffectUpgradeBought = true,
+            ref hasPotionEffect,
+            potionEffectBuyButton,
+            potionEffectBoughtButton,
+            potionEffectRowBg,
+            potionEffectIcon,
+            potionEffectInfoBg
+        );
     }
 
     public void BuyChoppingSpeedUpgrade()
     {
-        if (CurrencyManager.TrySpendMoney(ChoppingSpeedCost))
-        {
-            PerformBuy(
-                () => { playerController.choppingSpeedUpgrade = true; },
-                ref hasChoppingSpeed,
-                choppingSpeedBuyButton,
-                choppingSpeedBackground,
-                choppingSpeedIcon,
-                choppingSpeedInfoBackground
-            );
-            Debug.Log("Buying Chopping Speed");
-        }
-        else
-        {
-            interactionText.gameObject.SetActive(true);
-            interactionText.text = "You do not have enough money to buy this upgrade!";
-            interactionText.color = Color.red;
-            choppingSpeedBuyButton.SetActive(false);
-        }
+        PerformBuy(
+            choppingSpeedCost,
+            () => playerController.choppingSpeedUpgrade = true,
+            ref hasChoppingSpeed,
+            choppingSpeedBuyButton,
+            choppingSpeedBoughtButton,
+            choppingSpeedRowBg,
+            choppingSpeedIcon,
+            choppingSpeedInfoBg
+        );
     }
 
     public void BuyChoppingStaminaUpgrade()
     {
-        if (CurrencyManager.TrySpendMoney(ChoppingStaminaCost))
-        {
-            PerformBuy(
-                () => { staminaController.staminaReductionRate *= 0.8f; },
-                ref hasChoppingStamina,
-                choppingStaminaBuyButton,
-                choppingStaminaBackground,
-                choppingStaminaIcon,
-                choppingStaminaInfoBackground
-            );
-            //Debug.Log("Buying Chopping Stamina");
-        }
-        else
-        {
-            interactionText.gameObject.SetActive(true);
-            interactionText.text = "You do not have enough money to buy this upgrade!";
-            interactionText.color = Color.red;
-            choppingStaminaBuyButton.SetActive(false);
-        }
+        PerformBuy(
+            choppingStaminaCost,
+            () => staminaController.staminaReductionRate *= 0.8f,
+            ref hasChoppingStamina,
+            choppingStaminaBuyButton,
+            choppingStaminaBoughtButton,
+            choppingStaminaRowBg,
+            choppingStaminaIcon,
+            choppingStaminaInfoBg
+        );
     }
+
+    #endregion
 }

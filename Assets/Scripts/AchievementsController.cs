@@ -133,7 +133,56 @@ public class AchievementsController : MonoBehaviour
     public bool potionDrankThatDay = false;
     
     public TextMeshProUGUI CurrentMoneyAmountTMP;
+    
+    public CurrencyManager currencyManager;
 
+    public int[] TreesChoppedRewards = new int [5] {1, 20, 50, 100, 250};
+    public int[] UnlockAllAxesRewards = new int[1] {200};
+    public int[] ChopAllTreeTypesRewards  = new int[1] {100};
+    public int[] HealFromInjuryRewards  = new int[1] {50};
+    public int[] UsePotionsRewards  = new int[3] {10, 50, 100};
+    public int[] UnlockAllUpgradesRewards  = new int[1] {500};
+    public int[] SpendMoneyRewards =  new int[3] {50, 200, 500};
+    public int[] InteractWithNPCsRewards  =  new int[3] {20, 40, 100};
+    public int[] DrinkPotionsDailyRewards  =  new int[1] {200};
+    public int[] CurrentMoneyAmountRewards =  new int[1] {300}; 
+
+    public void Start()
+    {
+        currencyManager = FindObjectOfType<CurrencyManager>();
+    }
+
+    public void increaseUnlockAllAxesCurrentGoal()
+    {
+        currencyManager.AddMoney(UnlockAllAxesRewards[0]);
+    }
+
+    public void increaseChopAllTreeTypesCurrentGoal()
+    {
+        currencyManager.AddMoney(ChopAllTreeTypesRewards[0]);
+    }
+
+    public void increaseHealFromInjuryCurrentGoal()
+    {
+        currencyManager.AddMoney(HealFromInjuryRewards[0]);
+    }
+
+    public void increaseUnlockAllUpgradesCurrentGoal()
+    {
+        currencyManager.AddMoney(UnlockAllUpgradesRewards[0]);
+    }
+
+    public void increaseDrinkPotionsDailyCurrentGoal()
+    {
+        currencyManager.AddMoney(DrinkPotionsDailyRewards[0]);
+    }
+
+    public void increaseCurrentMoneyAmountCurrentGoal()
+    {
+        currencyManager.AddMoney(CurrentMoneyAmountRewards[0]);
+    }
+
+    
     public void increaseChoppedTreesCurrentGoal()
     {
         TreesChoppedCurrentLevel++;
@@ -148,6 +197,7 @@ public class AchievementsController : MonoBehaviour
             outline.enabled = true;
             TreesChoppedCoin.gameObject.SetActive(false);
         }
+        currencyManager.AddMoney(TreesChoppedRewards[TreesChoppedCurrentLevel - 1]);
     }
 
     public void increaseUsePotionsCurrentGoal()
@@ -164,6 +214,7 @@ public class AchievementsController : MonoBehaviour
             outline.enabled = true;
             UsePotionsCoin.gameObject.SetActive(false);
         }
+        currencyManager.AddMoney(UsePotionsRewards[UsePotionsCurrentLevel - 1]);
     }
 
     public void increaseSpendMoneyCurrentGoal()
@@ -180,6 +231,7 @@ public class AchievementsController : MonoBehaviour
             outline.enabled = true;
             SpendMoneyCoin.gameObject.SetActive(false);
         }
+        currencyManager.AddMoney(SpendMoneyRewards[SpendMoneyCurrentLevel - 1]);
     }
 
     public void increaseInteractWithNPCsCurrentGoal()
@@ -196,6 +248,7 @@ public class AchievementsController : MonoBehaviour
             outline.enabled = true;
             InteractWithNPCsCoin.gameObject.SetActive(false);
         }
+        currencyManager.AddMoney(InteractWithNPCsRewards[InteractWithNPCsCurrentLevel - 1]);
     }
 
     public void UpdateSliderFill(int currentAmount, int goalAmount, Image slider, TextMeshProUGUI text, ref int currentLevel, int[] array = null,

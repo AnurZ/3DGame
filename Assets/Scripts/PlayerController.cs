@@ -267,8 +267,10 @@ public class PlayerController : MonoBehaviour
         
         if(choppingSpeedUpgrade)
             chopDurationMultiplier *= 0.8f;
-        
-        float adjustedChopTime = baseChopTime * chopDurationMultiplier;
+
+
+        float axeChoppingSpeed = baseChopTime - 0.5f * ((int)selectedItem.currentAxeType - (int)nearbyTree.treeType);
+        float adjustedChopTime = axeChoppingSpeed * chopDurationMultiplier;
 
         if (staminaController.playerStamina < adjustedChopTime)
         {
@@ -282,8 +284,14 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("isChopping", true);
         animator.SetBool("IsWalking", false);
 
-        rb.linearVelocity = Vector3.zero;
-        rb.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationY;
+        rb.linearVelocity = Vector3.zero; // Stop all motion
+        rb.angularVelocity = Vector3.zero;
+
+// Freeze position and rotation on all axes (adjust if your movement is on X/Z)
+        rb.constraints = RigidbodyConstraints.FreezePositionX |
+                         RigidbodyConstraints.FreezePositionZ |
+                         RigidbodyConstraints.FreezeRotation;
+
 
         nearbyTree.StartChopping(risk, adjustedChopTime);
         
@@ -317,19 +325,16 @@ public class PlayerController : MonoBehaviour
         {
             currentInjury = InjuryStatus.Severe;
             recoveryDays = Random.Range(6, 11);
-            Debug.Log($"You suffered a <color=#C0392B>MINOR</color> injury! Recovery time: {recoveryDays} days.");
         }
         else if (roll <= chopInjuryChance.severeChance + chopInjuryChance.moderateChance && currentInjury != InjuryStatus.Moderate)
         {
             currentInjury = InjuryStatus.Moderate;
             recoveryDays = Random.Range(3, 6);
-            Debug.Log($"You suffered a <color=#FFA500>MODERATE</color> injury! Recovery time: {recoveryDays} days.");
         }
         else if (roll <= chopInjuryChance.severeChance + chopInjuryChance.moderateChance + chopInjuryChance.minorChance && currentInjury != InjuryStatus.Minor &&  currentInjury != InjuryStatus.Moderate)
         {
             currentInjury = InjuryStatus.Minor;
             recoveryDays = Random.Range(1, 3);
-            Debug.Log($"You suffered a <color=#FFFF66>SEVERE</color> injury! Recovery time: {recoveryDays} days.");
         }
         else
         {

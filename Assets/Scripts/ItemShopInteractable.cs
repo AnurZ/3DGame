@@ -31,9 +31,12 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
     
     [Header("Popup Text References")]
     public string itemDisplayName;
+    
+    public AchievementsController achievementsController;
 
     void Start()
     {
+        achievementsController = FindObjectOfType<AchievementsController>();
         // Cache all renderers & their original colors
         renderers = GetComponentsInChildren<Renderer>();
         originalColors = new Color[renderers.Length];
@@ -163,6 +166,8 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
             // If not a potion (i.e., one-time item), gray it out after purchase
             if (!isPotion)
                 SetAllColors(grayOutColor);
+            if (itemToGive.isAxe)
+                achievementsController.UnlockAllAxes++;
         }
         else
         {

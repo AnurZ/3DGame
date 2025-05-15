@@ -21,6 +21,8 @@ public class TreeController : MonoBehaviour
     private TreeSway treeSway;
     
     public PlayerController playerController;
+    public GameObject bonusDropPrefab; // Bonus item with 5% drop chance
+
     
     public enum TreeTypes
     {
@@ -133,8 +135,18 @@ public class TreeController : MonoBehaviour
         {
             Vector3 dropPosition = new Vector3(transform.position.x, 0.5f, transform.position.z);
             Instantiate(dropPrefab, dropPosition, Quaternion.identity);
-            Debug.Log("Prefab dropped!");
-            hasDroppedPrefab = true;  // Set flag to true to ensure item is dropped only once
+            Debug.Log("Log prefab dropped!");
+
+            // 5% chance to drop the bonus prefab
+            if (bonusDropPrefab != null && Random.value <= 1f)
+            {
+                Vector3 bonusDropPosition = new Vector3(transform.position.x + 1f, 0.5f, transform.position.z); // Offset a bit
+                Instantiate(bonusDropPrefab, bonusDropPosition, Quaternion.identity);
+                Debug.Log("Bonus prefab dropped!");
+            }
+
+            hasDroppedPrefab = true;
         }
     }
+
 }

@@ -2,6 +2,14 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
+using System.IO;
+
+
+[Serializable]
+public class TreeSaverList
+{
+    public List<TreeSpawner.TreeSaver> trees;
+}
 
 public class TreeSpawner : MonoBehaviour
 {
@@ -10,7 +18,29 @@ public class TreeSpawner : MonoBehaviour
     public int desiredTreeCount = 40;
     public float minDistanceBetweenTrees = 10f;
     public AchievementsController achievementsController;
+    [Serializable] 
+    public class TreeSaver
+    {
+        public Vector3 position;
+        public Quaternion rotation;
+        public GameObject treePrefab;
+    }
+    
+    public List<TreeSaver> SpawnedTrees = new List<TreeSaver>();
+    
+    public void SaveSpawnedTrees()
+    {
+        TreeSaverList container = new TreeSaverList();
+        container.trees = SpawnedTrees;
 
+        string json = JsonUtility.ToJson(container, true); // pretty print
+
+        string path = Path.Combine(Application.persistentDataPath, "spawnedTrees.json");
+        File.WriteAllText(path, json);
+
+        Debug.Log($"Saved {SpawnedTrees.Count} trees to {path}");
+    }
+    
     public void Start()
     {
         achievementsController = FindObjectOfType<AchievementsController>();
@@ -93,6 +123,13 @@ public class TreeSpawner : MonoBehaviour
                 newlySpawned.Add(newTree);
                 spawnedCount++;
                 treeSpawned = true;
+                TreeSaver Tree = new TreeSaver()
+                {
+                    position = candidate,
+                    treePrefab = selectedTree,
+                    rotation = randomRotation,
+                };
+                SpawnedTrees.Add(Tree);
                 break;
             }
 
@@ -103,6 +140,54 @@ public class TreeSpawner : MonoBehaviour
         }
 
         Debug.Log($"Spawn complete. Successfully spawned {spawnedCount} trees.");
+    }
+
+    public void LoadTrees()
+    {
+        string path = Path.Combine(Application.persistentDataPath, "spawnedTrees.json");
+
+        if (!File.Exists(path))
+        {
+            Debug.LogWarning("No saved trees file found at " + path);
+            return;
+        }
+
+        string json = File.ReadAllText(path);
+        TreeSaverList container = JsonUtility.FromJson<TreeSaverList>(json);
+
+        if (container != null && container.trees != null)
+        {
+            SpawnedTrees = container.trees;
+            Debug.Log($"Loaded {SpawnedTrees.Count} trees from {path}");
+
+            // Instantiate all trees
+            foreach (var tree in SpawnedTrees)
+            {
+                GameObject newTree = Instantiate(tree.treePrefab, tree.position, tree.rotation);
+                newTree.tag = "Tree";
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Failed to load trees from JSON.");
+        }
+    }
+
+    
+    public void RemoveTreeByPosition(Vector3 position)
+    {
+        // Find the first tree with the exact matching position
+        TreeSaver treeToRemove = SpawnedTrees.Find(tree => tree.position == position);
+
+        if (treeToRemove != null)
+        {
+            SpawnedTrees.Remove(treeToRemove);
+            Debug.Log($"Removed tree at position {position} from SpawnedTrees." + $"{SpawnedTrees.Count}");
+        }
+        else
+        {
+            Debug.LogWarning($"No tree found at position {position} in SpawnedTrees.");
+        }
     }
 
     GameObject GetTreePrefabBasedOnChopped()

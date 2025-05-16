@@ -36,6 +36,8 @@ public class TreeController : MonoBehaviour
     public TreeTypes treeType;
     
     public AchievementsController achievementsController;
+
+    public TreeSpawner treeSpawner;
     
     private void Start()
     {
@@ -46,6 +48,7 @@ public class TreeController : MonoBehaviour
         treeSway = GetComponent<TreeSway>(); // Get reference to TreeSway component
         playerController = FindObjectOfType<PlayerController>();
         achievementsController = FindObjectOfType<AchievementsController>();
+        treeSpawner = FindObjectOfType<TreeSpawner>();
     }
 
     public void StartHighlighting()
@@ -123,6 +126,7 @@ public class TreeController : MonoBehaviour
                 }
                 achievementsController.ChopAllTreeTypes = achievementsController.TreeType1 +  achievementsController.TreeType2 + achievementsController.TreeType3
                     +  achievementsController.TreeType4 + achievementsController.TreeType5;
+                treeSpawner.RemoveTreeByPosition(gameObject.transform.position);
                 Destroy(gameObject);
             }
             

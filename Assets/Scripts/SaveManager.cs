@@ -17,12 +17,15 @@ public class SaveManager : MonoBehaviour
     public UpgradesManager upgradesManager;  // Postavi u Inspectoru
     public GameObject player;
     public CurrencyManager currencyManager;
+    public TreeSpawner treeSpawner;
 
     // Praćene vrijednosti za detekciju promjena
     private int previousMoney;
     private int[] previousItemCounts;
     private Vector3 previousPlayerPosition;
     private bool[] previousUpgrades;
+    
+    
 
     // Putanja do fajla
     private string _path => Path.Combine(Application.persistentDataPath, "savefile.json");
@@ -35,6 +38,7 @@ public class SaveManager : MonoBehaviour
         // Ako nije ručno postavljeno, pronađi automatski
         if (upgradesManager == null)
             upgradesManager = FindObjectOfType<UpgradesManager>();
+        treeSpawner = FindObjectOfType<TreeSpawner>();
 
         previousMoney = currencyManager.CurrentMoney;
         previousPlayerPosition = player.transform.position;
@@ -168,6 +172,9 @@ public class SaveManager : MonoBehaviour
         previousPlayerPosition = player.transform.position;
         UpdateItemCounts();
         previousUpgrades       = ups;
+        
+        treeSpawner.SaveSpawnedTrees();
+        Debug.Log("Trees saved!");
     }
 
     private bool HasGameStateChanged()

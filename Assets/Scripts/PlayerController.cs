@@ -144,7 +144,7 @@ public class PlayerController : MonoBehaviour
         transparencyManager = FindObjectOfType<TransparencyController>();
         achievementsController = FindObjectOfType<AchievementsController>();
         treeSpawner = FindObjectOfType<TreeSpawner>();
-        treeSpawner.SpawnTrees();
+        treeSpawner.LoadTrees();
         
         if (injuryStateText != null)
             injuryStateText.gameObject.SetActive(true);

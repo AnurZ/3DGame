@@ -6,7 +6,7 @@ using System.Collections;
 public class BoatSway : MonoBehaviour
 {
     public TMP_Text popupText2;
-    
+    private bool declinedPurchase = false;
     [Header("Ending Sequence")]
     public CanvasGroup fadeCanvas;           // CanvasGroup za fade in/out
     public float fadeDuration = 1f;          // trajanje fadea
@@ -85,6 +85,7 @@ public class BoatSway : MonoBehaviour
 
     void Start()
     {
+        Debug.Log("BoatSway Start called");
         startPos = transform.position;
         if (waypoints.Length == 0 || pauseIndices.Length < 2)
         {
@@ -94,8 +95,12 @@ public class BoatSway : MonoBehaviour
 
         // Hide popup at start and wire up buttons
         ticketPopup.SetActive(false);
+        yesButton.onClick.RemoveAllListeners(); // prevent stacking
         yesButton.onClick.AddListener(OnTicketYes);
+
+        noButton.onClick.RemoveAllListeners();
         noButton.onClick.AddListener(OnTicketNo);
+
     }
 
     void Update()
@@ -166,18 +171,35 @@ public class BoatSway : MonoBehaviour
 
     public AudioClip Clip;
     
+    private bool listenersAdded = false;
+
     public void ShowTicketPopup()
     {
         awaitingPurchase = true;
         ticketPopup.SetActive(true);
-        popupText.text = $"Do you want to buy the ticket for {ticketPrice} coins?";
+        popupText.text = $"Do you want to buy the ticket for 6500 coins?";
+
+        if (!listenersAdded)
+        {
+            yesButton.onClick.RemoveAllListeners();
+            noButton.onClick.RemoveAllListeners();
+
+            yesButton.onClick.AddListener(OnTicketYes);
+            noButton.onClick.AddListener(OnTicketNo);
+
+            listenersAdded = true;
+        }
     }
+
 
     public void OnTicketYes()
     {
         // Koristi CurrencyManager za potrošnju
         if (CurrencyManager.Instance.TrySpendMoney(ticketPrice))
         {
+            Debug.Log("Ticket YES clicked from: " + this.name);
+            yesButton.interactable = false;
+            Debug.Log("Ticket price: " + ticketPrice);
             CurrencyManager.Instance.SetMoneyText();
             ticketPopup.SetActive(false);
             awaitingPurchase = false;
@@ -196,6 +218,7 @@ public class BoatSway : MonoBehaviour
     {
         ticketPopup.SetActive(false);
         awaitingPurchase = false;
+        //declinedPurchase = true;
     }
 
     IEnumerator BoardBoat()
@@ -267,67 +290,35 @@ public class BoatSway : MonoBehaviour
 
     IEnumerator HandleBridgeEvent(bool isFirst)
     {
-        // Swap to ending controller
+        // Freeze movement & physics
+        playerControllerScript.enabled = false;
+        playerRigidbody.isKinematic = true;
+
+        // Zamijeni animator kontroler
         playerAnimator.runtimeAnimatorController = endingAnimatorController;
 
-        // 1) teleport sa broda na obalu
-        playerTransform.SetParent(null, true);
-        var exitPoint = isFirst ? enterPoint1 : enterPoint2;
-        playerTransform.position = exitPoint.position;
-        playerTransform.rotation = exitPoint.rotation;
-        EnablePlayerMovement();
-        yield return null;
-
-        // 2) hod do mosta
-        playerAnimator.SetBool("IsWalking", true);
-        yield return null; // da Animator uhvati parametar
-        var wp = isFirst ? walkToBridgePoint1 : walkToBridgePoint2;
-        while (Vector3.Distance(playerTransform.position, wp.position) > 0.01f)
-        {
-            playerTransform.position = Vector3.MoveTowards(
-                playerTransform.position, wp.position, moveSpeed * Time.deltaTime);
-            yield return null;
-        }
-        playerAnimator.SetBool("IsWalking", false);
-
-        // 3) rotacija i sječa
-        var look = isFirst ? bridgeLookPoint1 : bridgeLookPoint2;
-        Vector3 dir = (look.position - playerTransform.position).normalized;
-        dir.y = 0f;
-        playerTransform.rotation = Quaternion.Slerp(playerTransform.rotation,
-            Quaternion.LookRotation(dir), Time.deltaTime * 10f);
-
+        // Pokreni animaciju sjekire direktno na brodu
         for (int i = 0; i < 3; i++)
         {
             playerAnimator.SetTrigger("IsChopping");
             yield return new WaitForSeconds(chopDuration);
-            
         }
 
-        // 4) uništi most
+        // Uništi odgovarajući most
         if (isFirst) Destroy(Bridge1);
         else Destroy(Bridge2);
         yield return new WaitForSeconds(0.13f);
 
-        // 5) povratak
-        playerAnimator.SetBool("IsWalking", true);
-        yield return null;
-        var ret = isFirst ? returnToBoatPoint1 : returnToBoatPoint2;
-        while (Vector3.Distance(playerTransform.position, ret.position) > 0.01f)
-        {
-            playerTransform.position = Vector3.MoveTowards(
-                playerTransform.position, ret.position, moveSpeed * Time.deltaTime);
-            yield return null;
-        }
-        playerAnimator.SetBool("IsWalking", false);
-
-        // 6) ukrcaj i disable
-        playerTransform.SetParent(boatBody, true);
-        DisablePlayerMovement();
-
-        // Restore original controller
+        // Vrati animator kontroler na normalni
         playerAnimator.runtimeAnimatorController = normalAnimatorController;
+
+        // Unfreeze movement & physics
+        playerRigidbody.isKinematic = false;
+        playerControllerScript.enabled = true;
     }
+
+
+
 
     private void OnTriggerEnter(Collider other)
     {
@@ -337,8 +328,22 @@ public class BoatSway : MonoBehaviour
             playerTransform = other.transform;
             playerRigidbody = other.GetComponent<Rigidbody>();
             playerControllerScript = other.GetComponent<PlayerController>();
+        
+            // If player declined before, allow asking again now
+            DialogSystem dialog = FindObjectOfType<DialogSystem>();
+            if (dialog != null && dialog.hasFinishedDialogue && !movementStarted)
+            {
+                if (declinedPurchase)
+                {
+                    declinedPurchase = false;
+                }
+
+                ShowTicketPopup();
+            }
+
         }
     }
+
 
     private void OnTriggerExit(Collider other)
     {

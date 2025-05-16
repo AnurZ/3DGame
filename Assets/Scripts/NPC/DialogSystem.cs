@@ -6,6 +6,8 @@ using UnityEngine;
 public class DialogSystem : MonoBehaviour
 {
     public bool ticketPurchased = false;
+    private bool hasShownTicketPopup = false;
+    public bool hasFinishedDialogue = false;
 
     [Header("Typewriter Settings")]
     public float typewriterSpeed = 0.05f;
@@ -71,30 +73,32 @@ public class DialogSystem : MonoBehaviour
             else
             {
                 dialogFinished = true;
+                hasFinishedDialogue = true;
+
                 CloseDialog();
 
-                // Automatski prikaži ticket popup
-                if (boatSway != null)
+                if (boatSway != null && !hasShownTicketPopup)
                 {
                     boatSway.ShowTicketPopup();
-                    dialogFinished = false; // Reset ako se koristi više puta
+                    hasShownTicketPopup = true;
                 }
             }
         }
+
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (ticketPurchased) return;
-        
-        if (other.CompareTag("Player"))
+        if (!ticketPurchased && other.CompareTag("Player"))
         {
             isPlayerInRange = true;
             currentLineIndex = 0;
             dialogFinished = false;
+            hasShownTicketPopup = false;
             ShowDialogLine(currentLineIndex);
         }
     }
+
 
     private void OnTriggerExit(Collider other)
     {

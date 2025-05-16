@@ -26,15 +26,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c88c1634fd0d6214ca77da72c300a7f7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 166.15001
+      value: 65.570915
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c88c1634fd0d6214ca77da72c300a7f7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 60.007317
+      value: 0.00732708
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c88c1634fd0d6214ca77da72c300a7f7, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 142.68
+      value: 61.128994
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c88c1634fd0d6214ca77da72c300a7f7, type: 3}
       propertyPath: m_LocalRotation.w
@@ -160,6 +160,7 @@ MonoBehaviour:
   dropPrefab: {fileID: 8137669601094962300, guid: 46dde8f815278684cb3e294fcb6983dc, type: 3}
   choppingDuration: 12
   playerController: {fileID: 0}
+  bonusDropPrefab: {fileID: 5191481413652199432, guid: fb0213ed97fad944bb0346b6c6d51d84, type: 3}
   treeType: 5
   achievementsController: {fileID: 0}
 --- !u!136 &7268821355387470442

@@ -5,7 +5,8 @@ public class FolderInventoryFalse : MonoBehaviour
     public GameObject inventoryUI;
     public GameObject buttonToHide;  // FolderInventoryFalse
     public GameObject buttonToShow;  // FolderInventoryTrue
-
+    public AudioClip close;
+    public AudioSource Audio;
     private bool justClosedInventory = false;
 
     private void Update()
@@ -25,10 +26,10 @@ public class FolderInventoryFalse : MonoBehaviour
 
     public void HideInventory()
     {
+        Audio.PlayOneShot(close);
         inventoryUI.SetActive(false);
         buttonToShow.SetActive(true);  // Show FolderInventoryTrue
         buttonToHide.SetActive(false); // Hide FolderInventoryFalse
-
        
 
         justClosedInventory = true; // Flag to protect from first click

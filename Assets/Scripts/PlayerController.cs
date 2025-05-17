@@ -206,7 +206,7 @@ public class PlayerController : MonoBehaviour
     }
 
     [SerializeField] private float chopSoundInterval = 0.5f; // koliko sekundi čekaš između udaraca
-    private Coroutine chopSfxCoroutine;
+    //private Coroutine chopSfxCoroutine;
     //[SerializeField] private float chopSoundDelay = 0f;
     private void StartChopping(float risk)
     {
@@ -280,6 +280,8 @@ public class PlayerController : MonoBehaviour
             return;
         }
         
+        
+        
         isChopping = true;
         animator.SetBool("isChopping", true);
         animator.SetBool("IsWalking", false);
@@ -295,9 +297,9 @@ public class PlayerController : MonoBehaviour
 
         nearbyTree.StartChopping(risk, adjustedChopTime);
         
-        if (chopSfxCoroutine != null) 
-            StopCoroutine(chopSfxCoroutine);
-        chopSfxCoroutine = StartCoroutine(ChopSoundLoop());
+       // if (chopSfxCoroutine != null) 
+        //    StopCoroutine(chopSfxCoroutine);
+       // chopSfxCoroutine = StartCoroutine(ChopSoundLoop());
 
         if (interactionText != null)
         {
@@ -307,6 +309,13 @@ public class PlayerController : MonoBehaviour
         
         
     }
+    
+    public void PlayChopSound()
+    {
+        if (choppingSource != null && choppingClip != null)
+            choppingSource.PlayOneShot(choppingClip);
+    }
+
 
     public void OnTreeChoppedDown()
     {
@@ -395,11 +404,11 @@ public class PlayerController : MonoBehaviour
     {
         if (!isChopping) return;
 
-        if (chopSfxCoroutine != null)
-        {
-            StopCoroutine(chopSfxCoroutine);
-            chopSfxCoroutine = null;
-        }
+        //if (chopSfxCoroutine != null)
+       // {
+        //    StopCoroutine(chopSfxCoroutine);
+       //     chopSfxCoroutine = null;
+        //}
         
         isChopping = false;
         animator.SetBool("isChopping", false);

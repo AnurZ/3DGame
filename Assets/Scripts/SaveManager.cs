@@ -199,6 +199,8 @@ public class SaveManager : MonoBehaviour
         return false;
     }
 
+    
+    
    public void LoadGame()
 {
     // --- Početni debug ---

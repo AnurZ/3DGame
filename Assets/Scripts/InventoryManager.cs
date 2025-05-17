@@ -111,7 +111,7 @@ public class InventoryManager : MonoBehaviour
             if (currentItem != null)
             {
                 if (currentItem.isPotion)
-                    StartCoroutine(ShowTextCoroutine(currentItem.ItemDisplayName + ("                         press [SPACEBAR] TO DRINK")));//formatting
+                    StartCoroutine(ShowTextCoroutine(currentItem.ItemDisplayName + (" press [SPACEBAR] TO DRINK")));//formatting
                 else
                     StartCoroutine(ShowTextCoroutine(currentItem.ItemDisplayName));
             }

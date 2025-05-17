@@ -4,6 +4,9 @@ using UnityEngine.UI;
 
 public class PotionManager : MonoBehaviour
 {
+    public AudioSource AudioSource;
+    public AudioClip Drink;
+    
     public GameObject potionPrefab; // Reference to the potion prefab (set in the Inspector)
     public PlayerController playerController;
     private bool isPotionHeld = false; // To track if the potion is currently held
@@ -173,6 +176,7 @@ public class PotionManager : MonoBehaviour
         if(PotionEffectUpgradeBought && playerController.daysToRecover > 0)
             playerController.daysToRecover--;
         inventoryManager.RemoveItemFromHand();
+        AudioSource.PlayOneShot(Drink);
     }
 
     private void IncreaseStamina()
@@ -186,6 +190,7 @@ public class PotionManager : MonoBehaviour
         staminaController.playerStamina += (PotionEffectUpgradeBought ? 55 : 50);
         if (staminaController.playerStamina >= 100)
             staminaController.playerStamina = 100;
+        AudioSource.PlayOneShot(Drink);
         inventoryManager.RemoveItemFromHand();
     }
 
@@ -194,6 +199,8 @@ public class PotionManager : MonoBehaviour
         ShieldPotionHours += (PotionEffectUpgradeBought ? 26 : 24);
         shieldPotionText.text = ShieldPotionHours + " hour" + (ShieldPotionHours > 1 ? "s left" : " left");
         shieldPotionInfo.SetActive(true);
+        AudioSource.PlayOneShot(Drink);
+
         inventoryManager.RemoveItemFromHand();
     }
     
@@ -202,6 +209,8 @@ public class PotionManager : MonoBehaviour
         FocusPotionHours += (PotionEffectUpgradeBought ? 26 : 24);
         FocusPotionText.text = FocusPotionHours + " hour" + (FocusPotionHours > 1 ? "s left" : " left");
         FocusPotionInfo.SetActive(true);
+        AudioSource.PlayOneShot(Drink);
+
         inventoryManager.RemoveItemFromHand();
     }
 
@@ -210,6 +219,8 @@ public class PotionManager : MonoBehaviour
         UpgradePotionHours += (PotionEffectUpgradeBought ? 26 : 24);
         UpgradePotionText.text = UpgradePotionHours + " hour" + (UpgradePotionHours > 1 ? "s left" : " left");
         UpgradePotionInfo.SetActive(true);
+        AudioSource.PlayOneShot(Drink);
+
         inventoryManager.RemoveItemFromHand();
     }
 }

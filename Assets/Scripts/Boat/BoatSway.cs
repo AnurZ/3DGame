@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using System.Runtime.CompilerServices;
+using UnityEngine.InputSystem;
 
 public class BoatSway : MonoBehaviour
 {
@@ -20,7 +22,13 @@ public class BoatSway : MonoBehaviour
     
     private bool endingStarted = false;
     
-    
+    [Header("Ending Cutscene Audio")]
+    public AudioSource backgroundMusicSource;  // assign your background music AudioSource here
+    public AudioSource endingMusicSource;      // assign your ending music AudioSource here
+
+    [Header("UI Root GameObjects")]
+    public GameObject[] uiRoots;                // assign all UI root objects here in inspector
+
     // --- Ticket UI ---
     [Header("Ticket UI")]
     public GameObject ticketPopup;
@@ -132,8 +140,35 @@ public class BoatSway : MonoBehaviour
         }
     }
 
+    private void setupScene()
+    {
+        foreach (var uiRoot in uiRoots)
+        {
+            uiRoot.SetActive(false);
+        }
+        Debug.Log("Disabled all ui");
+
+        // Disable player input (you already have this in DisablePlayerMovement)
+        DisablePlayerMovement();
+        Debug.Log("Disabled playermovement");
+
+        // Stop background music
+        if (backgroundMusicSource != null && backgroundMusicSource.isPlaying)
+            backgroundMusicSource.Stop();
+
+        // Play ending music loop
+        if (endingMusicSource != null)
+        {
+            endingMusicSource.loop = true;
+            endingMusicSource.Play();
+        }
+    }
+    
     IEnumerator PlayEndingSequence()
     {
+        // Disable all UI
+        
+
         // 1) Fade to black
         float t = 0f;
         fadeCanvas.gameObject.SetActive(true);
@@ -145,22 +180,19 @@ public class BoatSway : MonoBehaviour
         }
 
         creditsPanel.SetActive(false);
-        // 2) Prikaži linije teksta
+        // 2) Show ending lines text
         for (int i = 0; i < endingLines.Length; i++)
         {
-            popupText2.text = endingLines[i];           // iskoristi postojeći popupText ili dodaj novi TextMeshProUGUI
+            popupText2.text = endingLines[i];
             popupText2.gameObject.SetActive(true);
             yield return new WaitForSeconds(lineDuration);
         }
-        // sakrij text
         popupText2.gameObject.SetActive(false);
 
-        // 3) Pokaži credits panel i scroll
+        // 3) Show credits panel and scroll
         creditsPanel.SetActive(true);
-        // postavi creditsText na početnu poziciju (ispod ekrana)
         creditsText.anchoredPosition = new Vector2(0, -creditsPanel.GetComponent<RectTransform>().rect.height);
     
-        // scroll dok ne dođe do vrha
         float endPos = creditsText.rect.height;
         while (creditsText.anchoredPosition.y < endPos)
         {
@@ -168,6 +200,7 @@ public class BoatSway : MonoBehaviour
             yield return null;
         }
     }
+
 
     public AudioClip Clip;
     
@@ -204,7 +237,7 @@ public class BoatSway : MonoBehaviour
             ticketPopup.SetActive(false);
             awaitingPurchase = false;
             FindObjectOfType<DialogSystem>()?.gameObject.SetActive(false);
-
+            setupScene();
             StartCoroutine(BoardBoat());
         }
         else
@@ -357,14 +390,35 @@ public class BoatSway : MonoBehaviour
 
     void DisablePlayerMovement()
     {
-        if (playerControllerScript != null) playerControllerScript.enabled = false;
+        Debug.Log("DISABLING movement");
+
+        if (playerControllerScript != null)
+        {
+            playerControllerScript.enabled = false;
+        }
+
         if (playerRigidbody != null)
         {
             playerRigidbody.linearVelocity = Vector3.zero;
             playerRigidbody.angularVelocity = Vector3.zero;
             playerRigidbody.isKinematic = true;
         }
+
+        CharacterController cc = playerTransform.GetComponent<CharacterController>();
+        if (cc != null)
+        {
+            cc.enabled = false;
+        }
+
+        PlayerInput playerInput = playerTransform.GetComponent<PlayerInput>();
+        if (playerInput != null)
+        {
+            playerInput.enabled = false;
+        }
     }
+
+
+
 
     void EnablePlayerMovement()
     {

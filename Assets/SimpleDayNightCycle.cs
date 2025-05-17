@@ -211,42 +211,60 @@ public class SimpleDayNightCycle : MonoBehaviour
             yield return new WaitForSeconds(typingSpeed);
         }
     }
-
+    public AudioSource MusicPlayer;
     private IEnumerator SleepRoutine()
     {
         isSleeping = true;
         foreach (var go in uiToHide)
-                if (go != null) go.SetActive(false);
-        
+            if (go != null) go.SetActive(false);
+
         StaminaController.Instance.RestoreFullStamina();
         treeSpawner.SpawnTrees();
+
+        bool isBadDream = Random.value < 0.5f;
+        
+        // Stop background music BEFORE typing starts
+        if (isBadDream && MusicPlayer.isPlaying)
+        {
+            MusicPlayer.Pause();
+        }
         
         // 1) Fade to black
         yield return StartCoroutine(FadeCanvasGroup(0f, 1f, 2.5f));
-        
+
         // 2) --- DREAM SEQUENCE START ---
         if (dreamText != null)
             dreamText.gameObject.SetActive(true);
 
-        // advance time to 8 AM and increment day
-        timeOfDay   = GetTimeNormalizedFromHour(8);
+        // Advance time to 8 AM and increment day
+        timeOfDay = GetTimeNormalizedFromHour(8);
         currentDay++;
         PlayerPrefs.SetInt("Day", currentDay);
         UpdateDayText();
 
-        // IMMEDIATELY snap sun & color
+        // Snap sun & color
         RotateSun();
         UpdateLightColor();
 
-        // play dream text...
-        bool isBadDream = Random.value < 0.5f;
-        string line    = GetNextDream(isBadDream);
+        // Determine dream type
+        
+
+        // Play dream text
+        string line = GetNextDream(isBadDream);
         yield return StartCoroutine(TypeText(line));
 
+        // Play thunder if bad dream
         if (isBadDream && thunderAudioSource != null && thunderClip != null)
         {
             yield return new WaitForSeconds(0.5f);
             thunderAudioSource.PlayOneShot(thunderClip);
+        }
+
+        // Wait and resume background music
+        if (isBadDream)
+        {
+            yield return new WaitForSeconds(1.5f);
+            MusicPlayer.UnPause();
         }
 
         yield return new WaitForSeconds(2f);
@@ -255,14 +273,16 @@ public class SimpleDayNightCycle : MonoBehaviour
 
         yield return new WaitForSeconds(0.5f);
 
-        // 3) Fade back in — the world is already at new day
+        // 3) Fade back in
         yield return StartCoroutine(FadeCanvasGroup(1f, 0f, 2.5f));
-        
+
         foreach (var go in uiToHide)
             if (go != null) go.SetActive(true);
-        
+
         isSleeping = false;
     }
+
+
 
 
 

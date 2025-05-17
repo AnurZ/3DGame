@@ -219,7 +219,6 @@ public class SimpleDayNightCycle : MonoBehaviour
             if (go != null) go.SetActive(false);
 
         StaminaController.Instance.RestoreFullStamina();
-        treeSpawner.SpawnTrees();
 
         bool isBadDream = Random.value < 0.5f;
         
@@ -279,7 +278,9 @@ public class SimpleDayNightCycle : MonoBehaviour
         foreach (var go in uiToHide)
             if (go != null) go.SetActive(true);
 
+        treeSpawner.SpawnTrees();
         isSleeping = false;
+        
     }
 
 

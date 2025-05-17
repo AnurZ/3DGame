@@ -115,6 +115,7 @@ public class TreeController : MonoBehaviour
     {
         if (isChopping)
         {
+            Debug.Log("Chopping time: " + choppingTime);
             choppingTime += Time.deltaTime;
             playerController.TimeLeftText.text = (choppingDuration - choppingTime).ToString("F1");
             

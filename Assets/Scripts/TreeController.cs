@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+
+
 public class TreeController : MonoBehaviour
 {
     public float health = 100f;
@@ -14,6 +16,7 @@ public class TreeController : MonoBehaviour
 
     public GameObject dropPrefab;  // The prefab to drop when the tree is chopped down
 
+    public float ORIGINALCHOPPINGDURATION = 6f;
     public float choppingDuration = 6f;  // Default duration for chopping
     private float choppingTime = 0f;  // Track continuous chopping time
 
@@ -22,7 +25,9 @@ public class TreeController : MonoBehaviour
     
     public PlayerController playerController;
     public GameObject bonusDropPrefab; // Bonus item with 5% drop chance
-
+    private float randomZ;
+    
+    
     
     public enum TreeTypes
     {
@@ -38,9 +43,17 @@ public class TreeController : MonoBehaviour
     public AchievementsController achievementsController;
 
     public TreeSpawner treeSpawner;
+
+    private float timer = 0f;
     
+    [SerializeField] public SkillCheckAudio AudioSkillCheck;
+    
+    public AudioClip successClip;
+    public AudioClip failClip;
+    private float cooldownTimer = 0f;
     private void Start()
     {
+        AudioSkillCheck = FindObjectOfType<SkillCheckAudio>();
         treeRenderer = GetComponent<Renderer>();
         if (treeRenderer != null)
             originalMaterial = treeRenderer.material;
@@ -74,6 +87,11 @@ public class TreeController : MonoBehaviour
         // Start swaying when chopping starts
         treeSway?.StartSwaying();
         
+        timer = 0f;
+        randomZ = Random.Range(-360f, 0f);
+        playerController.SkillCheckArea.rectTransform.rotation = Quaternion.Euler(0f, 0f, randomZ);
+        
+        
         playerController.ChoppingGameObject.SetActive(true);
     }
 
@@ -81,7 +99,7 @@ public class TreeController : MonoBehaviour
     {
         isChopping = false;
         choppingTime = 0f;  // Reset chopping time if the player stops chopping
-
+        choppingDuration = ORIGINALCHOPPINGDURATION;
         // Stop swaying when chopping stops
         treeSway?.StopSwaying();
         
@@ -98,11 +116,56 @@ public class TreeController : MonoBehaviour
         if (isChopping)
         {
             choppingTime += Time.deltaTime;
-
+            playerController.TimeLeftText.text = (choppingDuration - choppingTime).ToString("F1");
+            
             // Update chopping UI fill
-            if (playerController.choppingImage != null)
+            if (playerController.choppingImage != null &&  choppingTime < choppingDuration)
             {
-                playerController.choppingImage.fillAmount = choppingTime / choppingDuration;
+                timer += Time.deltaTime;
+                if(cooldownTimer > 0)
+                {
+                    playerController.SkillCheckArea.gameObject.SetActive(false);
+                    cooldownTimer -= Time.deltaTime;
+                    if (cooldownTimer < 0) cooldownTimer = 0;
+                    
+                }
+                else 
+                    playerController.SkillCheckArea.gameObject.SetActive(true);
+                // Clamp value between 0 and 1 for slider fill
+                float fillAmount = Mathf.Clamp01(timer / 1f);
+                playerController.choppingImage.fillAmount = fillAmount;
+
+                if (Input.GetKeyDown(KeyCode.F) && cooldownTimer <= 0)
+                {
+                    Debug.Log(randomZ + " -- " + fillAmount*360 + " -- " + (randomZ+36));
+                    if(fillAmount*(-360) <= randomZ && fillAmount*(-360) >= randomZ - 36)
+                    {
+                        choppingTime += 1;
+                        AudioSkillCheck.playSuccess();
+                    }
+                    else
+                    {
+                        AudioSkillCheck.playFail();
+                        cooldownTimer = 1f;
+                    }
+                    
+                    timer = 0f;
+
+                    // Generate new random Z rotation (-360 to 0)
+                    randomZ = Random.Range(-360f, 0f);
+                    playerController.SkillCheckArea.rectTransform.rotation = Quaternion.Euler(0f, 0f, randomZ);
+                }
+                
+                // If a full second has passed
+                if (timer >= 1f)
+                {
+                    // Reset timer
+                    timer = 0f;
+
+                    // Generate new random Z rotation (-360 to 0)
+                    randomZ = Random.Range(-360f, 0f);
+                    playerController.SkillCheckArea.rectTransform.rotation = Quaternion.Euler(0f, 0f, randomZ);
+                }
             }
 
             if (StaminaController.Instance != null)

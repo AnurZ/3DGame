@@ -78,10 +78,14 @@ public class PlayerController : MonoBehaviour
     private float passiveStaminaTimer = 0f;
 
     public TreeSpawner treeSpawner;
+    public Image SkillCheckArea;
+    public TMP_Text TimeLeftText;
+    
     
     private void Awake()
     {
         Local = this;
+        
     }
     
     public void OnDayPassed()

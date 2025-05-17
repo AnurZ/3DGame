@@ -143,11 +143,16 @@ MonoBehaviour:
   highlightMaterial: {fileID: 2100000, guid: 54589bcc3464d6e4eb3c1a95b45fa88b, type: 2}
   timeBetweenChops: 1
   dropPrefab: {fileID: 8763868368262659378, guid: 744c537695ffba2468afb2ba5818b998, type: 3}
+  ORIGINALCHOPPINGDURATION: 9
   choppingDuration: 9
   playerController: {fileID: 0}
   bonusDropPrefab: {fileID: 1581827066615976667, guid: e9a9199b85273344f81e172d49da61e8, type: 3}
   treeType: 4
   achievementsController: {fileID: 0}
+  treeSpawner: {fileID: 0}
+  AudioSkillCheck: {fileID: 0}
+  successClip: {fileID: 8300000, guid: f9cdb757242e6bb4498e8c256ad8c7da, type: 3}
+  failClip: {fileID: 8300000, guid: efbf0b656058da540b8051b1c7ce4bb8, type: 3}
 --- !u!114 &5556060817743515524
 MonoBehaviour:
   m_ObjectHideFlags: 0

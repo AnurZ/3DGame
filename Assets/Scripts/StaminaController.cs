@@ -11,7 +11,7 @@ public class StaminaController : MonoBehaviour
     [Header("Stamina Settings")]
     public float playerStamina = 100f;
     private float maxStamina = 100f;
-    public float staminaReductionRate = 1f;
+    public float staminaReductionRate = 0.25f;
 
     [Header("Smooth Settings")]
     private float currentFillAmount;

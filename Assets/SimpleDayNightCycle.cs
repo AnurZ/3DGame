@@ -342,10 +342,15 @@ public class SimpleDayNightCycle : MonoBehaviour
         Debug.Log("Novi dan");
         if (achievementsController != null)
         {
-            if (!achievementsController.drinkPotionsDailyCollected)
-                achievementsController.increaseDrinkPotionsDailyCurrentGoal();
+            if (achievementsController.DrinkPotionsDaily > achievementsController.PotionsDrankUntilYesterday)
+            {
+                achievementsController.PotionsDrankUntilYesterday++;
+            }
             else
+            {
                 achievementsController.DrinkPotionsDaily = 0;
+                achievementsController.PotionsDrankUntilYesterday = 0;
+            }
 
         }
         

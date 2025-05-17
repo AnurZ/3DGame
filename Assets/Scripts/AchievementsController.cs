@@ -128,6 +128,8 @@ public class AchievementsController : MonoBehaviour
 
     private int dummyInt = 0;
 
+    public int PotionsDrankUntilYesterday = 0;
+
     // -- Unity Lifecycle --
 
     private void Awake()
@@ -152,6 +154,8 @@ public class AchievementsController : MonoBehaviour
 
     // -- Increase Methods (with one‑time checks) --
 
+    
+    bool AllAxesDone = false;
     public void increaseUnlockAllAxesCurrentGoal()
     {
         UnlockAllAxes++;
@@ -163,9 +167,11 @@ public class AchievementsController : MonoBehaviour
             UnlockAllAxesBoughtIcon.gameObject.SetActive(true);
             UnlockAllAxesIconBackground.GetComponent<Outline>().enabled = true;
             UnlockAllAxesCoin.gameObject.SetActive(false);
+            AllAxesDone  = true;
         }
     }
 
+    bool TreeTypesDone = false;
     public void increaseChopAllTreeTypesCurrentGoal()
     {
         ChopAllTreeTypes++;
@@ -177,9 +183,11 @@ public class AchievementsController : MonoBehaviour
             ChopAllTreeTypesBoughtIcon.gameObject.SetActive(true);
             ChopAllTreeTypesIconBackground.GetComponent<Outline>().enabled = true;
             ChopAllTreeTypesCoin.gameObject.SetActive(false);
+            TreeTypesDone = true;
         }
     }
 
+    bool HealFromInjuryDone = false;
     public void increaseHealFromInjuryCurrentGoal()
     {
         HealFromInjury++;
@@ -191,9 +199,11 @@ public class AchievementsController : MonoBehaviour
             HealFromInjuryBoughtIcon.gameObject.SetActive(true);
             HealFromInjuryIconBackground.GetComponent<Outline>().enabled = true;
             HealFromInjuryCoin.gameObject.SetActive(false);
+            HealFromInjuryDone  = true;
         }
     }
 
+    private bool AllUpgradesDone = false;
     public void increaseUnlockAllUpgradesCurrentGoal()
     {
         UnlockAllUpgrades++;
@@ -205,6 +215,7 @@ public class AchievementsController : MonoBehaviour
             UnlockAllUpgradesBoughtIcon.gameObject.SetActive(true);
             UnlockAllUpgradesIconBackground.GetComponent<Outline>().enabled = true;
             UnlockAllUpgradesCoin.gameObject.SetActive(false);
+            AllUpgradesDone  = true;
         }
     }
 
@@ -221,10 +232,11 @@ public class AchievementsController : MonoBehaviour
                 DrinkPotionsDailyBoughtIcon.gameObject.SetActive(true);
                 DrinkPotionsDailyIconBackground.GetComponent<Outline>().enabled = true;
                 DrinkPotionsDailyCoin.gameObject.SetActive(false);
+                drinkPotionsDone  = true;
             }
         }
     }
-
+    
     public void increaseCurrentMoneyAmountCurrentGoal()
     {
         if (!currentMoneyAmountCollected)
@@ -248,8 +260,9 @@ public class AchievementsController : MonoBehaviour
     {
         if (TreesChoppedCurrentLevel < TreesChoppedLevels.Length)
         {
-            TreesChopped++;
             TreesChoppedCurrentLevel++;
+            if(TreesChoppedCurrentLevel ==  TreesChoppedLevels.Length)
+                choppedTreesDone = true;
             int idx = TreesChoppedCurrentLevel - 1;
             if (!treesChoppedCollected[idx] && TreesChopped >= TreesChoppedLevels[idx])
             {
@@ -269,14 +282,17 @@ public class AchievementsController : MonoBehaviour
                 }
             }
         }
+        else
+            choppedTreesDone  = true;
     }
 
     public void increaseUsePotionsCurrentGoal()
     {
         if (UsePotionsCurrentLevel < UsePotionsLevel.Length)
         {
-            UsePotions++;
             UsePotionsCurrentLevel++;
+            if(UsePotionsCurrentLevel == UsePotionsLevel.Length)
+                UsePotionsDone = true;
             int idx = UsePotionsCurrentLevel - 1;
             if (!usePotionsCollected[idx] && UsePotions >= UsePotionsLevel[idx])
             {
@@ -284,16 +300,6 @@ public class AchievementsController : MonoBehaviour
                 currencyManager.AddMoney(UsePotionsRewards[idx]);
                 AudioSource.PlayOneShot(AudioClip);
 
-                if (idx == UsePotionsLevel.Length - 1)
-                {
-                    UsePotionsBoughtIcon.gameObject.SetActive(true);
-                    UsePotionsIconBackground.GetComponent<Outline>().enabled = true;
-                    UsePotionsCoin.gameObject.SetActive(false);
-                }
-                else
-                {
-                    UsePotionsIcon.gameObject.SetActive(true);
-                }
             }
         }
     }
@@ -302,8 +308,9 @@ public class AchievementsController : MonoBehaviour
     {
         if (SpendMoneyCurrentLevel < SpendMoneyLevel.Length)
         {
-            SpendMoney++;
             SpendMoneyCurrentLevel++;
+            if(SpendMoneyCurrentLevel ==  SpendMoneyLevel.Length)
+                SpendMoneyDone = true;
             int idx = SpendMoneyCurrentLevel - 1;
             if (!spendMoneyCollected[idx] && SpendMoney >= SpendMoneyLevel[idx])
             {
@@ -324,13 +331,15 @@ public class AchievementsController : MonoBehaviour
             }
         }
     }
+    
 
     public void increaseInteractWithNPCsCurrentGoal()
     {
         if (InteractWithNPCsCurrentLevel < InteractWithNPCSLevel.Length)
         {
-            InteractWithNPCs++;
             InteractWithNPCsCurrentLevel++;
+            if(InteractWithNPCsCurrentLevel == InteractWithNPCSLevel.Length)
+                InteractWithNPCSDone = true;
             int idx = InteractWithNPCsCurrentLevel - 1;
             if (!interactWithNPCsCollected[idx] && InteractWithNPCs >= InteractWithNPCSLevel[idx])
             {
@@ -354,7 +363,7 @@ public class AchievementsController : MonoBehaviour
 
     // -- Slider Update --
 
-    public void UpdateSliderFill(int currentAmount, int goalAmount, Image slider, TextMeshProUGUI text,
+    public void UpdateSliderFill(bool AchievementDone, int currentAmount, int goalAmount, Image slider, TextMeshProUGUI text,
         ref int currentLevel, int[] array = null,
         Image icon = null, Image background = null, Image coin = null, Image bought = null)
     {
@@ -364,8 +373,15 @@ public class AchievementsController : MonoBehaviour
         text.text = $"{Math.Min(currentAmount, displayGoal)}/{displayGoal}";
         if (currentAmount >= displayGoal)
         {
+            Debug.Log("CHOPPE DTREES DONE " + AchievementDone);
             icon?.gameObject.SetActive(false);
-            coin?.gameObject.SetActive(true);
+            if(AchievementDone)
+            {
+                coin?.gameObject.SetActive(false);
+                bought.gameObject.SetActive(true);
+            }
+            else
+                coin?.gameObject.SetActive(true);
             if (background != null)
             {
                 background.GetComponent<Outline>().enabled = true;
@@ -380,49 +396,58 @@ public class AchievementsController : MonoBehaviour
             CurrentMoneyAmount = Mathf.Min(parsed, CurrentMoneyAmountGoal);
 
         // Refresh each slider
-        UpdateSliderFill(TreesChopped, TreesChoppedGoal, TreesChoppedSlider, TreesChoppedFillAmount,
+        UpdateSliderFill(choppedTreesDone, TreesChopped, TreesChoppedGoal, TreesChoppedSlider, TreesChoppedFillAmount,
             ref TreesChoppedCurrentLevel, TreesChoppedLevels,
             TreesChoppedIcon, TreesChoppedIconBackground, TreesChoppedCoin, TreesChoppedBoughtIcon);
 
-        UpdateSliderFill(UnlockAllAxes, UnlockAllAxesGoal, UnlockAllAxesSlider, UnlockAllAxesFillAmount,
+        UpdateSliderFill(AllAxesDone, UnlockAllAxes, UnlockAllAxesGoal, UnlockAllAxesSlider, UnlockAllAxesFillAmount,
             ref dummyInt, null,
             UnlockAllAxesIcon, UnlockAllAxesIconBackground, UnlockAllAxesCoin, UnlockAllAxesBoughtIcon);
 
-        UpdateSliderFill(ChopAllTreeTypes, ChopAllTreeTypesGoal, ChopAllTreeTypesSlider, ChopAllTreeTypesFillAmount,
+        UpdateSliderFill(TreeTypesDone, ChopAllTreeTypes, ChopAllTreeTypesGoal, ChopAllTreeTypesSlider, ChopAllTreeTypesFillAmount,
             ref dummyInt, null,
             ChopAllTreeTypesIcon, ChopAllTreeTypesIconBackground, ChopAllTreeTypesCoin, ChopAllTreeTypesBoughtIcon);
 
-        UpdateSliderFill(HealFromInjury, HealFromInjuryGoal, HealFromInjurySlider, HealFromInjuryFillAmount,
+        UpdateSliderFill(HealFromInjuryDone, HealFromInjury, HealFromInjuryGoal, HealFromInjurySlider, HealFromInjuryFillAmount,
             ref dummyInt, null,
             HealFromInjuryIcon, HealFromInjuryIconBackground, HealFromInjuryCoin, HealFromInjuryBoughtIcon);
 
-        UpdateSliderFill(UsePotions, UsePotionsGoal, UsePotionsSlider, UsePotionsFillAmount,
+        UpdateSliderFill(UsePotionsDone, UsePotions, UsePotionsGoal, UsePotionsSlider, UsePotionsFillAmount,
             ref UsePotionsCurrentLevel, UsePotionsLevel,
             UsePotionsIcon, UsePotionsIconBackground, UsePotionsCoin, UsePotionsBoughtIcon);
 
-        UpdateSliderFill(UnlockAllUpgrades, UnlockAllUpgradesGoal, UnlockAllUpgradesSlider, UnlockAllUpgradesFillAmount,
+        UpdateSliderFill(AllUpgradesDone, UnlockAllUpgrades, UnlockAllUpgradesGoal, UnlockAllUpgradesSlider, UnlockAllUpgradesFillAmount,
             ref dummyInt, null,
             UnlockAllUpgradesIcon, UnlockAllUpgradesIconBackground, UnlockAllUpgradesCoin, UnlockAllUpgradesBoughtIcon);
 
-        UpdateSliderFill(SpendMoney, SpendMoneyGoal, SpendMoneySlider, SpendMoneyFillAmount,
+        UpdateSliderFill(SpendMoneyDone, SpendMoney, SpendMoneyGoal, SpendMoneySlider, SpendMoneyFillAmount,
             ref SpendMoneyCurrentLevel, SpendMoneyLevel,
             SpendMoneyIcon, SpendMoneyIconBackground, SpendMoneyCoin, SpendMoneyBoughtIcon);
 
-        UpdateSliderFill(InteractWithNPCs, InteractWithNPCsGoal, InteractWithNPCsSlider, InteractWithNPCsFillAmount,
+        UpdateSliderFill(InteractWithNPCSDone, InteractWithNPCs, InteractWithNPCsGoal, InteractWithNPCsSlider, InteractWithNPCsFillAmount,
             ref InteractWithNPCsCurrentLevel, InteractWithNPCSLevel,
             InteractWithNPCsIcon, InteractWithNPCsIconBackground, InteractWithNPCsCoin, InteractWithNPCsBoughtIcon);
 
-        UpdateSliderFill(DrinkPotionsDaily, DrinkPotionsDailyGoal, DrinkPotionsDailySlider, DrinkPotionsDailyFillAmount,
+        UpdateSliderFill(drinkPotionsDone,DrinkPotionsDaily, DrinkPotionsDailyGoal, DrinkPotionsDailySlider, DrinkPotionsDailyFillAmount,
             ref dummyInt, null,
             DrinkPotionsDailyIcon, DrinkPotionsDailyIconBackground, DrinkPotionsDailyCoin, DrinkPotionsDailyBoughtIcon);
 
-        UpdateSliderFill(CurrentMoneyAmount, CurrentMoneyAmountGoal, CurrentMoneyAmountSlider, CurrentMoneyAmountFillAmount,
+        UpdateSliderFill(CurrentMoneyDone, CurrentMoneyAmount, CurrentMoneyAmountGoal, CurrentMoneyAmountSlider, CurrentMoneyAmountFillAmount,
             ref dummyInt, null,
             CurrentMoneyAmountIcon, CurrentMoneyAmountIconBackground, CurrentMoneyAmountCoin, CurrentMoneyAmountBoughtIcon);
     }
 
     // -- Persistence --
 
+    bool drinkPotionsDone = false;
+    bool CurrentMoneyDone = false;
+    public bool choppedTreesDone = false;
+    public bool UsePotionsDone = false;
+    bool SpendMoneyDone = false;
+    bool InteractWithNPCSDone = false;
+    
+    
+    
     public void SaveAchievements()
     {
         // Basic counts and levels

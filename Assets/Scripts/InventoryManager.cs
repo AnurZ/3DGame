@@ -143,9 +143,9 @@ public class InventoryManager : MonoBehaviour
         {
             if (GetSelectedItem(false).isPotion)
             {
-                //achievementsController.UsePotions++;
-                //achievementsController.potionDrankThatDay = true;
-                achievementsController.increaseUsePotionsCurrentGoal();
+                if(achievementsController.DrinkPotionsDaily == achievementsController.PotionsDrankUntilYesterday) 
+                    achievementsController.DrinkPotionsDaily ++;
+                achievementsController.UsePotions ++;
             }
             Destroy(currentHeldItem); // Remove the held item visually
             currentHeldItem = null;

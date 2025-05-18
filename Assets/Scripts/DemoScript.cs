@@ -7,9 +7,9 @@ public class DemoScript : MonoBehaviour
     public InventoryManager inventoryManager;
     public Item[] itemsToPickUp;
 
-    public void PickupItem(int id)
+    public bool PickupItem(int id)
     {
-        bool result = inventoryManager.AddItem(itemsToPickUp[id]);  
+        return inventoryManager.AddItem(itemsToPickUp[id]);  
     }
 
     public void GetSelectedItem()

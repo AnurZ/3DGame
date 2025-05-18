@@ -51,6 +51,7 @@ public class SimpleDayNightCycle : MonoBehaviour
     public int lastHour = -1;
     public StaminaController staminaRegenController;
     public TreeSpawner treeSpawner;
+
     
     private void Shuffle<T>(List<T> list)
     {
@@ -123,6 +124,19 @@ public class SimpleDayNightCycle : MonoBehaviour
             
 
             PlayerPrefs.SetInt("Day", currentDay);
+            if (achievementsController != null)
+            {
+                if (achievementsController.DrinkPotionsDaily > achievementsController.PotionsDrankUntilYesterday)
+                {
+                    achievementsController.PotionsDrankUntilYesterday++;
+                }
+                else
+                {
+                    achievementsController.DrinkPotionsDaily = 0;
+                    achievementsController.PotionsDrankUntilYesterday = 0;
+                }
+
+            }
             UpdateDayText();
         }
 
@@ -217,7 +231,14 @@ public class SimpleDayNightCycle : MonoBehaviour
         isSleeping = true;
         foreach (var go in uiToHide)
             if (go != null) go.SetActive(false);
+        int FocusHours = potionManager.FocusPotionHours;
+        int ShieldHours = potionManager.ShieldPotionHours;
+        int UpgradeHours = potionManager.UpgradePotionHours;
 
+        potionManager.UpgradePotionHours = 0;
+        potionManager.FocusPotionHours = 0;
+        potionManager.ShieldPotionHours = 0;
+        
         StaminaController.Instance.RestoreFullStamina();
 
         bool isBadDream = Random.value < 0.5f;
@@ -239,6 +260,19 @@ public class SimpleDayNightCycle : MonoBehaviour
         timeOfDay = GetTimeNormalizedFromHour(8);
         currentDay++;
         PlayerPrefs.SetInt("Day", currentDay);
+        if (achievementsController != null)
+        {
+            if (achievementsController.DrinkPotionsDaily > achievementsController.PotionsDrankUntilYesterday)
+            {
+                achievementsController.PotionsDrankUntilYesterday++;
+            }
+            else
+            {
+                achievementsController.DrinkPotionsDaily = 0;
+                achievementsController.PotionsDrankUntilYesterday = 0;
+            }
+
+        }
         UpdateDayText();
 
         // Snap sun & color
@@ -278,6 +312,10 @@ public class SimpleDayNightCycle : MonoBehaviour
         foreach (var go in uiToHide)
             if (go != null) go.SetActive(true);
 
+        potionManager.UpgradePotionHours = UpgradeHours;
+        potionManager.FocusPotionHours = FocusHours;
+        potionManager.ShieldPotionHours = ShieldHours;
+        
         treeSpawner.SpawnTrees();
         isSleeping = false;
         
@@ -341,19 +379,7 @@ public class SimpleDayNightCycle : MonoBehaviour
     {
         dayText.text = "Day: " + currentDay.ToString();
         Debug.Log("Novi dan");
-        if (achievementsController != null)
-        {
-            if (achievementsController.DrinkPotionsDaily > achievementsController.PotionsDrankUntilYesterday)
-            {
-                achievementsController.PotionsDrankUntilYesterday++;
-            }
-            else
-            {
-                achievementsController.DrinkPotionsDaily = 0;
-                achievementsController.PotionsDrankUntilYesterday = 0;
-            }
-
-        }
+        
         
         //currentDay++;
         if (playerInjurySystem != null)

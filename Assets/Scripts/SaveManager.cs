@@ -18,7 +18,8 @@ public class SaveManager : MonoBehaviour
     public GameObject player;
     public CurrencyManager currencyManager;
     public TreeSpawner treeSpawner;
-
+    public StaminaController staminaController;
+    
     // Praćene vrijednosti za detekciju promjena
     private int previousMoney;
     private int[] previousItemCounts;
@@ -39,6 +40,7 @@ public class SaveManager : MonoBehaviour
         if (upgradesManager == null)
             upgradesManager = FindObjectOfType<UpgradesManager>();
         treeSpawner = FindObjectOfType<TreeSpawner>();
+        staminaController = FindObjectOfType<StaminaController>();
 
         previousMoney = currencyManager.CurrentMoney;
         previousPlayerPosition = player.transform.position;
@@ -125,6 +127,11 @@ public class SaveManager : MonoBehaviour
         Debug.Log($"[LoadGame DEBUG] InventoryManager.Instance={(InventoryManager.Instance==null?"NULL":"OK")}, slots count={(InventoryManager.Instance?.inventorySlots?.Length.ToString() ?? "N/A")}");
         Debug.Log($"[LoadGame DEBUG] upgradesManager={(upgradesManager==null?"NULL":"OK")}, upMgr.playerController={(upgradesManager?.playerController==null?"NULL":"OK")}, upMgr.staminaController={(upgradesManager?.staminaController==null?"NULL":"OK")}, upMgr.potionManager={(upgradesManager?.potionManager==null?"NULL":"OK")}");
 
+        data.shieldPotionHours = potionManager.ShieldPotionHours;
+        data.focusPotionHours = potionManager.FocusPotionHours;
+        data.upgradePotionHours = potionManager.UpgradePotionHours;
+        
+        data.playerStamina = staminaController.playerStamina;
 
         // Spremi inventar
         foreach (var slot in slots)
@@ -377,6 +384,18 @@ public class SaveManager : MonoBehaviour
     UpdateItemCounts();
     previousUpgrades       = GetCurrentUpgradeStates();
 
+    // 8) Potions
+    if (potionManager != null)
+    {
+        potionManager.ShieldPotionHours = data.shieldPotionHours;
+        potionManager.FocusPotionHours = data.focusPotionHours;
+        potionManager.UpgradePotionHours = data.upgradePotionHours;
+    }
+    
+    // 9) Stamina
+    if(staminaController != null)
+        staminaController.playerStamina = data.playerStamina;
+    
     isLoading = false;
 }
 
@@ -400,6 +419,12 @@ public class PlayerSaveData
     public bool potionEffectUpgrade;
     public bool choppingSpeedUpgrade; 
     public bool choppingStaminaUpgrade;
+    
+    public int shieldPotionHours;
+    public int focusPotionHours;
+    public int upgradePotionHours;
+
+    public float playerStamina;
 }
 
 [System.Serializable]

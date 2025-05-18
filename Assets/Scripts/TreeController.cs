@@ -201,14 +201,14 @@ public class TreeController : MonoBehaviour
     {
         if (dropPrefab != null && !hasDroppedPrefab)
         {
-            Vector3 dropPosition = new Vector3(transform.position.x, 0.5f, transform.position.z);
+            Vector3 dropPosition = new Vector3(transform.position.x, 0.75f, transform.position.z);
             Instantiate(dropPrefab, dropPosition, Quaternion.identity);
             Debug.Log("Log prefab dropped!");
 
             // 5% chance to drop the bonus prefab
             if (bonusDropPrefab != null && Random.value <= 1f)
             {
-                Vector3 bonusDropPosition = new Vector3(transform.position.x + 1f, 0.5f, transform.position.z); // Offset a bit
+                Vector3 bonusDropPosition = new Vector3(transform.position.x + 1f, 0.75f, transform.position.z); // Offset a bit
                 Instantiate(bonusDropPrefab, bonusDropPosition, Quaternion.identity);
                 Debug.Log("Bonus prefab dropped!");
             }

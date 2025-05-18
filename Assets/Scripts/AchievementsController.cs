@@ -128,7 +128,6 @@ public class AchievementsController : MonoBehaviour
 
     private int dummyInt = 0;
 
-    public int PotionsDrankUntilYesterday = 0;
 
     // -- Unity Lifecycle --
 
@@ -445,6 +444,7 @@ public class AchievementsController : MonoBehaviour
     public bool UsePotionsDone = false;
     bool SpendMoneyDone = false;
     bool InteractWithNPCSDone = false;
+    public int PotionsDrankUntilYesterday = 0;
     
     
     
@@ -494,6 +494,14 @@ public class AchievementsController : MonoBehaviour
         for (int i = 0; i < interactWithNPCsCollected.Length; i++)
             PlayerPrefs.SetInt(Prefix + $"InteractWithNPCsCollected{i}", interactWithNPCsCollected[i] ? 1 : 0);
 
+        PlayerPrefs.SetInt(Prefix + "DrinkPotionsDone", drinkPotionsDone ? 1 : 0);
+        PlayerPrefs.SetInt(Prefix + "CurrentMoneyDone", CurrentMoneyDone ? 1 : 0);
+        PlayerPrefs.SetInt(Prefix + "ChoppedTreesDone", choppedTreesDone ? 1 : 0);
+        PlayerPrefs.SetInt(Prefix + "UsePotionsDone", UsePotionsDone ? 1 : 0);
+        PlayerPrefs.SetInt(Prefix + "SpendMoneyDone", SpendMoneyDone ? 1 : 0);
+        PlayerPrefs.SetInt(Prefix + "InteractWithNPCSDone", InteractWithNPCSDone ? 1 : 0);
+        PlayerPrefs.SetInt(Prefix + "PotionsDrankUntilYesterday", PotionsDrankUntilYesterday);
+        
         PlayerPrefs.Save();
     }
 
@@ -529,6 +537,14 @@ public class AchievementsController : MonoBehaviour
         unlockAllUpgradesCollected   = PlayerPrefs.GetInt(Prefix + "UnlockAllUpgradesCollected", 0) == 1;
         drinkPotionsDailyCollected   = PlayerPrefs.GetInt(Prefix + "DrinkPotionsDailyCollected", 0) == 1;
         currentMoneyAmountCollected  = PlayerPrefs.GetInt(Prefix + "CurrentMoneyAmountCollected", 0) == 1;
+        
+        drinkPotionsDone = PlayerPrefs.GetInt(Prefix + "DrinkPotionsDone", 0) == 1;
+        CurrentMoneyDone = PlayerPrefs.GetInt(Prefix + "CurrentMoneyDone", 0) == 1;
+        choppedTreesDone = PlayerPrefs.GetInt(Prefix + "ChoppedTreesDone", 0) == 1;
+        UsePotionsDone = PlayerPrefs.GetInt(Prefix + "UsePotionsDone", 0) == 1;
+        SpendMoneyDone = PlayerPrefs.GetInt(Prefix + "SpendMoneyDone", 0) == 1;
+        InteractWithNPCSDone = PlayerPrefs.GetInt(Prefix + "InteractWithNPCSDone", 0) == 1;
+        PotionsDrankUntilYesterday = PlayerPrefs.GetInt(Prefix + "PotionsDrankUntilYesterday", 0);
 
         // Collected flags: multi‑tier
         for (int i = 0; i < treesChoppedCollected.Length; i++)

@@ -229,6 +229,7 @@ public class InventoryManager : MonoBehaviour
 
     public bool AddItem(Item item)
     {
+        Debug.Log("Start adding item");
         bool isStackable = !(item.isAxe || item.isPotion);
 
         // First, try to stack in existing slot

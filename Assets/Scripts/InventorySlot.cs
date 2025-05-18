@@ -38,18 +38,24 @@ public class InventorySlot : MonoBehaviour, IDropHandler
         }
     }
 
-    
     public void OnDrop(PointerEventData eventData)
     {
-        if (transform.childCount == 0) // Only allow one item per slot
+        InventoryItem inventoryItem = eventData.pointerDrag.GetComponent<InventoryItem>();
+        if (inventoryItem != null)
         {
-            InventoryItem inventoryItem = eventData.pointerDrag.GetComponent<InventoryItem>();
-            if (inventoryItem != null)
+            // Check if this slot already has an item
+            if (transform.childCount > 0)
             {
-                inventoryItem.parentAfterDrag = transform; // Set new parent
+                Transform existingItem = transform.GetChild(0);
+                existingItem.SetParent(inventoryItem.parentAfterDrag);
+                existingItem.localPosition = Vector3.zero;
             }
+
+            inventoryItem.parentAfterDrag = transform;
         }
     }
+
+    
     
     
 }

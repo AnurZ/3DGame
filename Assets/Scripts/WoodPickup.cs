@@ -13,7 +13,8 @@ public class WoodPickup : MonoBehaviour
             DemoScript demoScript = other.GetComponent<DemoScript>();
             if (demoScript != null)
             {
-                demoScript.PickupItem(itemIndexToGive);
+                if (!demoScript.PickupItem(itemIndexToGive))
+                    return;
             }
 
             // Disable the collider and make the item inactive to prevent further pickups

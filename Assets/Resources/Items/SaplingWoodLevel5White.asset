@@ -17,11 +17,11 @@ MonoBehaviour:
   actionType: 0
   stackable: 1
   image: {fileID: 21300000, guid: b470a8b0ebb0cf142974e652184d3834, type: 3}
-  itemPrefab: {fileID: 5191481413652199432, guid: fb0213ed97fad944bb0346b6c6d51d84, type: 3}
+  itemPrefab: {fileID: 5191481413652199432, guid: bf735a5fd9bcbd04fa139c381d16c703, type: 3}
   inHandPosition: {x: 0, y: 0, z: 0}
   inHandRotation: {x: 0, y: 0, z: 0}
   inHandScale: {x: 0.15, y: 0.15, z: 0.15}
   isAxe: 0
   isPotion: 0
-  ItemDisplayName: ITEM_NAME
+  ItemDisplayName: White Wood Sapling
   currentAxeType: 0

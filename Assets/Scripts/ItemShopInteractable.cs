@@ -143,7 +143,7 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
     public void OnActivate()
     {
         bool isPotion = itemToGive.itemName.ToLower().Contains("potion");
-
+        
         // If not a potion and already owned, prevent purchase
         if (!isPotion && InventoryManager.Instance.HasItem(itemToGive))
         {
@@ -156,9 +156,21 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
             }
             return;
         }
+        if (InventoryManager.Instance.IsFull())
+        {
+            Debug.Log("Inventory je pun! Ne možeš kupiti više itema.");
+            var playerObj = GameObject.FindWithTag("AudioPlayer") ?? GameObject.Find("AudioPlayer");
+            if (playerObj != null && noMoneyClip != null)
+            {
+                var sfxSource = playerObj.GetComponent<AudioSource>();
+                sfxSource?.PlayOneShot(noMoneyClip);
+            }
+            return;
+        }
 
         if (CurrencyManager.Instance.TrySpendMoney(cost))
         {
+            
             InventoryManager.Instance.AddItem(itemToGive);
             Debug.Log($"Kupio si {itemToGive.name}!");
             MoneyPopupManager.Instance.ShowPopup(-cost, Input.mousePosition);

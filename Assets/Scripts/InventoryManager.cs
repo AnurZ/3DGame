@@ -23,6 +23,19 @@ public class InventoryManager : MonoBehaviour
     
     public AchievementsController achievementsController;
     
+    public bool IsFull()
+    {
+        foreach (var slot in inventorySlots)
+        {
+            var itemInSlot = slot.GetComponentInChildren<InventoryItem>();
+            if (itemInSlot == null)
+            {
+                return false; // Pronađen prazan slot
+            }
+        }
+        return true; // Nema praznih slotova
+    }
+
     private void Start()
     {
         achievementsController = FindObjectOfType<AchievementsController>();

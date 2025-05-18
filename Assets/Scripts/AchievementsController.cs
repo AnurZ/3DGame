@@ -372,7 +372,7 @@ public class AchievementsController : MonoBehaviour
         text.text = $"{Math.Min(currentAmount, displayGoal)}/{displayGoal}";
         if (currentAmount >= displayGoal)
         {
-            Debug.Log("CHOPPE DTREES DONE " + AchievementDone);
+           // Debug.Log("CHOPPE DTREES DONE " + AchievementDone);
             icon?.gameObject.SetActive(false);
             if(AchievementDone)
             {

@@ -23,7 +23,8 @@ public class TreeSpawner : MonoBehaviour
     {
         public Vector3 position;
         public Quaternion rotation;
-        public GameObject treePrefab;
+        //public GameObject treePrefab;
+        public int treePrefabIndex;
     }
     
     public List<TreeSaver> SpawnedTrees = new List<TreeSaver>();
@@ -123,13 +124,16 @@ public class TreeSpawner : MonoBehaviour
                 newlySpawned.Add(newTree);
                 spawnedCount++;
                 treeSpawned = true;
+                int prefabIndex = System.Array.IndexOf(treePrefabs, selectedTree);
+
                 TreeSaver Tree = new TreeSaver()
                 {
                     position = candidate,
-                    treePrefab = selectedTree,
                     rotation = randomRotation,
+                    treePrefabIndex = prefabIndex,
                 };
                 SpawnedTrees.Add(Tree);
+
                 break;
             }
 
@@ -163,8 +167,23 @@ public class TreeSpawner : MonoBehaviour
             // Instantiate all trees
             foreach (var tree in SpawnedTrees)
             {
-                GameObject newTree = Instantiate(tree.treePrefab, tree.position, tree.rotation);
-                newTree.tag = "Tree";
+                if (tree.treePrefabIndex >= 0 && tree.treePrefabIndex < treePrefabs.Length)
+                {
+                    GameObject prefab = treePrefabs[tree.treePrefabIndex];
+                    if (prefab != null)
+                    {
+                        GameObject newTree = Instantiate(prefab, tree.position, tree.rotation);
+                        newTree.tag = "Tree";
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Prefab at index {tree.treePrefabIndex} is null.");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"Invalid prefab index: {tree.treePrefabIndex}");
+                }
             }
         }
         else
@@ -172,6 +191,7 @@ public class TreeSpawner : MonoBehaviour
             Debug.LogWarning("Failed to load trees from JSON.");
         }
     }
+
 
     
     public void RemoveTreeByPosition(Vector3 position)

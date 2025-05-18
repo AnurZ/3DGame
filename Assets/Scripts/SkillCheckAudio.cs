@@ -16,6 +16,6 @@ public class SkillCheckAudio : MonoBehaviour
 
     public void playFail()
     {
-        source.PlayOneShot(failClip);
+        source.PlayOneShot(failClip,0.33f);
     }
 }

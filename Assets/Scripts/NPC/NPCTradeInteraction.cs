@@ -162,21 +162,30 @@ public class MysticNPCTrade : MonoBehaviour
         switch (currentStage)
         {
             case QuestStage.First:
+                if (InventoryManager.Instance.IsFull())
+                {
+                    yield return StartCoroutine(ShowLine("Your inventory is full. Make some space first."));
+                    yield break;
+                }
+
                 if (TryRemoveItems(inv, requiredWoodItem, requiredWoodAmount, requiredWoodItemName, out string msg1))
                 {
                     inv.AddItem(potionItem);
                     yield return StartCoroutine(ShowLine("The forest thanks you... Take this potion."));
-                    //TransitionToNextQuest();
                     hasTraded = true;
                     isWaitingForNextQuest = true;
-                    questCooldownTimer = cooldownTimer; // koristi public float cooldownTimer iz Inspector-a
-                    SaveState(); // Save after trade
+                    questCooldownTimer = cooldownTimer;
+                    SaveState();
                     yield return new WaitForSeconds(finalChoiceDuration);
                     HideFloatingText();
                     yield break;
                 }
-                else yield return StartCoroutine(ShowLine(msg1));
+                else
+                {
+                    yield return StartCoroutine(ShowLine(msg1));
+                }
                 break;
+
 
             case QuestStage.Second:
                 if (TryRemoveItems(inv, rarerWoodItem, rarerWoodAmount, rarerWoodItemName, out string msg2))

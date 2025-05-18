@@ -70,7 +70,11 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 14c9fd1ef92b17541a42ed0c06ff5409, type: 2}
     - target: {fileID: 919132149155446097, guid: 031865590a892264dbc7fba57d38f683, type: 3}
       propertyPath: m_Name
-      value: SaplingLevel1
+      value: SaplingLevel1Item
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 031865590a892264dbc7fba57d38f683, type: 3}
+      propertyPath: m_TagString
+      value: SaplingItem
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

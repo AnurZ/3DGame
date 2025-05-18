@@ -20,7 +20,7 @@ MonoBehaviour:
   itemPrefab: {fileID: 3481150544104519291, guid: e35704c5e6e6cd74cbb01a16e967d259, type: 3}
   inHandPosition: {x: 0, y: 0, z: 0}
   inHandRotation: {x: 0, y: 0, z: 0}
-  inHandScale: {x: 0.15, y: 0.15, z: 0.15}
+  inHandScale: {x: 0.1, y: 0.1, z: 0.1}
   isAxe: 0
   isPotion: 0
   ItemDisplayName: Blue Wood Sapling

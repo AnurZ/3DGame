@@ -20,7 +20,7 @@ MonoBehaviour:
   itemPrefab: {fileID: 1581827066615976667, guid: 29f58598ee652f341a38c38c4e90a525, type: 3}
   inHandPosition: {x: 0, y: 0, z: 0}
   inHandRotation: {x: 0, y: 0, z: 0}
-  inHandScale: {x: 0.15, y: 0.15, z: 0.15}
+  inHandScale: {x: 0.1, y: 0.1, z: 0.1}
   isAxe: 0
   isPotion: 0
   ItemDisplayName: Purple Wood Sapling

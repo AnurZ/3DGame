@@ -3,16 +3,17 @@ using UnityEngine;
 public class SaplingPickup : MonoBehaviour
 {
     public int itemIndexToGive;
-    public Item item;
-    
+
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            InventoryManager inventoryManager = other.GetComponent<InventoryManager>();
-            if (inventoryManager != null)
+            Debug.Log("Pickup triggered by: " + other.name);
+
+            DemoScript demoScript = other.GetComponent<DemoScript>();
+            if (demoScript != null)
             {
-                if (!inventoryManager.AddItem(item))
+                if (!demoScript.PickupItem(itemIndexToGive))
                     return;
             }
 

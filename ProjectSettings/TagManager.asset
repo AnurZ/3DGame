@@ -16,6 +16,8 @@ TagManager:
   - Bridge
   - AudioPlayer
   - PricePopup
+  - SaplingDrop
+  - SaplingItem
   layers:
   - Default
   - TransparentFX

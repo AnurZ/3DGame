@@ -19,6 +19,7 @@ public class SaveManager : MonoBehaviour
     public CurrencyManager currencyManager;
     public TreeSpawner treeSpawner;
     public StaminaController staminaController;
+    public PlayerController playerController;
     
     // Praćene vrijednosti za detekciju promjena
     private int previousMoney;
@@ -41,6 +42,7 @@ public class SaveManager : MonoBehaviour
             upgradesManager = FindObjectOfType<UpgradesManager>();
         treeSpawner = FindObjectOfType<TreeSpawner>();
         staminaController = FindObjectOfType<StaminaController>();
+        playerController = FindObjectOfType<PlayerController>();
 
         previousMoney = currencyManager.CurrentMoney;
         previousPlayerPosition = player.transform.position;
@@ -132,6 +134,9 @@ public class SaveManager : MonoBehaviour
         data.upgradePotionHours = potionManager.UpgradePotionHours;
         
         data.playerStamina = staminaController.playerStamina;
+        
+        data.daysToRecover = playerController.daysToRecover;
+        data.currentInjuryState = (int)playerController.currentInjury;
 
         // Spremi inventar
         foreach (var slot in slots)
@@ -396,6 +401,10 @@ public class SaveManager : MonoBehaviour
     if(staminaController != null)
         staminaController.playerStamina = data.playerStamina;
     
+    // 10) InjuryState
+    playerController.currentInjury = (PlayerController.InjuryStatus)data.currentInjuryState;
+    playerController.daysToRecover = data.daysToRecover;
+    
     isLoading = false;
 }
 
@@ -425,6 +434,9 @@ public class PlayerSaveData
     public int upgradePotionHours;
 
     public float playerStamina;
+
+    public int currentInjuryState;
+    public int daysToRecover;
 }
 
 [System.Serializable]

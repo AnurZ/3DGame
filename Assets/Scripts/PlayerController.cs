@@ -35,8 +35,7 @@ public class PlayerController : MonoBehaviour
     public bool isInShop = false;
 
     private InventoryManager inventoryManager;
-
-    public enum InjuryStatus { Healthy, Minor, Moderate, Severe }
+    public enum InjuryStatus { Healthy = 0, Minor, Moderate, Severe }
     public InjuryStatus currentInjury = InjuryStatus.Healthy;
     private float injuryEffectMultiplier = 1f;
 
@@ -513,15 +512,15 @@ public class PlayerController : MonoBehaviour
                 break;
 
             case InjuryStatus.Minor:
-                injuryStateText.text = $"Injury state: <color=#FFFF66>Light injury</color> ({daysToRecover} day{(daysToRecover > 1 ? "s" : "")})";
+                injuryStateText.text = $"<color=#FFFF66>Light injury</color> ({daysToRecover} day{(daysToRecover > 1 ? "s" : "")})";
                 break;
 
             case InjuryStatus.Moderate:
-                injuryStateText.text = $"Injury state: <color=#FFA500>Moderate injury</color> ({daysToRecover} day{(daysToRecover > 1 ? "s" : "")})";
+                injuryStateText.text = $"<color=#FFA500>Moderate injury</color> ({daysToRecover} day{(daysToRecover > 1 ? "s" : "")})";
                 break;
 
             case InjuryStatus.Severe:
-                injuryStateText.text = $"Injury state: <color=#C0392B>Severe injury</color> ({daysToRecover} day{(daysToRecover > 1 ? "s" : "")})";
+                injuryStateText.text = $"<color=#C0392B>Severe injury</color> ({daysToRecover} day{(daysToRecover > 1 ? "s" : "")})";
                 break;
         }
     }
@@ -601,7 +600,6 @@ public class PlayerController : MonoBehaviour
         }
         if (other.CompareTag("Bridge"))
         {
-            Debug.Log("Usao na bridge");
             isOnBridge = true;
         }
     }

@@ -100,9 +100,13 @@ public class InventoryManager : MonoBehaviour
         uipanel.SetActive(true);
         textMeshPro.text = text;
         textMeshPro.color = Color.white;
-        yield return new WaitForSeconds(5f);
+
+        yield return new WaitForSeconds(2f); // change 2f to your desired display time
+
         textMeshPro.text = "";
         uipanel.SetActive(false);
+
+        currentTextCoroutine = null; // clear reference when done
     }
 
     void Awake()
@@ -110,6 +114,8 @@ public class InventoryManager : MonoBehaviour
         Instance = this;
     }
 
+    private Coroutine currentTextCoroutine;
+    
     void ChangeSelectedSlot(int newValue)
     {
         if (playerController != null && !playerController.isChopping)
@@ -123,10 +129,16 @@ public class InventoryManager : MonoBehaviour
             Item currentItem = GetSelectedItem(false);
             if (currentItem != null)
             {
-                if (currentItem.isPotion)
-                    StartCoroutine(ShowTextCoroutine(currentItem.ItemDisplayName + (" press [SPACEBAR] TO DRINK")));//formatting
-                else
-                    StartCoroutine(ShowTextCoroutine(currentItem.ItemDisplayName));
+                string message = currentItem.isPotion
+                    ? currentItem.ItemDisplayName + " press [SPACEBAR] TO DRINK"
+                    : currentItem.ItemDisplayName;
+
+                // Stop the currently running coroutine if it exists
+                if (currentTextCoroutine != null)
+                    StopCoroutine(currentTextCoroutine);
+
+                // Start and track the new coroutine
+                currentTextCoroutine = StartCoroutine(ShowTextCoroutine(message));
             }
 
             UpdateHeldItem();

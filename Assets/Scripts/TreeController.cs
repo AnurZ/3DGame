@@ -88,6 +88,7 @@ public class TreeController : MonoBehaviour
         treeSway?.StartSwaying();
         
         timer = 0f;
+        cooldownTimer = 0f;
         randomZ = Random.Range(-360f, 0f);
         playerController.SkillCheckArea.rectTransform.rotation = Quaternion.Euler(0f, 0f, randomZ);
         

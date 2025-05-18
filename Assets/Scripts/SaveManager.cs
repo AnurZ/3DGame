@@ -214,6 +214,7 @@ public class SaveManager : MonoBehaviour
         {
             player.transform.position = new Vector3(70f, 0f, 185f); // <-- PROMIJENI AKO IMAŠ KONKRETNU LOKACIJU
             player.transform.eulerAngles = Vector3.zero;
+            
             Debug.Log("🟢 Postavljena početna pozicija igrača za novu igru.");
         }
         else
@@ -227,6 +228,14 @@ public class SaveManager : MonoBehaviour
     {
         Debug.LogWarning($"SaveManager: nema save file na {_path}");
         FindObjectOfType<NewGameInventoryManager>()?.CreateDefaultInventory();
+        string treePath = Path.Combine(Application.persistentDataPath, "spawnedTrees.json");
+        if (File.Exists(treePath))
+        {
+            File.Delete(treePath);
+            Debug.Log("🟠 Obrisan stari fajl sa drvećem – nova igra počinje svježe.");
+        }
+        TreeSpawner TreeSpawner = FindObjectOfType<TreeSpawner>();
+        TreeSpawner.SpawnTrees();
         return;
     }
 

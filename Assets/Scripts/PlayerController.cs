@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioClip grassWalkClip;
     [SerializeField] private AudioClip woodWalkClip;
     [SerializeField] private AudioClip choppingClip;
+    [SerializeField] private AudioClip InjuryClip;
     private bool isOnBridge = false;
 
     
@@ -360,6 +361,7 @@ public class PlayerController : MonoBehaviour
         SetInjuryStateText(recoveryDays);
 
         if (playerInjuryAlert != null)
+            
             playerInjuryAlert.SetActive(true);
     }
 
@@ -374,7 +376,7 @@ public class PlayerController : MonoBehaviour
                 injuryStateText.text = "";
                 return;
             }
-
+            choppingSource.PlayOneShot(InjuryClip);
             playerInjuryAlert.SetActive(true);
             string injuryText = "";
 

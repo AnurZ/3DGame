@@ -9,6 +9,7 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
 {
     [SerializeField] private AudioClip hoverSoundClip;
     [SerializeField] private AudioClip buySoundClip;
+    [SerializeField] private AudioClip noMoneyClip;
 
 
     [SerializeField] private CursorManager CursorManager;
@@ -147,6 +148,12 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
         if (!isPotion && InventoryManager.Instance.HasItem(itemToGive))
         {
             Debug.Log("Već posjeduješ ovaj item!");
+            var playerObj = GameObject.FindWithTag("AudioPlayer") ?? GameObject.Find("AudioPlayer");
+            if (playerObj != null && buySoundClip != null)
+            {
+                var sfxSource = playerObj.GetComponent<AudioSource>();
+                sfxSource?.PlayOneShot(noMoneyClip);
+            }
             return;
         }
 
@@ -171,6 +178,12 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
         }
         else
         {
+            var playerObj = GameObject.FindWithTag("AudioPlayer") ?? GameObject.Find("AudioPlayer");
+            if (playerObj != null && buySoundClip != null)
+            {
+                var sfxSource = playerObj.GetComponent<AudioSource>();
+                sfxSource?.PlayOneShot(noMoneyClip);
+            }
             Debug.Log("Nemaš dovoljno novca.");
         }
     }

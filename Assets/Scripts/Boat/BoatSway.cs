@@ -331,7 +331,7 @@ public class BoatSway : MonoBehaviour
         playerAnimator.runtimeAnimatorController = endingAnimatorController;
 
         // Pokreni animaciju sjekire direktno na brodu
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 2; i++)
         {
             playerAnimator.SetTrigger("IsChopping");
             yield return new WaitForSeconds(chopDuration);

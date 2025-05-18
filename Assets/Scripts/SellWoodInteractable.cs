@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System.Linq;
+using Mono.Cecil.Cil;
 
 [RequireComponent(typeof(Collider))]
 public class SellWoodInteractable : MonoBehaviour, IShopInteractable
@@ -94,13 +95,30 @@ public class SellWoodInteractable : MonoBehaviour, IShopInteractable
             CurrencyManager.Instance.AddMoney(totalEarned);
             SetAllColors(soldColor);
             MoneyPopupManager.Instance.ShowPopup(totalEarned, Input.mousePosition);
-            
+            Transform countTransform = transform.Find("Count");
+            if (countTransform != null)
+            {
+                countText = countTransform.GetComponent<TextMeshPro>();
+            }
+
+            StartCoroutine(DelayedCountUpdate());
+
             var playerObj = GameObject.Find("AudioPlayer");
             if (playerObj != null && sellSoundClip != null)
             {
                 var sfx = playerObj.GetComponent<AudioSource>();
                 sfx?.PlayOneShot(sellSoundClip);
             }
+            
+            // Ažuriraj sve druge objekte sa SellWoodInteractable skriptom
+            SellWoodInteractable[] allWoodObjects = FindObjectsOfType<SellWoodInteractable>();
+            foreach (var woodObject in allWoodObjects)
+            {
+                woodObject.StartCoroutine(woodObject.DelayedCountUpdate());
+
+            }
+            StartCoroutine(DelayedCountUpdate());
+
         }
         else
         {

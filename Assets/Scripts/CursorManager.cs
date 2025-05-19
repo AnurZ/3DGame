@@ -22,7 +22,7 @@ public class CursorManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Cursor index out of range: " + index);
+//             Debug.LogWarning("Cursor index out of range: " + index);
         }
     }
 }

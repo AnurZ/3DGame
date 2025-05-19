@@ -26,7 +26,7 @@ public class SellSpecificWoodInteractable : MonoBehaviour, IShopInteractable
 
     public void OnHoverEnter()
     {
-        Debug.Log("OnHoverEnter");
+//         Debug.Log("OnHoverEnter");
         SetAllColors(hoverColor);
     }
 
@@ -54,7 +54,7 @@ public class SellSpecificWoodInteractable : MonoBehaviour, IShopInteractable
         }
         else
         {
-            Debug.Log("No items of type " + woodItem.itemName + " to sell.");
+//             Debug.Log("No items of type " + woodItem.itemName + " to sell.");
         }
     }
 

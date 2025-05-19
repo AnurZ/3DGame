@@ -8,7 +8,7 @@ public class WoodPickup : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log("Pickup triggered by: " + other.name);
+//             Debug.Log("Pickup triggered by: " + other.name);
 
             DemoScript demoScript = other.GetComponent<DemoScript>();
             if (demoScript != null)

@@ -93,11 +93,11 @@ public class BoatSway : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("BoatSway Start called");
+//         Debug.Log("BoatSway Start called");
         startPos = transform.position;
         if (waypoints.Length == 0 || pauseIndices.Length < 2)
         {
-            Debug.LogError("Assign at least two waypoints and two pauseIndices!");
+//             Debug.LogError("Assign at least two waypoints and two pauseIndices!");
             enabled = false;
         }
 
@@ -146,11 +146,11 @@ public class BoatSway : MonoBehaviour
         {
             uiRoot.SetActive(false);
         }
-        Debug.Log("Disabled all ui");
+//         Debug.Log("Disabled all ui");
 
         // Disable player input (you already have this in DisablePlayerMovement)
         DisablePlayerMovement();
-        Debug.Log("Disabled playermovement");
+//         Debug.Log("Disabled playermovement");
 
         // Stop background music
         if (backgroundMusicSource != null && backgroundMusicSource.isPlaying)
@@ -230,9 +230,9 @@ public class BoatSway : MonoBehaviour
         // Koristi CurrencyManager za potrošnju
         if (CurrencyManager.Instance.TrySpendMoney(ticketPrice))
         {
-            Debug.Log("Ticket YES clicked from: " + this.name);
+//             Debug.Log("Ticket YES clicked from: " + this.name);
             yesButton.interactable = false;
-            Debug.Log("Ticket price: " + ticketPrice);
+//             Debug.Log("Ticket price: " + ticketPrice);
             CurrencyManager.Instance.SetMoneyText();
             ticketPopup.SetActive(false);
             awaitingPurchase = false;
@@ -390,7 +390,7 @@ public class BoatSway : MonoBehaviour
 
     void DisablePlayerMovement()
     {
-        Debug.Log("DISABLING movement");
+//         Debug.Log("DISABLING movement");
 
         if (playerControllerScript != null)
         {

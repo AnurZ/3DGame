@@ -71,7 +71,7 @@ public class MenuManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("⚠️ NewGameInventoryManager nije pronađen!");
+//             Debug.LogWarning("⚠️ NewGameInventoryManager nije pronađen!");
         }
 
         SceneManager.sceneLoaded += OnSceneLoadedNewGame;
@@ -93,11 +93,11 @@ public class MenuManager : MonoBehaviour
         if (newInvManager != null)
         {
             newInvManager.CreateDefaultInventory();
-            Debug.Log("✅ Default inventar kreiran nakon učitavanja nove scene.");
+//             Debug.Log("✅ Default inventar kreiran nakon učitavanja nove scene.");
         }
         else
         {
-            Debug.LogWarning("⚠️ NewGameInventoryManager nije pronađen u novoj sceni!");
+//             Debug.LogWarning("⚠️ NewGameInventoryManager nije pronađen u novoj sceni!");
         }
 
         // Otkaži registraciju metode nakon prvog poziva
@@ -178,7 +178,7 @@ public class MenuManager : MonoBehaviour
     IEnumerator StartNewGameWithFade()
     {
         yield return StartCoroutine(FadeToBlackNewGame());
-        Debug.Log("🌑 Fade završen. Učitavanje scene...");
+//         Debug.Log("🌑 Fade završen. Učitavanje scene...");
         //SceneManager.LoadScene("IGRICASCENE");
     }
 
@@ -243,7 +243,7 @@ public class MenuManager : MonoBehaviour
         dialogueText.gameObject.SetActive(false);
 
         // Fade to black
-        Debug.Log("Set blackscreennewGame.gameObject.SetActive");
+//         Debug.Log("Set blackscreennewGame.gameObject.SetActive");
         
 
         // Load scene

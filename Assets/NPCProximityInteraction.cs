@@ -92,7 +92,7 @@ public class NPCProximityInteraction : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("No TextMeshPro found in floating text prefab.");
+//             Debug.LogWarning("No TextMeshPro found in floating text prefab.");
         }
     }
 

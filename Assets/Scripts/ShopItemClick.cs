@@ -34,11 +34,11 @@ public class ShopItemClick : MonoBehaviour
             CurrencyManager.Instance.CurrentMoney -= item.cost;  // Oduzmi novac
             InventoryManager inventoryManager = FindObjectOfType<InventoryManager>();  // Pronađi instancu InventoryManager
             inventoryManager.AddItem(item.itemToGive);  // Dodaj item u inventar
-            Debug.Log("Item kupljen: " + item.itemToGive.name);
+//             Debug.Log("Item kupljen: " + item.itemToGive.name);
         }
         else
         {
-            Debug.Log("Nemate dovoljno novca za kupovinu ovog itema.");
+//             Debug.Log("Nemate dovoljno novca za kupovinu ovog itema.");
         }
     }
 

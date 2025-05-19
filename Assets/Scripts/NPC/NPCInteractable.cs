@@ -30,7 +30,7 @@ public class NPCInteractable : MonoBehaviour
     private void StartDialog()
     {
         dialogStarted = true;
-        Debug.Log($"Talking to {npcName}");
+//         Debug.Log($"Talking to {npcName}");
 
         dialogSystem.dialogLines = dialogLines;
         dialogSystem.enabled = true; // osiguraj da je komponenta aktivna

@@ -43,7 +43,7 @@ public class MoneyPopup : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Popup text is not assigned!");
+//             Debug.LogError("Popup text is not assigned!");
         }
     }
 
@@ -61,7 +61,7 @@ public class MoneyPopup : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("AudioPlayer GameObject nije pronađen u sceni za error SFX!");
+//             Debug.LogWarning("AudioPlayer GameObject nije pronađen u sceni za error SFX!");
         }
     }
 

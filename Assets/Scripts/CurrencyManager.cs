@@ -26,7 +26,7 @@ public class CurrencyManager : MonoBehaviour
     public void AddMoney(int amount)
     {
         CurrentMoney += amount;
-        Debug.Log("Dodano novca: " + amount + " | Trenutno: " + CurrentMoney);
+//         Debug.Log("Dodano novca: " + amount + " | Trenutno: " + CurrentMoney);
         SetMoneyText(); 
     }
     
@@ -43,14 +43,14 @@ public class CurrencyManager : MonoBehaviour
         if (CurrentMoney >= amount)
         {
             CurrentMoney -= amount;
-            Debug.Log("Potrošeno: " + amount + " | Preostalo: " + CurrentMoney);
+//             Debug.Log("Potrošeno: " + amount + " | Preostalo: " + CurrentMoney);
             if(achievementsController != null)
                 achievementsController.SpendMoney += amount;
             return true;
         }
         else
         {
-            Debug.Log("Nema dovoljno novca!");
+//             Debug.Log("Nema dovoljno novca!");
             return false;
         }
     }

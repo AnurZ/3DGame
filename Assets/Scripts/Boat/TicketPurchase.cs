@@ -17,7 +17,7 @@ public class TicketPurchase : MonoBehaviour
             else
             {
                 // Ako nema dovoljno novca, prikaži obavijest
-                Debug.Log("Nemate dovoljno novca za tiket!");
+//                 Debug.Log("Nemate dovoljno novca za tiket!");
             }
         }
     }

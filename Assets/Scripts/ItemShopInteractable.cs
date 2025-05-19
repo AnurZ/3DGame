@@ -72,7 +72,7 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
         }
         else
         {
-            Debug.LogWarning("AudioPlayer GameObject nije pronađen u sceni!");
+//             Debug.LogWarning("AudioPlayer GameObject nije pronađen u sceni!");
         }
 
         
@@ -109,7 +109,7 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
         }
         else
         {
-            Debug.LogWarning("pricePopupPrefab is not assigned in the Inspector.");
+//             Debug.LogWarning("pricePopupPrefab is not assigned in the Inspector.");
         }
     }
 
@@ -147,7 +147,7 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
         // If not a potion and already owned, prevent purchase
         if (!isPotion && InventoryManager.Instance.HasItem(itemToGive))
         {
-            Debug.Log("Već posjeduješ ovaj item!");
+//             Debug.Log("Već posjeduješ ovaj item!");
             var playerObj = GameObject.FindWithTag("AudioPlayer") ?? GameObject.Find("AudioPlayer");
             if (playerObj != null && buySoundClip != null)
             {
@@ -158,7 +158,7 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
         }
         if (InventoryManager.Instance.IsFull())
         {
-            Debug.Log("Inventory je pun! Ne možeš kupiti više itema.");
+//             Debug.Log("Inventory je pun! Ne možeš kupiti više itema.");
             var playerObj = GameObject.FindWithTag("AudioPlayer") ?? GameObject.Find("AudioPlayer");
             if (playerObj != null && noMoneyClip != null)
             {
@@ -172,7 +172,7 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
         {
             
             InventoryManager.Instance.AddItem(itemToGive);
-            Debug.Log($"Kupio si {itemToGive.name}!");
+//             Debug.Log($"Kupio si {itemToGive.name}!");
             MoneyPopupManager.Instance.ShowPopup(-cost, Input.mousePosition);
 
             var playerObj = GameObject.FindWithTag("AudioPlayer") ?? GameObject.Find("AudioPlayer");
@@ -196,7 +196,7 @@ public class ItemShopInteractable : MonoBehaviour, IShopInteractable
                 var sfxSource = playerObj.GetComponent<AudioSource>();
                 sfxSource?.PlayOneShot(noMoneyClip);
             }
-            Debug.Log("Nemaš dovoljno novca.");
+//             Debug.Log("Nemaš dovoljno novca.");
         }
     }
 

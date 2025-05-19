@@ -20,13 +20,13 @@ public class MoneyPopupManager : MonoBehaviour
     {
         if (moneyPopupPrefab == null)
         {
-            Debug.LogWarning("MoneyPopup Prefab nije postavljen!");
+//             Debug.LogWarning("MoneyPopup Prefab nije postavljen!");
             return;
         }
 
         if (amount == 0)
         {
-            Debug.LogWarning("Popup za 0 amount ne treba da se prikazuje!");
+//             Debug.LogWarning("Popup za 0 amount ne treba da se prikazuje!");
             return;
         }
 

@@ -116,7 +116,7 @@ public class TreeController : MonoBehaviour
     {
         if (isChopping)
         {
-            Debug.Log("Chopping time: " + choppingTime);
+//             Debug.Log("Chopping time: " + choppingTime);
             choppingTime += Time.deltaTime;
             playerController.TimeLeftText.text = (choppingDuration - choppingTime).ToString("F1");
             
@@ -139,7 +139,7 @@ public class TreeController : MonoBehaviour
 
                 if (Input.GetKeyDown(KeyCode.F) && cooldownTimer <= 0)
                 {
-                    Debug.Log(randomZ + " -- " + fillAmount*360 + " -- " + (randomZ+36));
+//                     Debug.Log(randomZ + " -- " + fillAmount*360 + " -- " + (randomZ+36));
                     if(fillAmount*(-360) <= randomZ && fillAmount*(-360) >= randomZ - 36)
                     {
                         choppingTime += 1;
@@ -204,14 +204,14 @@ public class TreeController : MonoBehaviour
         {
             Vector3 dropPosition = new Vector3(transform.position.x, 0.75f, transform.position.z);
             Instantiate(dropPrefab, dropPosition, Quaternion.identity);
-            Debug.Log("Log prefab dropped!");
+//             Debug.Log("Log prefab dropped!");
 
             // 5% chance to drop the bonus prefab
             if (bonusDropPrefab != null && Random.value <= 1f)
             {
                 Vector3 bonusDropPosition = new Vector3(transform.position.x + 1f, 0.75f, transform.position.z); // Offset a bit
                 Instantiate(bonusDropPrefab, bonusDropPosition, Quaternion.identity);
-                Debug.Log("Bonus prefab dropped!");
+//                 Debug.Log("Bonus prefab dropped!");
             }
 
             hasDroppedPrefab = true;

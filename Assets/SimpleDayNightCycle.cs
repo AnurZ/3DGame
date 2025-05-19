@@ -378,7 +378,7 @@ public class SimpleDayNightCycle : MonoBehaviour
     void UpdateDayText()
     {
         dayText.text = "Day: " + currentDay.ToString();
-        Debug.Log("Novi dan");
+//         Debug.Log("Novi dan");
         
         
         //currentDay++;

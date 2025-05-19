@@ -9,13 +9,13 @@ public class NewGameInventoryManager : MonoBehaviour
     {
         if (SaveManager.IsNewGame)
         {
-            Debug.Log("✅ Default inventar kreiran nakon učitavanja nove scene.");
+//             Debug.Log("✅ Default inventar kreiran nakon učitavanja nove scene.");
             CreateDefaultInventory();
             SaveManager.IsNewGame = false;
         }
         else
         {
-            Debug.Log("📦 Loadani podaci iz save-a.");
+//             Debug.Log("📦 Loadani podaci iz save-a.");
             SceneManager.sceneLoaded += OnSceneLoaded; // Registriraj za logiranje nakon učitavanja scene
         }
     }
@@ -23,7 +23,7 @@ public class NewGameInventoryManager : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         // Ovdje se logira samo kada je scena učitana
-        Debug.Log("📦 Loadani podaci iz save-a.");
+//         Debug.Log("📦 Loadani podaci iz save-a.");
         SceneManager.sceneLoaded -= OnSceneLoaded; // Odjava od eventa
 
         
@@ -33,7 +33,7 @@ public class NewGameInventoryManager : MonoBehaviour
     {
         if (InventoryManager.Instance == null)
         {
-            Debug.LogWarning("⚠️ InventoryManager nije inicijaliziran!");
+//             Debug.LogWarning("⚠️ InventoryManager nije inicijaliziran!");
             return;
         }
 
@@ -63,7 +63,7 @@ public class NewGameInventoryManager : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning($"Default item '{defaultItemNames[i]}' nije pronađen u Resources/Items/");
+//                 Debug.LogWarning($"Default item '{defaultItemNames[i]}' nije pronađen u Resources/Items/");
             }
         }
 

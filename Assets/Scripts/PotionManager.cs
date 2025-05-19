@@ -132,7 +132,7 @@ public class PotionManager : MonoBehaviour
                     break;
 
                 default:
-                    Debug.Log("Unknown potion type.");
+//                     Debug.Log("Unknown potion type.");
                     break;
             }
             
@@ -156,7 +156,7 @@ public class PotionManager : MonoBehaviour
         {
             playerController.currentInjury = PlayerController.InjuryStatus.Moderate;
             playerController.UpdateInjuryStateText();
-            Debug.Log("Potion has no effect on severe injuries.");
+//             Debug.Log("Potion has no effect on severe injuries.");
         }
         else if (playerController.currentInjury == PlayerController.InjuryStatus.Minor)
         {
@@ -165,7 +165,7 @@ public class PotionManager : MonoBehaviour
             playerController.daysToRecover = 0; // Instant recovery
             playerController.UpdateInjuryStateText();
             achievementsController.HealFromInjury = 1;
-            Debug.Log("Potion healed minor injury.");
+//             Debug.Log("Potion healed minor injury.");
         }
         else if (playerController.currentInjury == PlayerController.InjuryStatus.Moderate)
         {

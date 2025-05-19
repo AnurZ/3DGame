@@ -93,7 +93,7 @@ public class PlayerController : MonoBehaviour
         if (currentInjury != InjuryStatus.Healthy)
         {
             daysToRecover--;
-            Debug.Log("daysToRecover" + daysToRecover);
+//             Debug.Log("daysToRecover" + daysToRecover);
             if (daysToRecover <= 0)
             {
                 currentInjury = InjuryStatus.Healthy;
@@ -116,7 +116,7 @@ public class PlayerController : MonoBehaviour
             walkingSource.Stop();
 
         
-        Debug.Log("Entered shop.");
+//         Debug.Log("Entered shop.");
     }
 
     public void ExitShop()
@@ -217,7 +217,7 @@ public class PlayerController : MonoBehaviour
         if (nearbyTree == null) return;
         if (currentInjury == InjuryStatus.Severe)
         {
-            Debug.Log("Cannot chop while severely injured!");
+//             Debug.Log("Cannot chop while severely injured!");
             return;
         }
         
@@ -254,7 +254,7 @@ public class PlayerController : MonoBehaviour
             chopInjuryChance.moderateChance *= 0.9f;
             chopInjuryChance.severeChance *= 0.9f;
         }
-        Debug.Log($"Injury chance at chop start: Minor {chopInjuryChance.minorChance * 100}% | Moderate {chopInjuryChance.moderateChance * 100}% | Severe {chopInjuryChance.severeChance * 100}%");
+//         Debug.Log($"Injury chance at chop start: Minor {chopInjuryChance.minorChance * 100}% | Moderate {chopInjuryChance.moderateChance * 100}% | Severe {chopInjuryChance.severeChance * 100}%");
         
 
         float baseChopTime = nearbyTree.choppingDuration;
@@ -323,14 +323,14 @@ public class PlayerController : MonoBehaviour
 
     public void OnTreeChoppedDown()
     {
-        Debug.Log($"Ukupni chance {injuryRisk} Injury chance at chop start: Minor {chopInjuryChance.minorChance * 100}% | Moderate {chopInjuryChance.moderateChance * 100}% | Severe {chopInjuryChance.severeChance * 100}%");
+//         Debug.Log($"Ukupni chance {injuryRisk} Injury chance at chop start: Minor {chopInjuryChance.minorChance * 100}% | Moderate {chopInjuryChance.moderateChance * 100}% | Severe {chopInjuryChance.severeChance * 100}%");
         TryApplyInjury();
     }
 
     private void TryApplyInjury()
     {
         float roll = Random.value;
-        Debug.Log($"Injury Roll: {roll}");
+//         Debug.Log($"Injury Roll: {roll}");
         
         int recoveryDays = daysToRecover;
 
@@ -444,7 +444,7 @@ public class PlayerController : MonoBehaviour
                 staminaController.playerStamina += 5f;
                 staminaController.playerStamina = staminaController.playerStamina > 100 ? 100 : staminaController.playerStamina;
                 passiveStaminaTimer = 0f; // Reset timer
-                Debug.Log("Passive stamina regenerated +5 " + staminaController.playerStamina);
+//                 Debug.Log("Passive stamina regenerated +5 " + staminaController.playerStamina);
             }
         }
         else
@@ -492,7 +492,7 @@ public class PlayerController : MonoBehaviour
         {
             dayNightCycle.Sleep();
             FindAnyObjectByType<SaveManager>().SaveGame();
-            Debug.Log("SavedGame!");
+//             Debug.Log("SavedGame!");
             uiPanel.SetActive(false);
             interactionText.text = "";
         }
@@ -634,7 +634,7 @@ public class PlayerController : MonoBehaviour
             {
                 isInShop = false;
                 gameplayUI.SetActive(true);
-                Debug.Log("Exited shop.");
+//                 Debug.Log("Exited shop.");
             }
             
         }

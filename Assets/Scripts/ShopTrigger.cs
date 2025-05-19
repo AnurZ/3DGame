@@ -36,7 +36,7 @@
 
             if (playerInside && Input.GetKeyDown(KeyCode.Escape))
             {
-                Debug.Log("ESC pritisnut - pokušavam zoom u shop.");
+//                 Debug.Log("ESC pritisnut - pokušavam zoom u shop.");
                 zoomTransition.ZoomBackToPlayer();
                 if (PlayerController.Local != null)
                     PlayerController.Local.isInShop = false;
@@ -47,7 +47,7 @@
                 if (obj != null)
                 {
                     Destroy(obj);
-                    Debug.Log("Destroyed PricePopup!");
+//                     Debug.Log("Destroyed PricePopup!");
                 }
             }
         }
@@ -56,7 +56,7 @@
         {
             if (other.CompareTag("Player"))
             {
-                Debug.Log("Player je ušao u shop trigger.");
+//                 Debug.Log("Player je ušao u shop trigger.");
                 playerInside = true;
             }
         }

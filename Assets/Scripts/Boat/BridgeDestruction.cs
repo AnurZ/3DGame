@@ -15,7 +15,7 @@ public class BridgeDestruction : MonoBehaviour
     {
         if (other.CompareTag("Boat"))
         {
-            Debug.Log("Collsion with " + other.name);
+//             Debug.Log("Collsion with " + other.name);
             DestroyBridge();
         }
     }

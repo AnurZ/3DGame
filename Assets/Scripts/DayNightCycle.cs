@@ -57,7 +57,7 @@ public class DayNightCycle : MonoBehaviour
         {
             float timeRate = 1f / secondsInFullDay;
             cycleTime += timeRate * Time.deltaTime;
-            Debug.Log("cycle time:"  + cycleTime);
+//             Debug.Log("cycle time:"  + cycleTime);
             if (cycleTime >= 1f)
             {
                 cycleTime = 0f;
@@ -144,9 +144,9 @@ public class DayNightCycle : MonoBehaviour
     {
         dayCounter++;
         UpdateDayCounter();
-        Debug.Log("POTIONMANAGER: " + potionManager.ShieldPotionHours);
+//         Debug.Log("POTIONMANAGER: " + potionManager.ShieldPotionHours);
         PlayerPrefs.SetInt("CurrentDay", dayCounter);
-        Debug.Log("Novi dan");
+//         Debug.Log("Novi dan");
         if (playerInjurySystem != null)
             playerInjurySystem.OnDayPassed();
     }

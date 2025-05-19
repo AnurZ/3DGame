@@ -39,7 +39,7 @@ public class TreeSpawner : MonoBehaviour
         string path = Path.Combine(Application.persistentDataPath, "spawnedTrees.json");
         File.WriteAllText(path, json);
 
-        Debug.Log($"Saved {SpawnedTrees.Count} trees to {path}");
+//         Debug.Log($"Saved {SpawnedTrees.Count} trees to {path}");
     }
     
     public void Start()
@@ -58,11 +58,11 @@ public class TreeSpawner : MonoBehaviour
 
         if (treesToSpawn <= 0)
         {
-            Debug.Log("No need to spawn trees.");
+//             Debug.Log("No need to spawn trees.");
             return;
         }
 
-        Debug.Log($"Spawning {treesToSpawn} trees...");
+//         Debug.Log($"Spawning {treesToSpawn} trees...");
 
         int spawnedCount = 0;
         List<GameObject> newlySpawned = new List<GameObject>();
@@ -139,11 +139,11 @@ public class TreeSpawner : MonoBehaviour
 
             if (!treeSpawned)
             {
-                Debug.Log("CANT SPAWN THE TREE");
+//                 Debug.Log("CANT SPAWN THE TREE");
             }
         }
 
-        Debug.Log($"Spawn complete. Successfully spawned {spawnedCount} trees.");
+//         Debug.Log($"Spawn complete. Successfully spawned {spawnedCount} trees.");
     }
 
     public void LoadTrees()
@@ -152,7 +152,7 @@ public class TreeSpawner : MonoBehaviour
 
         if (!File.Exists(path))
         {
-            Debug.LogWarning("No saved trees file found at " + path);
+//             Debug.LogWarning("No saved trees file found at " + path);
             return;
         }
 
@@ -162,7 +162,7 @@ public class TreeSpawner : MonoBehaviour
         if (container != null && container.trees != null)
         {
             SpawnedTrees = container.trees;
-            Debug.Log($"Loaded {SpawnedTrees.Count} trees from {path}");
+//             Debug.Log($"Loaded {SpawnedTrees.Count} trees from {path}");
 
             // Instantiate all trees
             foreach (var tree in SpawnedTrees)
@@ -177,18 +177,18 @@ public class TreeSpawner : MonoBehaviour
                     }
                     else
                     {
-                        Debug.LogWarning($"Prefab at index {tree.treePrefabIndex} is null.");
+//                         Debug.LogWarning($"Prefab at index {tree.treePrefabIndex} is null.");
                     }
                 }
                 else
                 {
-                    Debug.LogWarning($"Invalid prefab index: {tree.treePrefabIndex}");
+//                     Debug.LogWarning($"Invalid prefab index: {tree.treePrefabIndex}");
                 }
             }
         }
         else
         {
-            Debug.LogWarning("Failed to load trees from JSON.");
+//             Debug.LogWarning("Failed to load trees from JSON.");
         }
     }
 
@@ -202,11 +202,11 @@ public class TreeSpawner : MonoBehaviour
         if (treeToRemove != null)
         {
             SpawnedTrees.Remove(treeToRemove);
-            Debug.Log($"Removed tree at position {position} from SpawnedTrees." + $"{SpawnedTrees.Count}");
+//             Debug.Log($"Removed tree at position {position} from SpawnedTrees." + $"{SpawnedTrees.Count}");
         }
         else
         {
-            Debug.LogWarning($"No tree found at position {position} in SpawnedTrees.");
+//             Debug.LogWarning($"No tree found at position {position} in SpawnedTrees.");
         }
     }
 

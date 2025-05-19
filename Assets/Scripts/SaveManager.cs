@@ -55,8 +55,8 @@ public class SaveManager : MonoBehaviour
         yield return null;  
         if (!IsNewGame)
             LoadGame();
-        else
-            Debug.Log("🟡 Novi game – preskačem LoadGame()");
+       // else
+//             Debug.Log("🟡 Novi game – preskačem LoadGame()");
     }
 
     private void Update()
@@ -106,7 +106,7 @@ public class SaveManager : MonoBehaviour
         
         if (player == null || currencyManager == null || InventoryManager.Instance == null)
         {
-            Debug.LogWarning("SaveManager: nedostaju reference!");
+//             Debug.LogWarning("SaveManager: nedostaju reference!");
             return;
         }
         
@@ -125,9 +125,9 @@ public class SaveManager : MonoBehaviour
         };
         
         // debug start
-        Debug.Log($"[LoadGame DEBUG] player={(player==null?"NULL":"OK")}, currencyManager={(currencyManager==null?"NULL":"OK")}");
-        Debug.Log($"[LoadGame DEBUG] InventoryManager.Instance={(InventoryManager.Instance==null?"NULL":"OK")}, slots count={(InventoryManager.Instance?.inventorySlots?.Length.ToString() ?? "N/A")}");
-        Debug.Log($"[LoadGame DEBUG] upgradesManager={(upgradesManager==null?"NULL":"OK")}, upMgr.playerController={(upgradesManager?.playerController==null?"NULL":"OK")}, upMgr.staminaController={(upgradesManager?.staminaController==null?"NULL":"OK")}, upMgr.potionManager={(upgradesManager?.potionManager==null?"NULL":"OK")}");
+//         Debug.Log($"[LoadGame DEBUG] player={(player==null?"NULL":"OK")}, currencyManager={(currencyManager==null?"NULL":"OK")}");
+//         Debug.Log($"[LoadGame DEBUG] InventoryManager.Instance={(InventoryManager.Instance==null?"NULL":"OK")}, slots count={(InventoryManager.Instance?.inventorySlots?.Length.ToString() ?? "N/A")}");
+//         Debug.Log($"[LoadGame DEBUG] upgradesManager={(upgradesManager==null?"NULL":"OK")}, upMgr.playerController={(upgradesManager?.playerController==null?"NULL":"OK")}, upMgr.staminaController={(upgradesManager?.staminaController==null?"NULL":"OK")}, upMgr.potionManager={(upgradesManager?.potionManager==null?"NULL":"OK")}");
 
         data.shieldPotionHours = potionManager.ShieldPotionHours;
         data.focusPotionHours = potionManager.FocusPotionHours;
@@ -168,16 +168,16 @@ public class SaveManager : MonoBehaviour
         data.choppingStaminaUpgrade    = upgradesManager.hasChoppingStamina;
 
         // Debug prije pisanja:
-        Debug.Log($"[SaveManager] sprema upgradeove → " +
-                  $"staminaRegen={data.staminaRegenUpgrade}, speed={data.speedUpgrade}, " +
-                  $"injury={data.injuryShieldUpgrade}, severe={data.severeInjuryShieldUpgrade}, " +
-                  $"potion={data.potionEffectUpgrade}, chopSpeed={data.choppingSpeedUpgrade}, " +
-                  $"chopStam={data.choppingStaminaUpgrade}");
+//         Debug.Log($"[SaveManager] sprema upgradeove → " +
+                 // $"staminaRegen={data.staminaRegenUpgrade}, speed={data.speedUpgrade}, " +
+                 // $"injury={data.injuryShieldUpgrade}, severe={data.severeInjuryShieldUpgrade}, " +
+                 // $"potion={data.potionEffectUpgrade}, chopSpeed={data.choppingSpeedUpgrade}, " +
+                 // $"chopStam={data.choppingStaminaUpgrade}");
         
         // Zapiši JSON
         string json = JsonUtility.ToJson(data, true);
         File.WriteAllText(_path, json);
-        Debug.Log($"SaveManager: sačuvano → {_path}\n{json}");
+//         Debug.Log($"SaveManager: sačuvano → {_path}\n{json}");
 
         // Ažuriraj praćene vrijednosti
         previousMoney          = currencyManager.CurrentMoney;
@@ -186,7 +186,7 @@ public class SaveManager : MonoBehaviour
         previousUpgrades       = ups;
         
         treeSpawner.SaveSpawnedTrees();
-        Debug.Log("Trees saved!");
+//         Debug.Log("Trees saved!");
     }
 
     private bool HasGameStateChanged()
@@ -227,24 +227,24 @@ public class SaveManager : MonoBehaviour
             player.transform.position = new Vector3(70f, 0f, 185f); // <-- PROMIJENI AKO IMAŠ KONKRETNU LOKACIJU
             player.transform.eulerAngles = Vector3.zero;
             
-            Debug.Log("🟢 Postavljena početna pozicija igrača za novu igru.");
+//             Debug.Log("🟢 Postavljena početna pozicija igrača za novu igru.");
         }
         else
         {
-            Debug.LogWarning("⚠️ Igrač nije pronađen prilikom postavljanja pozicije!");
+//             Debug.LogWarning("⚠️ Igrač nije pronađen prilikom postavljanja pozicije!");
         }
 
         return;
     }
     if (!File.Exists(_path))
     {
-        Debug.LogWarning($"SaveManager: nema save file na {_path}");
+//         Debug.LogWarning($"SaveManager: nema save file na {_path}");
         FindObjectOfType<NewGameInventoryManager>()?.CreateDefaultInventory();
         string treePath = Path.Combine(Application.persistentDataPath, "spawnedTrees.json");
         if (File.Exists(treePath))
         {
             File.Delete(treePath);
-            Debug.Log("🟠 Obrisan stari fajl sa drvećem – nova igra počinje svježe.");
+//             Debug.Log("🟠 Obrisan stari fajl sa drvećem – nova igra počinje svježe.");
         }
         TreeSpawner TreeSpawner = FindObjectOfType<TreeSpawner>();
         TreeSpawner.SpawnTrees();
@@ -254,7 +254,7 @@ public class SaveManager : MonoBehaviour
     isLoading = true;
     var json = File.ReadAllText(_path);
     var data = JsonUtility.FromJson<PlayerSaveData>(json);
-    Debug.Log($"SaveManager: učitano →\n{json}");
+//     Debug.Log($"SaveManager: učitano →\n{json}");
 
     // 1) Player
     if (player != null)

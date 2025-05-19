@@ -22,7 +22,7 @@ public class InventorySlot : MonoBehaviour, IDropHandler
         }
         else
         {
-            Debug.LogWarning($"Image reference is missing on {gameObject.name}");
+//             Debug.LogWarning($"Image reference is missing on {gameObject.name}");
         }
     }
 
@@ -34,7 +34,7 @@ public class InventorySlot : MonoBehaviour, IDropHandler
         }
         else
         {
-            Debug.LogWarning($"Image reference is missing on {gameObject.name}");
+//             Debug.LogWarning($"Image reference is missing on {gameObject.name}");
         }
     }
 
